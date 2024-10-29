@@ -1,0 +1,4 @@
+#Minishell
+##Group:
+- Bruno
+- Tiago

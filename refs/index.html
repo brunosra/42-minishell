@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minishell Functions Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f9;
+            color: #333;
+            padding: 20px;
+        }
+        h2 {
+            color: #1e90ff;
+            cursor: pointer;
+        }
+        h3 {
+            color: #ff6347;
+        }
+        p {
+            margin: 5px 0;
+        }
+        code {
+            background-color: #f5f5f5;
+            padding: 2px 4px;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+        .function-block {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: none; /* Initially hide the details */
+        }
+        .collapse-button {
+            background-color: #1e90ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Minishell Functions Documentation</h1>
+
+    <div>
+        <h2 onclick="toggleFunctionBlock(1)">1. <code>readline</code> (GNU Readline library)</h2>
+        <div id="function-1" class="function-block">
+            <h3>Description:</h3>
+            <p>Reads a line of input from the user, providing line-editing features and history support.</p>
+            <h3>Returns:</h3>
+            <p>A dynamically allocated string containing the user input, or <code>NULL</code> on EOF (e.g., <code>Ctrl+D</code>).</p>
+            <h3>Usage:</h3>
+            <p><code>char *readline(const char *prompt);</code></p>
+        </div>
+    </div>
+
+    <div>
+        <h2 onclick="toggleFunctionBlock(2)">2. <code>rl_clear_history</code> (GNU Readline library)</h2>
+        <div id="function-2" class="function-block">
+            <h3>Description:</h3>
+            <p>Clears the history of commands saved by <code>add_history</code>.</p>
+            <h3>Returns:</h3>
+            <p><code>void</code></p>
+            <h3>Usage:</h3>
+            <p><code>void rl_clear_history(void);</code></p>
+        </div>
+    </div>
+
+    <div>
+        <h2 onclick="toggleFunctionBlock(3)">3. <code>rl_on_new_line</code> (GNU Readline library)</h2>
+        <div id="function-3" class="function-block">
+            <h3>Description:</h3>
+            <p>Informs Readline that a new line has started, often used after a signal interrupt.</p>
+            <h3>Returns:</h3>
+            <p><code>0</code> if successful, <code>-1</code> on failure.</p>
+            <h3>Usage:</h3>
+            <p><code>int rl_on_new_line(void);</code></p>
+        </div>
+    </div>
+
+    <div>
+        <h2 onclick="toggleFunctionBlock(4)">4. <code>rl_replace_line</code> (GNU Readline library)</h2>
+        <div id="function-4" class="function-block">
+            <h3>Description:</h3>
+            <p>Replaces the current contents of the input line with a new string.</p>
+            <h3>Returns:</h3>
+            <p><code>void</code></p>
+            <h3>Usage:</h3>
+            <p><code>void rl_replace_line(const char *text, int clear_undo);</code></p>
+        </div>
+    </div>
+
+    <div>
+        <h2 onclick="toggleFunctionBlock(5)">5. <code>rl_redisplay</code> (GNU Readline library)</h2>
+        <div id="function-5" class="function-block">
+            <h3>Description:</h3>
+            <p>Redisplays the current line after modifications (e.g., after calling <code>rl_replace_line</code>).</p>
+            <h3>Returns:</h3>
+            <p><code>void</code></p>
+            <h3>Usage:</h3>
+            <p><code>void rl_redisplay(void);</code></p>
+        </div>
+    </div>
+
+    <div>
+        <h2 onclick="toggleFunctionBlock(6)">6. <code>add_history</code> (GNU Readline library)</h2>
+        <div id="function-6" class="function-block">
+            <h3>Description:</h3>
+            <p>Adds a line of input to the command history for future recall with arrow keys.</p>
+            <h3>Returns:</h3>
+            <p><code>void</code></p>
+            <h3>Usage:</h3>
+            <p><code>void add_history(const char *line);</code></p>
+        </div>
+    </div>
+
+    <div>
+        <h2 onclick="toggleFunctionBlock(7)">7. <code>printf</code> (Standard Library)</h2>
+        <div id="function-7" class="function-block">
+            <h3>Description:</h3>
+            <p>Formats and prints a string to the standard output.</p>
+            <h3>Returns:</h3>
+            <p>The number of characters printed (excluding the null byte), or a negative value on error.</p>
+            <h3>Usage:</h3>
+            <p><code>int printf(const char *format, ...);</code></p>
+        </div>
+    </div>
+
+    <div>
+        <h2 onclick="toggleFunctionBlock(8)">8. <code>malloc</code> (Standard Library)</h2>
+        <div id="function-8" class="function-block">
+            <h3>Description:</h3>
+            <p>Allocates a specified number of bytes of memory.</p>
+            <h3>Returns:</h3>
+            <p>A pointer to the allocated memory, or <code>NULL</code> if allocation fails.</p>
+            <h3>Usage:</h3>
+            <p><code>void *malloc(size_t size);</code></p>
+        </div>
+    </div>
+
+    <div>
+        <h2 onclick="toggleFunctionBlock(9)">9. <code>free</code> (Standard Library)</h2>
+        <div id="function-9" class="function-block">
+            <h3>Description:</h3>
+            <p>Frees previously allocated memory.</p>
+            <h3>Returns:</h3>
+            <p><code>void</code></p>
+            <h3>Usage:</h3>
+            <p><code>void free(void *ptr);</code></p>
+        </div>
+    </div>
+
+    <div>
+        <h2 onclick="toggleFunctionBlock(10)">10. <code>write</code> (System Call)</h2>
+        <div id="function-10" class="function-block">
+            <h3>Description:</h3>
+            <p>Writes data to a file descriptor (e.g., stdout, a file, or a pipe).</p>
+            <h3>Returns:</h3>
+            <p>The number of bytes written, or <code>-1</code> on error.</p>
+            <h3>Usage:</h3>
+            <p><code>ssize_t write(int fd, const void *buf, size_t count);</code></p>
+        </div>
+    </div>
+
+	<div>
+		<h2 onclick="toggleFunctionBlock(11)">11. <code>access</code> (System Call)</h2>
+		<div id="function-11" class="function-block">
+			<h3>Description:</h3>
+			<p>Checks the calling process's ability to access a file. It can verify the existence, read, write, or execute permissions.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>0</code> on success, or <code>-1</code> on error (with <code>errno</code> set to indicate the error).</p>
+			<h3>Usage:</h3>
+			<p><code>int access(const char *pathname, int mode);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(12)">12. <code>open</code> (System Call)</h2>
+		<div id="function-12" class="function-block">
+			<h3>Description:</h3>
+			<p>Opens a file and returns a file descriptor. It can also create a new file.</p>
+			<h3>Returns:</h3>
+			<p>Returns the file descriptor on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int open(const char *pathname, int flags, mode_t mode);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(13)">13. <code>read</code> (System Call)</h2>
+		<div id="function-13" class="function-block">
+			<h3>Description:</h3>
+			<p>Reads data from a file descriptor into a buffer.</p>
+			<h3>Returns:</h3>
+			<p>The number of bytes read, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>ssize_t read(int fd, void *buf, size_t count);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(14)">14. <code>close</code> (System Call)</h2>
+		<div id="function-14" class="function-block">
+			<h3>Description:</h3>
+			<p>Closes a file descriptor, so that it no longer refers to any file and may be reused.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>0</code> on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int close(int fd);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(15)">15. <code>fork</code> (System Call)</h2>
+		<div id="function-15" class="function-block">
+			<h3>Description:</h3>
+			<p>Creates a new process by duplicating the calling process. The new process is referred to as the child process.</p>
+			<h3>Returns:</h3>
+			<p>The process ID (PID) of the child process to the parent process, <code>0</code> to the child process, or <code>-1</code</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>pid_t fork(void);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(16)">16. <code>wait</code> (System Call)</h2>
+		<div id="function-16" class="function-block">
+			<h3>Description:</h3>
+			<p>Suspends execution of the calling process until one of its children terminates.</p>
+			<h3>Returns:</h3>
+			<p>The PID of the child that terminated, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>pid_t wait(int *status);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(17)">17. <code>waitpid</code> (System Call)</h2>
+		<div id="function-17" class="function-block">
+			<h3>Description:</h3>
+			<p>Waits for a specific child process to change state.</p>
+			<h3>Returns:</h3>
+			<p>The PID of the child that terminated, <code>0</code> if <code>WNOHANG</code> is specified and no child has exited, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>pid_t waitpid(pid_t pid, int *status, int options);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(18)">18. <code>wait3</code> (System Call)</h2>
+		<div id="function-18" class="function-block">
+			<h3>Description:</h3>
+			<p>Similar to <code>wait</code>, but also returns resource usage information for the child process.</p>
+			<h3>Returns:</h3>
+			<p>The PID of the child that terminated, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>pid_t wait3(int *status, int options, struct rusage *rusage);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(19)">19. <code>wait4</code> (System Call)</h2>
+		<div id="function-19" class="function-block">
+			<h3>Description:</h3>
+			<p>Similar to <code>waitpid</code>, but also returns resource usage information for the child process.</p>
+			<h3>Returns:</h3>
+			<p>The PID of the child that terminated, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>pid_t wait4(pid_t pid, int *status, int options, struct rusage *rusage);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(20)">20. <code>signal</code> (System Call)</h2>
+		<div id="function-20" class="function-block">
+			<h3>Description:</h3>
+			<p>Sets a signal handler for the specified signal.</p>
+			<h3>Returns:</h3>
+			<p>The previous value of the signal handler, or <code>SIG_ERR</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>void (*signal(int signum, void (*handler)(int)))(int);</code></p>
+		</div>
+	</div>
+	<div>
+		<h2 onclick="toggleFunctionBlock(21)">21. <code>sigaction</code> (Signal Handling)</h2>
+		<div id="function-21" class="function-block">
+			<h3>Description:</h3>
+			<p>Examines and changes the action taken by a process on receipt of a specific signal.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>0</code> on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(22)">22. <code>sigemptyset</code> (Signal Handling)</h2>
+		<div id="function-22" class="function-block">
+			<h3>Description:</h3>
+			<p>Initializes the signal set to exclude all signals.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>0</code> on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int sigemptyset(sigset_t *set);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(23)">23. <code>sigaddset</code> (Signal Handling)</h2>
+		<div id="function-23" class="function-block">
+			<h3>Description:</h3>
+			<p>Adds a specific signal to a signal set.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>0</code> on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int sigaddset(sigset_t *set, int signum);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(24)">24. <code>kill</code> (Signal Handling)</h2>
+		<div id="function-24" class="function-block">
+			<h3>Description:</h3>
+			<p>Sends a specified signal to a specified process.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>0</code> on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int kill(pid_t pid, int sig);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(25)">25. <code>exit</code> (Standard Library)</h2>
+		<div id="function-25" class="function-block">
+			<h3>Description:</h3>
+			<p>Terminates the calling process and returns a status code to the operating system.</p>
+			<h3>Returns:</h3>
+			<p>This function does not return; the process is terminated.</p>
+			<h3>Usage:</h3>
+			<p><code>void exit(int status);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(26)">26. <code>getcwd</code> (Standard Library)</h2>
+		<div id="function-26" class="function-block">
+			<h3>Description:</h3>
+			<p>Gets the current working directory.</p>
+			<h3>Returns:</h3>
+			<p>A pointer to the current working directory string on success, or <code>NULL</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>char *getcwd(char *buf, size_t size);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(27)">27. <code>chdir</code> (Standard Library)</h2>
+		<div id="function-27" class="function-block">
+			<h3>Description:</h3>
+			<p>Changes the current working directory of the calling process to the specified path.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>0</code> on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int chdir(const char *path);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(28)">28. <code>stat</code> (File Information)</h2>
+		<div id="function-28" class="function-block">
+			<h3>Description:</h3>
+			<p>Retrieves information about a specified file.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>0</code> on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int stat(const char *path, struct stat *buf);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(29)">29. <code>lstat</code> (File Information)</h2>
+		<div id="function-29" class="function-block">
+			<h3>Description:</h3>
+			<p>Retrieves information about a specified file, without following symbolic links.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>0</code> on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int lstat(const char *path, struct stat *buf);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(30)">30. <code>fstat</code> (File Information)</h2>
+		<div id="function-30" class="function-block">
+			<h3>Description:</h3>
+			<p>Retrieves information about an open file referenced by the file descriptor.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>0</code> on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int fstat(int fd, struct stat *buf);</code></p>
+		</div>
+	</div>
+	<div>
+		<h2 onclick="toggleFunctionBlock(31)">31. <code>unlink</code> (File Operations)</h2>
+		<div id="function-31" class="function-block">
+			<h3>Description:</h3>
+			<p>Removes a link to a file, effectively deleting the file if it has no more links.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>0</code> on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int unlink(const char *pathname);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(32)">32. <code>execve</code> (Process Execution)</h2>
+		<div id="function-32" class="function-block">
+			<h3>Description:</h3>
+			<p>Executes the program pointed to by a file descriptor, replacing the current process image.</p>
+			<h3>Returns:</h3>
+			<p>This function does not return on success; on error, it returns <code>-1</code>.</p>
+			<h3>Usage:</h3>
+			<p><code>int execve(const char *pathname, char *const argv[], char *const envp[]);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(33)">33. <code>dup</code> (File Operations)</h2>
+		<div id="function-33" class="function-block">
+			<h3>Description:</h3>
+			<p>Duplicates a file descriptor, returning a new file descriptor that refers to the same open file description.</p>
+			<h3>Returns:</h3>
+			<p>Returns the new file descriptor on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int dup(int oldfd);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(34)">34. <code>dup2</code> (File Operations)</h2>
+		<div id="function-34" class="function-block">
+			<h3>Description:</h3>
+			<p>Duplicates a file descriptor to a specified value.</p>
+			<h3>Returns:</h3>
+			<p>Returns the new file descriptor on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int dup2(int oldfd, int newfd);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(35)">35. <code>pipe</code> (Interprocess Communication)</h2>
+		<div id="function-35" class="function-block">
+			<h3>Description:</h3>
+			<p>Creates a pair of connected file descriptors for interprocess communication.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>0</code> on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int pipe(int pipefd[2]);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(36)">36. <code>opendir</code> (Directory Operations)</h2>
+		<div id="function-36" class="function-block">
+			<h3>Description:</h3>
+			<p>Opens a directory stream corresponding to the directory name.</p>
+			<h3>Returns:</h3>
+			<p>Returns a pointer to the directory stream on success, or <code>NULL</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>DIR *opendir(const char *name);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(37)">37. <code>readdir</code> (Directory Operations)</h2>
+		<div id="function-37" class="function-block">
+			<h3>Description:</h3>
+			<p>Reads the next entry from a directory stream.</p>
+			<h3>Returns:</h3>
+			<p>Returns a pointer to the next <code>struct dirent</code> on success, or <code>NULL</code> on error or end of directory.</p>
+			<h3>Usage:</h3>
+			<p><code>struct dirent *readdir(DIR *dirp);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(38)">38. <code>closedir</code> (Directory Operations)</h2>
+		<div id="function-38" class="function-block">
+			<h3>Description:</h3>
+			<p>Closes a directory stream.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>0</code> on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int closedir(DIR *dirp);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(39)">39. <code>strerror</code> (String Operations)</h2>
+		<div id="function-39" class="function-block">
+			<h3>Description:</h3>
+			<p>Returns a pointer to the textual representation of the current errno value.</p>
+			<h3>Returns:</h3>
+			<p>Returns a pointer to the error string.</p>
+			<h3>Usage:</h3>
+			<p><code>char *strerror(int errnum);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(40)">40. <code>perror</code> (Error Handling)</h2>
+		<div id="function-40" class="function-block">
+			<h3>Description:</h3>
+			<p>Prints a description for the last error that occurred, as indicated by <code>errno</code>.</p>
+			<h3>Returns:</h3>
+			<p>This function does not return a value.</p>
+			<h3>Usage:</h3>
+			<p><code>void perror(const char *s);</code></p>
+		</div>
+	</div>
+	<div>
+		<h2 onclick="toggleFunctionBlock(41)">41. <code>isatty</code> (Terminal Operations)</h2>
+		<div id="function-41" class="function-block">
+			<h3>Description:</h3>
+			<p>Tests whether a file descriptor refers to a terminal.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>1</code> if the file descriptor refers to a terminal, <code>0</code> otherwise, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int isatty(int fd);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(42)">42. <code>ttyname</code> (Terminal Operations)</h2>
+		<div id="function-42" class="function-block">
+			<h3>Description:</h3>
+			<p>Returns the name of the terminal associated with the specified file descriptor.</p>
+			<h3>Returns:</h3>
+			<p>Returns a pointer to the terminal name on success, or <code>NULL</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>char *ttyname(int fd);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(43)">43. <code>ttyslot</code> (Terminal Operations)</h2>
+		<div id="function-43" class="function-block">
+			<h3>Description:</h3>
+			<p>Returns the slot number of the terminal associated with the calling process.</p>
+			<h3>Returns:</h3>
+			<p>Returns the terminal slot number or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int ttyslot(void);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(44)">44. <code>ioctl</code> (Device Control)</h2>
+		<div id="function-44" class="function-block">
+			<h3>Description:</h3>
+			<p>Performs device-specific input/output operations on file descriptors.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>0</code> on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int ioctl(int fd, unsigned long request, ...);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(45)">45. <code>getenv</code> (Environment Variables)</h2>
+		<div id="function-45" class="function-block">
+			<h3>Description:</h3>
+			<p>Retrieves the value of an environment variable.</p>
+			<h3>Returns:</h3>
+			<p>Returns a pointer to the value string, or <code>NULL</code> if the variable is not found.</p>
+			<h3>Usage:</h3>
+			<p><code>char *getenv(const char *name);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(46)">46. <code>tcsetattr</code> (Terminal Control)</h2>
+		<div id="function-46" class="function-block">
+			<h3>Description:</h3>
+			<p>Sets the parameters associated with the terminal referenced by the file descriptor.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>0</code> on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int tcsetattr(int fd, int optional_actions, const struct termios *termios_p);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(47)">47. <code>tcgetattr</code> (Terminal Control)</h2>
+		<div id="function-47" class="function-block">
+			<h3>Description:</h3>
+			<p>Gets the parameters associated with the terminal referenced by the file descriptor.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>0</code> on success, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int tcgetattr(int fd, struct termios *termios_p);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(48)">48. <code>tgetent</code> (Terminal Capabilities)</h2>
+		<div id="function-48" class="function-block">
+			<h3>Description:</h3>
+			<p>Initializes the terminal capability data structures from the terminfo database.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>1</code> if the terminal exists, <code>0</code> if it does not, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int tgetent(char *bp, const char *name);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(49)">49. <code>tgetflag</code> (Terminal Capabilities)</h2>
+		<div id="function-49" class="function-block">
+			<h3>Description:</h3>
+			<p>Checks if a specified boolean capability is present.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>1</code> if the capability is present, <code>0</code> if it is not, or <code>-1</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int tgetflag(const char *id);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(50)">50. <code>tgetnum</code> (Terminal Capabilities)</h2>
+		<div id="function-50" class="function-block">
+			<h3>Description:</h3>
+			<p>Retrieves the value of a specified numeric capability.</p>
+			<h3>Returns:</h3>
+			<p>Returns the value of the capability, or <code>-1</code> if it does not exist.</p>
+			<h3>Usage:</h3>
+			<p><code>int tgetnum(const char *id);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(51)">51. <code>tgetstr</code> (Terminal Capabilities)</h2>
+		<div id="function-51" class="function-block">
+			<h3>Description:</h3>
+			<p>Retrieves the value of a specified string capability.</p>
+			<h3>Returns:</h3>
+			<p>Returns a pointer to the capability string, or <code>NULL</code> if it does not exist.</p>
+			<h3>Usage:</h3>
+			<p><code>char *tgetstr(const char *id, char **area);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(52)">52. <code>tgoto</code> (Terminal Capabilities)</h2>
+		<div id="function-52" class="function-block">
+			<h3>Description:</h3>
+			<p>Generates a string to move the cursor to a specific position on the terminal.</p>
+			<h3>Returns:</h3>
+			<p>Returns a pointer to the cursor movement string.</p>
+			<h3>Usage:</h3>
+			<p><code>char *tgoto(const char *cap, int col, int row);</code></p>
+		</div>
+	</div>
+	
+	<div>
+		<h2 onclick="toggleFunctionBlock(53)">53. <code>tputs</code> (Terminal Capabilities)</h2>
+		<div id="function-53" class="function-block">
+			<h3>Description:</h3>
+			<p>Outputs a string, applying padding to ensure correct timing.</p>
+			<h3>Returns:</h3>
+			<p>Returns <code>OK</code> on success, or <code>ERR</code> on error.</p>
+			<h3>Usage:</h3>
+			<p><code>int tputs(const char *str, int affcnt, int (*outc)(int));</code></p>
+		</div>
+	</div>
+	
+
+    <script>
+        function toggleFunctionBlock(number) {
+            const block = document.getElementById('function-' + number);
+            if (block.style.display === "none" || block.style.display === "") {
+                block.style.display = "block";
+            } else {
+                block.style.display = "none";
+            }
+        }
+        document.querySelectorAll('.function-block').forEach(block => {
+            block.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
