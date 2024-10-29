@@ -1,4 +1,6 @@
 #Minishell
+##Group Name:
+We need a good group name, Tiago! =)
 ##Group:
-- Bruno
-- Tiago
+- Bruno Almeida
+- Tiago Sousa
