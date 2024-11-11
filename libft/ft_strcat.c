@@ -1,28 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   handle_signal.c                                    :+:      :+:    :+:   */
+/*   ft_strcat.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/08 23:28:39 by tcosta-f         ###   ########.fr       */
+/*   Created: 2023/12/22 02:34:29 by tcosta-f          #+#    #+#             */
+/*   Updated: 2024/11/08 01:38:51 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "libft.h"
 
-void ft_signal_handler(int signum)
+char	*ft_strcat(char *dest, char *src)
 {
-	if (signum == SIGINT)
-	{
-		rl_replace_line("", 0); //limpa a linha
-		rl_on_new_line();
-	//	rl_redisplay; //exibe um novo prompt;
-	}
-	if (signum == SIGQUIT)
-	{
-		// TODO
-	}
-}
+	int	i;
+	int	j;
 
+	j = 0;
+	i = 0;
+	while (dest[j] != '\0')
+	{
+		j++;
+	}
+	while (src[i] != '\0')
+	{
+		dest[j] = src[i];
+		i++;
+		j++;
+	}
+	dest[j] = '\0';
+	return (dest);
+}

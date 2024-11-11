@@ -1,28 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   handle_signal.c                                    :+:      :+:    :+:   */
+/*   ft_strcpy.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/08 23:28:39 by tcosta-f         ###   ########.fr       */
+/*   Created: 2023/12/20 00:23:34 by tcosta-f          #+#    #+#             */
+/*   Updated: 2024/11/08 01:46:32 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "libft.h"
 
-void ft_signal_handler(int signum)
+char	*ft_strcpy(char *dest, char *src)
 {
-	if (signum == SIGINT)
+	int	i;
+
+	i = 0;
+	while (src[i] != '\0')
 	{
-		rl_replace_line("", 0); //limpa a linha
-		rl_on_new_line();
-	//	rl_redisplay; //exibe um novo prompt;
+		dest[i] = src[i];
+		i++;
 	}
-	if (signum == SIGQUIT)
-	{
-		// TODO
-	}
+	dest[i] = '\0';
+	return (dest);
 }
 

@@ -1,28 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   handle_signal.c                                    :+:      :+:    :+:   */
+/*   ft_strcmp.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/08 23:28:39 by tcosta-f         ###   ########.fr       */
+/*   Created: 2023/12/21 16:49:29 by tcosta-f          #+#    #+#             */
+/*   Updated: 2024/11/08 23:39:47 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "libft.h"
 
-void ft_signal_handler(int signum)
+int	ft_strcmp(char *s1, char *s2)
 {
-	if (signum == SIGINT)
-	{
-		rl_replace_line("", 0); //limpa a linha
-		rl_on_new_line();
-	//	rl_redisplay; //exibe um novo prompt;
-	}
-	if (signum == SIGQUIT)
-	{
-		// TODO
-	}
-}
+	int	i;
 
+	i = 0;
+	while (s1[i] != '\0' && s2[i])
+	{
+		if (s1[i] == s2[i])
+		{
+			i++;
+		}
+		else
+		{
+			return (s1[i] - s2[i]);
+		}
+	}
+	if ((s1[i] == '\0' && s2[i]) || (s1[i] && s2[i] == '\0'))
+	{
+		return (s1[i] - s2[i]);
+	}
+	return (0);
+}
