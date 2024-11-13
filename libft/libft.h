@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 15:21:25 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/04/30 02:50:27 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/08 01:44:14 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,10 @@ char	*ft_strjoin(const char *s1, const char *s2);
 char	*ft_strtrim(const char *s1, const char *set);
 char	**ft_split(const char *s, char c);
 char	*ft_strmapi(const char *s, char (*f)(unsigned int, char));
+char	*ft_strcpy(char *dest, char *src);
+char	*ft_strcat(char *dest, char *src);
+char	*ft_strndup(const char *str, int n);
+int	ft_strcmp(char *s1, char *s2);
 char	*ft_itoa(int n);
 void	ft_bzero(void *str, size_t n);
 void	*ft_memcpy(void *dest, const void *src, size_t n);
