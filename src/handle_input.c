@@ -6,22 +6,25 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:39:44 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/08 03:05:24 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/10 19:53:28 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
 int			ft_count_args(char *str);
-static int	ft_check_quotes(char *str);
-static void	ft_get_additional_input(char **str);
+int	ft_check_quotes(char *str);
+void	ft_get_additional_input(char **str);
 int			ft_handle_quotes(char *str, int i);
-static int	ft_handle_argument(char *str, int i);
+int	ft_handle_argument(char *str, int i);
 
 int	ft_count_args(char *str)
 {
-	int count = 0;
-	int i = 0;
+	int count;
+	int i;
+
+	i = 0;
+	count = 0;
 
 	while (ft_check_quotes(str))
 		ft_get_additional_input(&str); // Se necessário, obter mais input
