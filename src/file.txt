@@ -1,2 +1,0 @@
-ola
-Comando terminou com status 0
