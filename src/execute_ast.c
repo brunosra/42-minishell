@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/13 02:47:52 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/14 03:19:41 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,39 +74,22 @@ int	ft_handle_output_redirect(t_node *node)
 int	ft_handle_input_redirect(t_node *node)
 {
 	int	fd;
-	int	save_stdin;  // Variável para salvar o stdin original
 	int	status;
 
-	// Salva o stdin original
-	save_stdin = dup(STDIN_FILENO);
-	if (save_stdin == -1)
-	{
-		perror("dup");
-		return (1);
-	}
 	fd = open(node->right->token->value, O_RDONLY);
 	if (fd == -1)
 	{
 		perror("open");
-		close(save_stdin);
 		return (1);
 	}
 	if (dup2(fd, STDIN_FILENO) == -1)
 	{
 		perror("dup2");
 		close(fd);
-		close(save_stdin);
 		return (1);
 	}
 	close(fd);
 	status = ft_execute_ast(node->left);
-	if (dup2(save_stdin, STDIN_FILENO) == -1) 	// Restaura o stdin original
-	{
-		perror("dup2");
-		close(save_stdin);
-		return (1);
-	}
-	close(save_stdin);  // Fecha o descritor de arquivo do stdin original
 	return (status);
 }
 
