@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/13 03:43:46 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/14 03:18:43 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ int	main(void)
 	t_token				*tokens;
 	t_node				*ast_root;
 	int					status;
+	int					save_stdin;
 
 	sa.sa_handler = ft_signal_handler;
 	sigemptyset(&sa.sa_mask);
@@ -29,9 +30,14 @@ int	main(void)
 	sigaction(SIGINT, &sa, NULL);
 	while (1)
 	{
-		input = NULL;
+		save_stdin = dup(STDIN_FILENO);
+		if (save_stdin == -1)
+		{
+			perror("dup");
+			return (1);
+		}
 		input = readline("minishell$ ");
-		if (!input) // Saída do loop ao receber EOF (Ctrl+D)
+		if (input == NULL) // Saída do loop ao receber EOF (Ctrl+D)
 		{
     		printf("Recebido NULL de readline. Saindo...\n");
     		break;
@@ -45,6 +51,13 @@ int	main(void)
 			status = ft_execute_ast(ast_root);
 			if (status != 0)
 				fprintf(stderr, "Erro na execução do comando: status %d\n", status);
+			if (dup2(save_stdin, STDIN_FILENO) == -1) 	// Restaura o stdin original
+			{
+				perror("dup2");
+				close(save_stdin);
+				return (1);
+			}
+			close(save_stdin);
 		}
 		ft_free_tokens(tokens); // Libera tokens
 		ft_free_ast(ast_root); // Libera AST

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/10 21:38:53 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/13 22:26:16 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ t_node *ft_parse_ast(t_token *tokens)
     op_node = NULL;
 	while (tokens[i].value)
 	{
-        if (tokens[i].type == TOKEN_COMMAND || tokens[i].type == TOKEN_FILENAME)
+        if (tokens[i].type == TOKEN_COMMAND || tokens[i].type == TOKEN_FILENAME) // ls -la > filetxt |
 		{
             // Agrupa o comando e argumentos em um único nó de comando
             if (tokens[i].type == TOKEN_COMMAND)

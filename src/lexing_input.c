@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/10 20:13:19 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/13 22:53:25 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,20 +25,12 @@ t_token	*ft_tokenize_input(char *str, int n_args, int i, int j)
 	tokens = malloc(sizeof(t_token) * (n_args + 1)); // Aloca espaço para os tokens
 	if (!tokens)
 		return (NULL);
-
 	while (str[i])
 	{
 		while (str[i] == ' ') // Ignora espaços
 			i++;
 		if (str[i] == '\0') // Final da string
 			break ;
-/* 		if (str[i] == '"' || str[i] == '\'') // Caso tenha aspas
-		{
-			ft_handle_quotes(str, i); // Trata as aspas
-			if (i == -1)
-				return (NULL);
-			i++;
-		} */
 		i = ft_tokenize(str, &i, tokens, &j);
 		n_tokens++;
 		if (n_tokens == n_args)
@@ -94,7 +86,7 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 		return (TOKEN_INPUT_REDIRECT);
 	else if (str[0] == '$')
 		return (TOKEN_VARIABLE);
-	else if (/* str[0] == '-' &&  */(prev_type == TOKEN_COMMAND || prev_type == TOKEN_ARGUMENT))
+	else if ((prev_type == TOKEN_COMMAND || prev_type == TOKEN_ARGUMENT))
 		return (TOKEN_ARGUMENT);
 	else if (((str[0] == '"' || str[0] == '\'') && prev_type != TOKEN_COMMAND) || prev_type == TOKEN_OUTPUT_REDIRECT)
 		return (TOKEN_FILENAME);
