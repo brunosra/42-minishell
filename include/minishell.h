@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/12 22:37:29 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/15 23:22:14 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ typedef enum e_token_type
 	TOKEN_VARIABLE,
 	TOKEN_OUTPUT_REDIRECT,
 	TOKEN_INPUT_REDIRECT,
+	TOKEN_HEREDOC,
 }	t_type;
 
 typedef struct s_token
@@ -53,8 +54,23 @@ typedef struct s_ast_node
 	t_node *right;
 }	t_node;
 
+typedef struct s_minishell
+{
+	char				*input;
+	t_token 			*tokens;
+	t_node				*ast_root;
+	int					status;
+	int					save_stdin;
+	int					save_stdout;
+	int 				n_args;
+	int					n_tokens;
+	int					pid;
+	struct	sigaction	sa;
+	int					pipefd[2];
+}				t_minishell;
+
 /**__HANDLE_and_LEXING_INPUT__**/
-t_token	*ft_handle_and_tokenize_input(char *input);
+int	ft_handle_and_tokenize_input(t_minishell *ms);
 /**__HANDLE_INPUT__**/
 int		ft_count_args(char *str);
 int		ft_check_quotes(char *str);
@@ -75,11 +91,12 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index);
 void	print_ast(t_node *node, int depth);
 
 /**__EXECUTE_AST__ **/
-int	ft_execute_ast(t_node *node);
-int	ft_handle_output_redirect(t_node *node);
-int	ft_handle_input_redirect(t_node *node);
-int	ft_handle_pipe(t_node *node);
-int	ft_execute_command(t_node *node);
+int	ft_execute_ast(t_node *node, t_minishell *ms);
+int	ft_handle_output_redirect(t_node *node, t_minishell *ms);
+int	ft_handle_input_redirect(t_node *node, t_minishell *ms);
+int	ft_handle_pipe(t_node *node, t_minishell *ms);
+int	ft_execute_command(t_node *node, t_minishell *ms);
+int	ft_handle_heredoc(t_node *node, t_minishell *ms);
 
 /**__BUILTINS__**/
 void 	fT_builtin_exit(char **args);
