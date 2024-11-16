@@ -6,7 +6,7 @@
 /*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/16 11:28:06 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/16 16:25:17 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,19 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 	return (*i);
 }
 
+int ft_check_builtins(char *str)
+{
+	if (!ft_strcmp(str, "echo"))
+		return (1);
+	if (!ft_strcmp(str, "pwd"))
+		return (printf("builtin: pwd -->"), 1);
+	if (!ft_strcmp(str, "exit"))
+		return (printf("builtin: exit -->"), 1);
+	if (!ft_strcmp(str, "cd"))
+		return (printf("builtin: cd -->"), 1);
+	return (0);
+}
+
 t_type	ft_get_token_type(char *str, t_type prev_type)
 {
 	if (!ft_strcmp(str, "|"))
@@ -88,9 +101,11 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 		return (TOKEN_HEREDOC);
 	else if (str[0] == '$')
 		return (TOKEN_VARIABLE);
-	else if ((prev_type == TOKEN_COMMAND || prev_type == TOKEN_ARGUMENT))
+	else if ((prev_type == TOKEN_COMMAND || prev_type == TOKEN_BUILTIN || prev_type == TOKEN_ARGUMENT))
 		return (TOKEN_ARGUMENT);
 	else if (((str[0] == '"' || str[0] == '\'') && prev_type != TOKEN_COMMAND) || prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT || prev_type == TOKEN_HEREDOC)
 		return (TOKEN_FILENAME);
+	else if (ft_check_builtins(str))
+		return (TOKEN_BUILTIN);
 	return (TOKEN_COMMAND);
 }

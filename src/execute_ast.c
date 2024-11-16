@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute_ast.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/16 03:24:24 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/16 16:14:09 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
 		return (ft_handle_heredoc(node, ms));
 	else if (node->token->type == TOKEN_OPERATOR)
 		return (ft_handle_pipe(node, ms));
+	else if (node->token->type == TOKEN_BUILTIN)
+		return (ft_execute_command(node, ms));
 	else if (node->token->type == TOKEN_COMMAND)
 		return (ft_execute_command(node, ms));
 	return (0);
@@ -198,6 +200,19 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 	return (ft_execute_ast(node->right, ms));
 }
 
+int	ft_exec_builtins(t_node *node, t_minishell *ms)
+{
+	printf("node token: %s\n", node->token->value);
+	if (!ft_strcmp(node->token->value, "echo"))
+		ft_builtin_echo(node->cmd_ready);
+	// if (!ft_strcmp(node->token->value, "pwd"))
+	// 	return (printf("builtin: pwd -->"), 1);
+	// if (!ft_strcmp(node->token->value, "exit"))
+	// 	return (printf("builtin: exit -->"), 1);
+	// if (!ft_strcmp(node->token->value, "cd"))
+	return (ft_execute_ast(node->left, ms));
+}
+
 int	ft_execute_command(t_node *node, t_minishell *ms)
 {
 	ms->pid = fork();
@@ -208,8 +223,13 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	}
 	if (ms->pid == 0)
 	{
-		execvp(node->cmd_ready[0], node->cmd_ready);
-		perror("execvp");
+		if (ft_check_builtins(node->token->value))
+			ft_exec_builtins(node, ms);
+		else
+		{
+			execvp(node->cmd_ready[0], node->cmd_ready);
+			perror("execvp");
+		}
 		exit(1);
 	}
 	waitpid(ms->pid, &ms->status, 0);

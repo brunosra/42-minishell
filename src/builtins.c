@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/14 20:28:33 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/16 16:18:01 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,16 @@
 void ft_builtin_pwd(void);
 void ft_builtin_exit(char **args); */
 
+/* JUST FOR TEST */
+static void print_str_arr(char **args)
+{
+	int i;
+
+	i = -1;
+	while (args[++i])
+		printf("[%d]: %s\n", i, args[i]);
+}
+
 void ft_builtin_echo(char **args)
 {
 	int i;
@@ -23,6 +33,7 @@ void ft_builtin_echo(char **args)
 
 	i = 1;
 	newline = 1;
+	print_str_arr(args);
 	if (args[i] && !ft_strcmp(args[i], "-n"))
 	{
 		newline = 0;
@@ -64,11 +75,11 @@ void ft_builtin_exit(char **args)
 	exit(exit_code);
 }
 
-void ft_builtin_cd(char *path)
-{
-	int ret;
+// void ft_builtin_cd(char *path)
+// {
+// 	int ret;
 
-	if (path[1])
-		ret = chdir(path);
-	if (ret)
-}
+// 	if (path[1])
+// 		ret = chdir(path);
+// 	if (ret)
+// }

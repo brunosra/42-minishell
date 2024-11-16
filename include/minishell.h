@@ -6,7 +6,7 @@
 /*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/16 11:27:45 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/16 16:10:57 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <string.h>
+# include "errors.h"
 
 typedef struct s_ast_node t_node;
 
@@ -37,6 +38,7 @@ typedef enum e_token_type
 	TOKEN_OUTPUT_REDIRECT,
 	TOKEN_INPUT_REDIRECT,
 	TOKEN_HEREDOC,
+	TOKEN_BUILTIN,
 }	t_type;
 
 typedef struct s_token
@@ -99,8 +101,10 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms);
 int	ft_handle_pipe(t_node *node, t_minishell *ms);
 int	ft_execute_command(t_node *node, t_minishell *ms);
 int	ft_handle_heredoc(t_node *node, t_minishell *ms);
+int	ft_handle_builtins(t_node *node, t_minishell *ms);
 
 /**__BUILTINS__**/
+int		ft_check_builtins(char *str);
 void 	ft_builtin_exit(char **args);
 void 	ft_builtin_pwd(void);
 void 	ft_builtin_echo(char **args);
