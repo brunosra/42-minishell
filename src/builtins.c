@@ -3,18 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/08 02:55:51 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/14 20:28:33 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-void ft_builtin_echo(char **args);
+/* void ft_builtin_echo(char **args);
 void ft_builtin_pwd(void);
-void fT_builtin_exit(char **args);
+void ft_builtin_exit(char **args); */
 
 void ft_builtin_echo(char **args)
 {
@@ -54,7 +54,7 @@ void ft_builtin_pwd(void)
 	return ;
 }
 
-void fT_builtin_exit(char **args)
+void ft_builtin_exit(char **args)
 {
 	int exit_code;
 
@@ -62,4 +62,13 @@ void fT_builtin_exit(char **args)
 	if (args[1])
 		exit_code = ft_atoi(args[1]);
 	exit(exit_code);
+}
+
+void ft_builtin_cd(char *path)
+{
+	int ret;
+
+	if (path[1])
+		ret = chdir(path);
+	if (ret)
 }

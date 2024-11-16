@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/12 22:37:29 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/14 20:18:19 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ int	ft_handle_pipe(t_node *node);
 int	ft_execute_command(t_node *node);
 
 /**__BUILTINS__**/
-void 	fT_builtin_exit(char **args);
+void 	ft_builtin_exit(char **args);
 void 	ft_builtin_pwd(void);
 void 	ft_builtin_echo(char **args);
 
