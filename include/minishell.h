@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/14 20:18:19 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/16 10:39:24 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,12 +55,14 @@ typedef struct s_ast_node
 
 /**__HANDLE_and_LEXING_INPUT__**/
 t_token	*ft_handle_and_tokenize_input(char *input);
+
 /**__HANDLE_INPUT__**/
 int		ft_count_args(char *str);
 int		ft_check_quotes(char *str);
 void	ft_get_additional_input(char **str);
 int		ft_handle_quotes(char *str, int i);
 int		ft_handle_argument(char *str, int i);
+
 /**__LEXING_INPUT__**/
 t_token	*ft_tokenize_input(char *str, int n_args, int i, int j);
 int		ft_tokenize(char *str, int *i, t_token *tokens, int *j);
@@ -71,6 +73,7 @@ t_node	*ft_parse_ast(t_token *tokens); // muito grande!
 t_node	*ft_create_cmd_node(t_token *token);
 t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right);
 t_node	*ft_group_command_tokens(t_token *tokens, int *index);
+
 /* Temporaria para testar */
 void	print_ast(t_node *node, int depth);
 
