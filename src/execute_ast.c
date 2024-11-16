@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/16 03:24:24 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/16 16:44:50 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,6 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 	}
 	return (ft_execute_ast(node->left, ms));
 }
-
 int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 {
 	int	fd;
