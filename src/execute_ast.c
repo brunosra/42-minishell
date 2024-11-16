@@ -124,7 +124,6 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 	}
 	return (ft_execute_ast(node->left, ms));
 }
-
 int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 {
 	int	fd;
