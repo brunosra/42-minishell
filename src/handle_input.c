@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_input.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:39:44 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/16 11:27:59 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/16 17:40:37 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int			ft_count_args(char *str);
 int			ft_check_quotes(char *str);
-void		ft_get_additional_input(char **str);
+/* void		ft_get_additional_input(char **str); */
 int			ft_handle_quotes(char *str, int i);
 int			ft_handle_argument(char *str, int i);
 
@@ -25,14 +25,22 @@ int	ft_count_args(char *str)
 
 	i = 0;
 	count = 0;
-	while (ft_check_quotes(str))
-		ft_get_additional_input(&str); // Se necessário, obter mais input
+/* 	while (ft_check_quotes(str))
+		ft_get_additional_input(&str); // Se necessário, obter mais input */
 	while (str[i])
 	{
 		while (str[i] == ' ') // Ignora espaços
 			i++;
 		if (str[i] == '\0') // Final da string
 			break ;
+		if (str[i] == '|' || str[i] == '<' || str[i] == '>')
+		{
+			count++;
+			if (str[i + 1])
+				i++;
+			if (str[i + 1] && (str[i] == '<' || str[i] == '>'))
+				i++;
+		}
 		if (str[i] == '"' || str[i] == '\'') // Caso tenha aspas
 		{
 			i = ft_handle_quotes(str, i); // Trata as aspas
@@ -43,6 +51,7 @@ int	ft_count_args(char *str)
 			i = ft_handle_argument(str, i); // Chama a função auxiliar para avançar o índice no argumento
 		count++;
 	}
+	printf("%i\n", count);
 	return (count);
 }
 
@@ -64,7 +73,7 @@ int	ft_check_quotes(char *str)
 	return (quote_type != '\0');
 }
 
-void	ft_get_additional_input(char **str)
+/* void	ft_get_additional_input(char **str)
 {
 	char	*buffer;
 	char	*new_str;
@@ -81,7 +90,7 @@ void	ft_get_additional_input(char **str)
 		*str = new_str;
 		free(buffer);
 	}
-}
+} */
 
 int	ft_handle_quotes(char *str, int i)
 {
@@ -99,7 +108,7 @@ int	ft_handle_quotes(char *str, int i)
 
 int	ft_handle_argument(char *str, int i)
 {
-	while (str[i] && str[i] != ' ' && str[i] != '"' && str[i] != '\'')
+	while (str[i] && str[i] != ' ' && str[i] != '"' && str[i] != '\'' && str[i] != '|' && str[i] != '>' && str[i] != '<')
 		i++; // Avança até o próximo espaço ou aspa
 	return (i);
 }

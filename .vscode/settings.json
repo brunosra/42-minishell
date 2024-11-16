@@ -11,5 +11,6 @@
     	"editorRuler.foreground": "#ffffff1e"
 	},
 	"git.suggestSmartCommit": false,
-	"editor.indentSize": "tabSize"
+	"editor.indentSize": "tabSize",
+	"C_Cpp.errorSquiggles": "disabled"
 }
