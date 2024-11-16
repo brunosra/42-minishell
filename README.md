@@ -10,8 +10,8 @@
 
 ## Usage:
 
-> `./minishell`
+<code style="color : yellowgreen">`./minishell`</code>
 
 ## Check Leaks:
 
-> `valgrind -s --track-origins=yes --leak-check=full --show-leak-kinds=all --suppressions=valgrind_readline.supp`
+<code style="color : yellowgreen">`valgrind -s --track-origins=yes --leak-check=full --show-leak-kinds=all --suppressions=valgrind_readline.supp`</code>
