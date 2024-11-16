@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/13 22:26:16 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/15 01:35:11 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ t_node *ft_parse_ast(t_token *tokens)
     op_node = NULL;
 	while (tokens[i].value)
 	{
-        if (tokens[i].type == TOKEN_COMMAND || tokens[i].type == TOKEN_FILENAME) // ls -la > filetxt |
+        if (tokens[i].type == TOKEN_COMMAND || tokens[i].type == TOKEN_FILENAME)
 		{
             // Agrupa o comando e argumentos em um único nó de comando
             if (tokens[i].type == TOKEN_COMMAND)
@@ -48,13 +48,13 @@ t_node *ft_parse_ast(t_token *tokens)
 			{
                 root = cmd_node;
             }
-			else if (current && (current->token->type == TOKEN_OPERATOR || current->token->type == TOKEN_OUTPUT_REDIRECT))
+			else if (current && (current->token->type == TOKEN_OPERATOR || current->token->type == TOKEN_OUTPUT_REDIRECT || current->token->type == TOKEN_INPUT_REDIRECT || current->token->type == TOKEN_HEREDOC))
 			{
                 current->right = cmd_node;
             }
             current = cmd_node;
         }
-        else if (tokens[i].type == TOKEN_OPERATOR || tokens[i].type == TOKEN_OUTPUT_REDIRECT || tokens[i].type == TOKEN_INPUT_REDIRECT)
+        else if (tokens[i].type == TOKEN_OPERATOR || tokens[i].type == TOKEN_OUTPUT_REDIRECT || tokens[i].type == TOKEN_INPUT_REDIRECT || tokens[i].type == TOKEN_HEREDOC)
 		{
             // Processa operadores como |, >, <, >>, <<
             if (!ft_strcmp(tokens[i].value, "|"))

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 15:21:25 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/08 01:44:14 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/15 01:16:54 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,8 @@ int		ft_isprint(int c);
 int		ft_strncmp(const char *str1, const char *str2, size_t n);
 int		ft_memcmp(const void *str1, const void *str2, size_t n);
 int		ft_lstsize(t_list *lst);
+int		ft_strcmp(char *s1, char *s2);
+int		ft_cmp_str_str(const char *big, const char *lit, size_t len);
 char	*ft_strchr(const char *str, int c);
 char	*ft_strnstr(const char *big, const char *lit, size_t len);
 char	*ft_strrchr(const char *str, int c);
@@ -50,7 +52,6 @@ char	*ft_strmapi(const char *s, char (*f)(unsigned int, char));
 char	*ft_strcpy(char *dest, char *src);
 char	*ft_strcat(char *dest, char *src);
 char	*ft_strndup(const char *str, int n);
-int	ft_strcmp(char *s1, char *s2);
 char	*ft_itoa(int n);
 void	ft_bzero(void *str, size_t n);
 void	*ft_memcpy(void *dest, const void *src, size_t n);

@@ -6,90 +6,101 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/14 03:18:43 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/15 22:15:58 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
 int				main(void);
-t_token *ft_handle_and_tokenize_input(char *input);
+int	ft_handle_and_tokenize_input(t_minishell *ms);
 
 int	main(void)
 {
-	char				*input;
-	struct	sigaction	sa;
-	t_token				*tokens;
-	t_node				*ast_root;
-	int					status;
-	int					save_stdin;
+	t_minishell	ms;
 
-	sa.sa_handler = ft_signal_handler;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_RESTART;
-	sigaction(SIGINT, &sa, NULL);
+	// Configuração inicial do signal handler
+	ms.sa.sa_handler = ft_signal_handler;
+	sigemptyset(&ms.sa.sa_mask);
+	ms.sa.sa_flags = SA_RESTART;
+	sigaction(SIGINT, &ms.sa, NULL);
+
 	while (1)
 	{
-		save_stdin = dup(STDIN_FILENO);
-		if (save_stdin == -1)
+		// Salva os descritores originais de stdin e stdout
+		ms.save_stdin = dup(STDIN_FILENO);
+		ms.save_stdout = dup(STDOUT_FILENO);
+		if (ms.save_stdin == -1 || ms.save_stdout == -1)
 		{
 			perror("dup");
 			return (1);
 		}
-		input = readline("minishell$ ");
-		if (input == NULL) // Saída do loop ao receber EOF (Ctrl+D)
+
+		// Lê o comando do usuário
+		ms.input = readline("minishell$ ");
+		if (ms.input == NULL) // Saída do loop ao receber EOF (Ctrl+D)
 		{
     		printf("Recebido NULL de readline. Saindo...\n");
     		break;
 		}
-		add_history(input);
-		tokens = ft_handle_and_tokenize_input(input);
-		ast_root = ft_parse_ast(tokens);
-		print_ast(ast_root, 5); // para testar
-		if (ast_root)
+		add_history(ms.input);
+
+		// Tokeniza e cria a AST
+		ft_handle_and_tokenize_input(&ms);
+		ms.ast_root = ft_parse_ast(ms.tokens);
+
+		print_ast(ms.ast_root, 5); // Para testar a estrutura da AST
+
+		// Executa a AST, se válida
+		if (ms.ast_root)
 		{
-			status = ft_execute_ast(ast_root);
-			if (status != 0)
-				fprintf(stderr, "Erro na execução do comando: status %d\n", status);
-			if (dup2(save_stdin, STDIN_FILENO) == -1) 	// Restaura o stdin original
+			ms.status = ft_execute_ast(ms.ast_root, &ms);
+			if (ms.status != 0)
+				fprintf(stderr, "Erro na execução do comando: status %d\n", ms.status);
+
+			// Restaura stdin e stdout para o estado original
+			if (dup2(ms.save_stdin, STDIN_FILENO) == -1 || dup2(ms.save_stdout, STDOUT_FILENO) == -1)
 			{
 				perror("dup2");
-				close(save_stdin);
+				close(ms.save_stdin);
+				close(ms.save_stdout);
 				return (1);
 			}
-			close(save_stdin);
+			close(ms.save_stdin);
+			close(ms.save_stdout);
 		}
-		ft_free_tokens(tokens); // Libera tokens
-		ft_free_ast(ast_root); // Libera AST
-		free(input); // Libera a string do input
+
+		// Libera memória
+		ft_free_tokens(ms.tokens);
+		ft_free_ast(ms.ast_root);
+		free(ms.input);
 	}
-	free(input); // Libera o último input antes de sair
+
+	// Libera o último input antes de sair
+	free(ms.input);
 	return (0);
 }
- // main para testes
+
 /* int	main(void)
 {
-	char 				*input = "echo ola | grep ola"; 
-	t_token				*tokens;
-	t_node				*ast_root;
+	char				*input = "echo ola | grep ola";
+	t_minishell			ms;
 
-	tokens = ft_handle_and_tokenize_input(input);
-	ast_root = ft_parse_ast(tokens);
-	print_ast(ast_root, 0);
-	ft_execute_ast(ast_root);
-	ft_free_tokens(tokens);
-	ft_free_ast(ast_root);
+	ms.tokens = ft_handle_and_tokenize_input(input);
+	ms.ast_root = ft_parse_ast(ms.tokens);
+	print_ast(ms.ast_root, 0);
+	ft_execute_ast(ms.ast_root);
+	ft_free_tokens(ms.tokens);
+	ft_free_ast(ms.ast_root);
 	return (0);
-} 
- */
-t_token *ft_handle_and_tokenize_input(char *input)
-{
-	int n_args;
-	t_token *tokens;
+}
+*/
 
-	n_args = ft_count_args(input);
-	if (n_args == -1)
-		return (NULL);
-	tokens = ft_tokenize_input(input, n_args, 0, 0);
-	return (tokens);
+int	ft_handle_and_tokenize_input(t_minishell *ms)
+{
+	ms->n_args = ft_count_args(ms->input); // Atualiza n_args diretamente em ms
+	if (ms->n_args == -1)
+		return (1);
+	ms->tokens = ft_tokenize_input(ms->input, ms->n_args, 0, 0);
+	return (0);
 }
