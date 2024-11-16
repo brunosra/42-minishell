@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_ASTree.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/15 01:35:11 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/16 14:16:17 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,10 @@ t_node *ft_parse_ast(t_token *tokens)
     op_node = NULL;
 	while (tokens[i].value)
 	{
-        if (tokens[i].type == TOKEN_COMMAND || tokens[i].type == TOKEN_FILENAME)
+        if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND || tokens[i].type == TOKEN_FILENAME)
 		{
             // Agrupa o comando e argumentos em um único nó de comando
-            if (tokens[i].type == TOKEN_COMMAND)
+            if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND)
 				cmd_node = ft_group_command_tokens(tokens, &i);
 			else
 			{
@@ -167,7 +167,7 @@ t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right)
 }
 
 /* Temporaria para testar */
-void print_ast(t_node *node, int depth)
+void	print_ast(t_node *node, int depth)
 {
     int i;
 	int j;

@@ -3,20 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   handle_input.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:39:44 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/15 18:45:10 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/16 11:27:59 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
 int			ft_count_args(char *str);
-int	ft_check_quotes(char *str);
-void	ft_get_additional_input(char **str);
+int			ft_check_quotes(char *str);
+void		ft_get_additional_input(char **str);
 int			ft_handle_quotes(char *str, int i);
-int	ft_handle_argument(char *str, int i);
+int			ft_handle_argument(char *str, int i);
 
 int	ft_count_args(char *str)
 {

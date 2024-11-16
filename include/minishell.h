@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/15 23:22:14 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/16 16:10:57 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <string.h>
+# include "errors.h"
 
 typedef struct s_ast_node t_node;
 
@@ -37,6 +38,7 @@ typedef enum e_token_type
 	TOKEN_OUTPUT_REDIRECT,
 	TOKEN_INPUT_REDIRECT,
 	TOKEN_HEREDOC,
+	TOKEN_BUILTIN,
 }	t_type;
 
 typedef struct s_token
@@ -77,6 +79,7 @@ int		ft_check_quotes(char *str);
 void	ft_get_additional_input(char **str);
 int		ft_handle_quotes(char *str, int i);
 int		ft_handle_argument(char *str, int i);
+
 /**__LEXING_INPUT__**/
 t_token	*ft_tokenize_input(char *str, int n_args, int i, int j);
 int		ft_tokenize(char *str, int *i, t_token *tokens, int *j);
@@ -87,6 +90,7 @@ t_node	*ft_parse_ast(t_token *tokens); // muito grande!
 t_node	*ft_create_cmd_node(t_token *token);
 t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right);
 t_node	*ft_group_command_tokens(t_token *tokens, int *index);
+
 /* Temporaria para testar */
 void	print_ast(t_node *node, int depth);
 
@@ -97,9 +101,11 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms);
 int	ft_handle_pipe(t_node *node, t_minishell *ms);
 int	ft_execute_command(t_node *node, t_minishell *ms);
 int	ft_handle_heredoc(t_node *node, t_minishell *ms);
+int	ft_handle_builtins(t_node *node, t_minishell *ms);
 
 /**__BUILTINS__**/
-void 	fT_builtin_exit(char **args);
+int		ft_check_builtins(char *str);
+void 	ft_builtin_exit(char **args);
 void 	ft_builtin_pwd(void);
 void 	ft_builtin_echo(char **args);
 

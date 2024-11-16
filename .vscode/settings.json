@@ -1,0 +1,15 @@
+{
+	"files.associations": {
+		"minishell.h": "c"
+	},
+	"editor.insertSpaces": false,
+	"editor.detectIndentation": false,
+	"editor.rulers": [
+		80
+	],
+	"workbench.colorCustomizations": {
+    	"editorRuler.foreground": "#ffffff1e"
+	},
+	"git.suggestSmartCommit": false,
+	"editor.indentSize": "tabSize"
+}

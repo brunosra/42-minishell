@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
 /*   Updated: 2024/11/16 15:07:35 by tcosta-f         ###   ########.fr       */
@@ -31,10 +31,7 @@ int	main(void)//int argc, char **argv, char **envp     //extern type environ
 		ms.save_stdin = dup(STDIN_FILENO);
 		ms.save_stdout = dup(STDOUT_FILENO);
 		if (ms.save_stdin == -1 || ms.save_stdout == -1)
-		{
-			perror("dup");
-			return (1);
-		}
+			return(perror("dup"), 1);
 
 		// Lê o comando do usuário
 		ms.input = readline("minishell$ ");
