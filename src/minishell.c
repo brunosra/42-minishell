@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/15 22:15:58 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/16 15:07:35 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int				main(void);
 int	ft_handle_and_tokenize_input(t_minishell *ms);
 
-int	main(void)
+int	main(void)//int argc, char **argv, char **envp     //extern type environ
 {
 	t_minishell	ms;
 
