@@ -6,7 +6,7 @@
 /*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:39:44 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/16 10:37:45 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/16 11:27:59 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ int	ft_count_args(char *str)
 
 	i = 0;
 	count = 0;
-
 	while (ft_check_quotes(str))
 		ft_get_additional_input(&str); // Se necessário, obter mais input
 	while (str[i])

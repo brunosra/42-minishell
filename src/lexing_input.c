@@ -6,7 +6,7 @@
 /*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/16 10:38:15 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/16 11:28:06 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,13 +82,15 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 		return (TOKEN_OPERATOR);
 	else if (!ft_strcmp(str, ">") || !ft_strcmp(str, ">>"))
 		return (TOKEN_OUTPUT_REDIRECT);
-	else if (!ft_strcmp(str, "<") || !ft_strcmp(str, "<<"))
+	else if (!ft_strcmp(str, "<"))
 		return (TOKEN_INPUT_REDIRECT);
+	else if (!ft_strcmp(str, "<<"))
+		return (TOKEN_HEREDOC);
 	else if (str[0] == '$')
 		return (TOKEN_VARIABLE);
 	else if ((prev_type == TOKEN_COMMAND || prev_type == TOKEN_ARGUMENT))
 		return (TOKEN_ARGUMENT);
-	else if (((str[0] == '"' || str[0] == '\'') && prev_type != TOKEN_COMMAND) || prev_type == TOKEN_OUTPUT_REDIRECT)
+	else if (((str[0] == '"' || str[0] == '\'') && prev_type != TOKEN_COMMAND) || prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT || prev_type == TOKEN_HEREDOC)
 		return (TOKEN_FILENAME);
 	return (TOKEN_COMMAND);
 }
