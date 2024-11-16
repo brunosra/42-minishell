@@ -3,18 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   lexing_input.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/13 22:53:25 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/16 10:38:15 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
 t_token			*ft_tokenize_input(char *str, int n_args, int i, int j);
-int		ft_tokenize(char *str, int *i, t_token *tokens, int *j);
-t_type	ft_get_token_type(char *str, t_type prev_type);
+int				ft_tokenize(char *str, int *i, t_token *tokens, int *j);
+t_type			ft_get_token_type(char *str, t_type prev_type);
 
 t_token	*ft_tokenize_input(char *str, int n_args, int i, int j)
 {
