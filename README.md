@@ -10,8 +10,8 @@
 
 ## Usage:
 
-<p style="color: yellowgreen">`./minishell`</p>
++`./minishell`+
 
 ## Check Leaks:
 
-<p style="color: yellowgreen">`valgrind -s --track-origins=yes --leak-check=full --show-leak-kinds=all --suppressions=valgrind_readline.supp`</p>
++`valgrind -s --track-origins=yes --leak-check=full --show-leak-kinds=all --suppressions=valgrind_readline.supp`+
