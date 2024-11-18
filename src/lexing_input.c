@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexing_input.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/16 16:25:17 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/18 01:28:08 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ t_token	*ft_tokenize_input(char *str, int n_args, int i, int j)
 	while (str[i])
 	{
 		while (str[i] == ' ') // Ignora espaços
-			i++;
+			i++;		
 		if (str[i] == '\0') // Final da string
 			break ;
 		i = ft_tokenize(str, &i, tokens, &j);
@@ -64,10 +64,20 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 		(*j)++;
 		return (++(*i));
 	}
+ 	else if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<')
+	{
+		(*i)++;
+		if (str[*i] == '>' || str[*i] == '<')
+			(*i)++;
+	}
 	else
 	{
 		while (str[*i] && str[*i] != ' ' && str[*i] != '"' && str[*i] != '\'')
+		{
+			if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<')
+				break ;
 			(*i)++;
+		}	
 	}
 	tokens[*j].value = ft_strndup(str + start, *i - start);
 //	write(1, tokens[*j].value, ft_strlen(tokens[*j].value));

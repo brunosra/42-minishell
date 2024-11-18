@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:39:44 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/16 17:40:37 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/18 01:34:22 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,13 +35,12 @@ int	ft_count_args(char *str)
 			break ;
 		if (str[i] == '|' || str[i] == '<' || str[i] == '>')
 		{
-			count++;
 			if (str[i + 1])
 				i++;
 			if (str[i + 1] && (str[i] == '<' || str[i] == '>'))
 				i++;
 		}
-		if (str[i] == '"' || str[i] == '\'') // Caso tenha aspas
+		else if (str[i] == '"' || str[i] == '\'') // Caso tenha aspas
 		{
 			i = ft_handle_quotes(str, i); // Trata as aspas
 			if (i == -1)

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/16 17:27:06 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/18 19:40:13 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,11 +56,20 @@ typedef struct s_ast_node
 	t_node *right;
 }	t_node;
 
+typedef struct s_env
+{
+	char **envp;
+	char *env_paths;
+	char **paths;
+	char *full_path;
+}	t_env;
+
 typedef struct s_minishell
 {
 	char				*input;
 	t_token 			*tokens;
 	t_node				*ast_root;
+	t_env				env;
 	int					status;
 	int					save_stdin;
 	int					save_stdout;
@@ -101,7 +110,9 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms);
 int	ft_handle_pipe(t_node *node, t_minishell *ms);
 int	ft_execute_command(t_node *node, t_minishell *ms);
 int	ft_handle_heredoc(t_node *node, t_minishell *ms);
-int	ft_handle_builtins(t_node *node, t_minishell *ms);
+//int	ft_handle_builtins(t_node *node, t_minishell *ms); //nao existe pois nao?
+int	ft_find_executable(t_minishell *ms, char *cmd);
+void ft_free_split(char **str);
 
 /**__BUILTINS__**/
 int		ft_check_builtins(char *str);
