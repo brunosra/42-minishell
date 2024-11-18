@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_malloc.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 22:18:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/16 12:27:23 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/18 20:16:37 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	ft_free_tokens(t_token *tokens);
 void	ft_free_ast(t_node *root);
-void	ft_free_cmd_ready(char **cmd_ready);
+/* void	ft_free_env(t_env *env); */
 
 void	ft_free_tokens(t_token *tokens)
 {
@@ -37,20 +37,28 @@ void	ft_free_ast(t_node *root)
 		ft_free_ast(root->left);
 	if (root->right)
 		ft_free_ast(root->right);
-	ft_free_cmd_ready(root->cmd_ready);
+	ft_free_split(root->cmd_ready);
 	free(root);
 	return ;
 }
 
-void	ft_free_cmd_ready(char **cmd_ready)
+/* void	ft_free_env(t_env *env)
 {
-	int	i;
+	if (env->full_path)
+		free(env->full_path);
+} */
 
-	if (!cmd_ready)
+void ft_free_split(char **str)
+{
+	int i;
+
+	i = 0;
+	if (!str || !*str)
 		return ;
-	i = -1;
-	while (cmd_ready[++i])
-		free(cmd_ready[i]);
-	free(cmd_ready);
+	while (str[i])
+		i++;
+	while (--i >= 0)
+		free(str[i]);
+	free(str);
 	return ;
 }

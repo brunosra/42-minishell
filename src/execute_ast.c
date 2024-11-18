@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/18 19:39:53 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/18 20:02:58 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -279,19 +279,4 @@ int	ft_find_executable(t_minishell *ms, char *cmd)
 	}
 	ft_free_split(ms->env.paths);
 	return (127);
-}
-
-void ft_free_split(char **str)
-{
-	int i;
-
-	i = 0;
-	if (!str || !*str)
-		return ;
-	while (str[i])
-		i++;
-	while (--i >= 0)
-		free(str[i]);
-	free(str);
-	return ;
 }
