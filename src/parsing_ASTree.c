@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_ASTree.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/16 14:16:17 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/19 00:25:55 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ t_node *ft_parse_ast(t_token *tokens)
     op_node = NULL;
 	while (tokens[i].value)
 	{
-        if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND || tokens[i].type == TOKEN_FILENAME)
+        if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND || tokens[i].type == TOKEN_FILENAME || tokens[i].type == TOKEN_VARIABLE)
 		{
             // Agrupa o comando e argumentos em um único nó de comando
             if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND)
@@ -111,7 +111,7 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 	// Conta o número de argumentos e o comando inicial
 	arg_count = 1;
 	(*index)++;
-	while (tokens[*index].value && tokens[*index].type == TOKEN_ARGUMENT)
+	while (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE))
 	{
 		arg_count++;
 		(*index)++;
