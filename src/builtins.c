@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/16 16:18:01 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/19 20:47:46 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,19 @@ void ft_builtin_exit(char **args)
 	if (args[1])
 		exit_code = ft_atoi(args[1]);
 	exit(exit_code);
+}
+
+void ft_builtin_env(char **args)
+{
+	char **env;
+
+	env = args;
+	while (*env != 0)
+	{
+		env = **args;
+		printf("%s\n", **env);
+		env++;
+	}
 }
 
 // void ft_builtin_cd(char *path)
