@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/19 20:47:46 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/19 20:55:57 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,8 +82,7 @@ void ft_builtin_env(char **args)
 	env = args;
 	while (*env != 0)
 	{
-		env = **args;
-		printf("%s\n", **env);
+		printf("%s\n", *env);
 		env++;
 	}
 }
