@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/18 20:17:07 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/19 20:38:55 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,9 @@ int	main(int argc, char **argv, char **envp)
 	sigemptyset(&ms.sa.sa_mask);
 	ms.sa.sa_flags = SA_RESTART;
 	sigaction(SIGINT, &ms.sa, NULL);
-	ms.env.envp = envp;
+	ms.env.envp = ft_duplicate_envp(envp);
+	if (!ms.env.envp)
+		return (perror("malloc"), 1);
 	while (1)
 	{
 		ms.save_stdin = dup(STDIN_FILENO);
@@ -57,12 +59,13 @@ int	main(int argc, char **argv, char **envp)
 			close(ms.save_stdin);
 			close(ms.save_stdout);
 		}
+		ft_update_envp(&ms, envp);
 		ft_free_tokens(ms.tokens);
 		ft_free_ast(ms.ast_root);
-		/* ft_free_env(&ms.env); */
 		free(ms.input);
 	}
 	free(ms.input);
+	ft_free_split(ms.env.envp);
 	return (0);
 }
 
@@ -87,5 +90,6 @@ int	ft_handle_and_tokenize_input(t_minishell *ms)
 	if (ms->n_args == -1)
 		return (1);
 	ms->tokens = ft_tokenize_input(ms->input, ms->n_args, 0, 0);
+	ft_revalue_token_variable(ms);
 	return (0);
 }

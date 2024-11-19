@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/18 20:16:35 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/19 20:27:03 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ typedef struct s_token
 {
 	t_type	type;
 	char	*value;
+
 }	t_token;
 
 /**__Parsing__**/
@@ -127,6 +128,12 @@ void	ft_free_tokens(t_token *tokens);
 void	ft_free_ast(t_node *root);
 /* void	ft_free_env(t_env *env); */
 void	ft_free_split(char **str);
+
+/**__HANDLE_ENV__ **/
+int		ft_revalue_token_variable(t_minishell *ms);
+char	*ft_get_env(const char *key, char **envp);
+char	**ft_duplicate_envp(char **envp);
+int		ft_update_envp(t_minishell *ms, char **envp);
 
 
 #endif
