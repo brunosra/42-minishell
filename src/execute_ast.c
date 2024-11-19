@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute_ast.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/18 20:02:58 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/19 21:00:42 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,6 +209,8 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 	printf("node token: %s\n", node->token->value);
 	if (!ft_strcmp(node->token->value, "echo"))
 		ft_builtin_echo(node->cmd_ready);
+	if (!ft_strcmp(node->token->value, "env"))
+		ft_builtin_env(ms->env.envp);
 	// if (!ft_strcmp(node->token->value, "pwd"))
 	// 	return (printf("builtin: pwd -->"), 1);
 	// if (!ft_strcmp(node->token->value, "exit"))
