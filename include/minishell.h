@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/16 16:10:57 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/18 20:16:35 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,11 +56,20 @@ typedef struct s_ast_node
 	t_node *right;
 }	t_node;
 
+typedef struct s_env
+{
+	char **envp;
+	char *env_paths;
+	char **paths;
+	char *full_path;
+}	t_env;
+
 typedef struct s_minishell
 {
 	char				*input;
 	t_token 			*tokens;
 	t_node				*ast_root;
+	t_env				env;
 	int					status;
 	int					save_stdin;
 	int					save_stdout;
@@ -76,7 +85,7 @@ int	ft_handle_and_tokenize_input(t_minishell *ms);
 /**__HANDLE_INPUT__**/
 int		ft_count_args(char *str);
 int		ft_check_quotes(char *str);
-void	ft_get_additional_input(char **str);
+/* void	ft_get_additional_input(char **str); */
 int		ft_handle_quotes(char *str, int i);
 int		ft_handle_argument(char *str, int i);
 
@@ -101,7 +110,8 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms);
 int	ft_handle_pipe(t_node *node, t_minishell *ms);
 int	ft_execute_command(t_node *node, t_minishell *ms);
 int	ft_handle_heredoc(t_node *node, t_minishell *ms);
-int	ft_handle_builtins(t_node *node, t_minishell *ms);
+//int	ft_handle_builtins(t_node *node, t_minishell *ms); //nao existe pois nao?
+int	ft_find_executable(t_minishell *ms, char *cmd);
 
 /**__BUILTINS__**/
 int		ft_check_builtins(char *str);
@@ -115,6 +125,8 @@ void 			ft_signal_handler(int signum);
 /**__FREE_MALLOCs_**/
 void	ft_free_tokens(t_token *tokens);
 void	ft_free_ast(t_node *root);
-void	ft_free_cmd_ready(char **cmd_ready);
+/* void	ft_free_env(t_env *env); */
+void	ft_free_split(char **str);
+
 
 #endif

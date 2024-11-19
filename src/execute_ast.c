@@ -3,21 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   execute_ast.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/16 16:14:09 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/18 20:02:58 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 int	ft_execute_ast(t_node *node, t_minishell *ms);
+int	ft_handle_heredoc(t_node *node, t_minishell *ms);
 int	ft_handle_output_redirect(t_node *node, t_minishell *ms);
 int	ft_handle_input_redirect(t_node *node, t_minishell *ms);
 int	ft_handle_pipe(t_node *node, t_minishell *ms);
 int	ft_execute_command(t_node *node, t_minishell *ms);
-int	ft_handle_heredoc(t_node *node, t_minishell *ms);
+int	ft_find_executable(t_minishell *ms, char *cmd);
+void ft_free_split(char **str);
 
 int	ft_execute_ast(t_node *node, t_minishell *ms)
 {
@@ -124,10 +126,13 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 	}
 	return (ft_execute_ast(node->left, ms));
 }
+
 int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 {
 	int	fd;
 
+	/* Verificar se o ficheiro e valido */
+	//	TODO
 	if (!ft_strcmp(node->token->value, ">"))
 	{
 		fd = open(node->right->token->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
@@ -226,11 +231,52 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 			ft_exec_builtins(node, ms);
 		else
 		{
-			execvp(node->cmd_ready[0], node->cmd_ready);
+			ft_find_executable(ms, node->cmd_ready[0]);
+			if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
+			{
+				write(2, &node->cmd_ready[0], strlen(node->cmd_ready[0]));
+				write(2, ": command not found\n", 20);
+				exit(127);
+			}
+			execve(ms->env.full_path, node->cmd_ready, ms->env.envp);
 			perror("execvp");
 		}
 		exit(1);
 	}
 	waitpid(ms->pid, &ms->status, 0);
 	return (0);
+}
+
+int	ft_find_executable(t_minishell *ms, char *cmd)
+{
+	int		i;
+
+	i = 0;
+	ms->env.env_paths = getenv("PATH");
+	if (!ms->env.env_paths)
+		return (1);
+	ms->env.paths = ft_split(ms->env.env_paths, ':'); // Divide PATH em diretórios
+	if (!ms->env.paths)
+		return (1);
+	while (ms->env.paths[i])
+	{
+		ms->env.full_path = malloc(ft_strlen(ms->env.paths[i]) + ft_strlen(cmd) + 2); // +2 para '/' e '\0'
+		if (!ms->env.full_path)
+		{
+			ft_free_split(ms->env.paths); /* TODO */
+			return (1);
+		}
+		ft_strcpy(ms->env.full_path, ms->env.paths[i]);
+		ft_strcat(ms->env.full_path, "/");
+		ft_strcat(ms->env.full_path, cmd);
+		if (access(ms->env.full_path, X_OK) == 0) // Verifica se é executável
+		{
+			ft_free_split(ms->env.paths);
+			return (0);
+		}
+		free(ms->env.full_path);
+		i++;
+	}
+	ft_free_split(ms->env.paths);
+	return (127);
 }
