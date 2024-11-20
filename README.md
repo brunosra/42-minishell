@@ -16,6 +16,10 @@
 
 `valgrind -s --track-origins=yes --leak-check=full --show-leak-kinds=all --suppressions=valgrind_readline.supp`
 
+## Minishell Task List:
+
+[Minishell Task List --> Google Drive Sheets](https://docs.google.com/spreadsheets/d/1X4kh5HCZU5TssXyUEBgGDkhZ3uCTyA1BjP974dPNYpY/edit?gid=0#gid=0)
+
 ## Minishell Test List:
 
-[Minishell Test List --> Google Drive Sheets](https://docs.google.com/spreadsheets/d/1xfEmTvdgWb6z7qeyYBdVXCNC3XkYA8FPeYnBQtZGbYI/edit?pli=1&gid=0#gid=0)
+[Minishell Test List --> Google Drive Sheets](https://docs.google.com/spreadsheets/d/1SES4wqFz-qAOcvdbCnbF--DKCN_708L4PudtX_Ihrkc/edit?gid=0#gid=0)
