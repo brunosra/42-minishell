@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:39:44 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/18 01:34:22 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/20 01:11:04 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ int	ft_count_args(char *str)
 
 	i = 0;
 	count = 0;
-/* 	while (ft_check_quotes(str))
-		ft_get_additional_input(&str); // Se necessário, obter mais input */
+ 	if (ft_check_quotes(str))
+		return (-1); // erro por falta de fechar aspas!
 	while (str[i])
 	{
 		while (str[i] == ' ') // Ignora espaços

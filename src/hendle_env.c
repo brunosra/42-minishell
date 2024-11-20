@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/19 20:29:35 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/20 04:35:07 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 int		ft_revalue_token_variable(t_minishell *ms);
 char	*ft_get_env(const char *key, char **envp);
 char	**ft_duplicate_envp(char **envp);
-int		ft_update_envp(t_minishell *ms, char **envp);
 
 char	**ft_duplicate_envp(char **envp)
 {
@@ -57,11 +56,11 @@ int	ft_revalue_token_variable(t_minishell *ms)
 		if (ms->tokens[i].type == TOKEN_VARIABLE)
 		{
 			env_value = ft_get_env(ms->tokens[i].value + 1, ms->env.envp);
-			if (!env_value)
+			if (!env_value) // ALterar isto!!!
 			{
-				ft_putstr_fd("Erro: Variável '", 2);
-				ft_putstr_fd(ms->tokens[i].value, 2);
-				ft_putstr_fd("' não encontrada", 2);
+				ft_putstr_fd("Erro: Variável '", 2); // ALterar isto!!!
+				ft_putstr_fd(ms->tokens[i].value, 2); // ALterar isto!!!
+				ft_putstr_fd("' não encontrada", 2); // ALterar isto!!!
 				return (1);
 			}
 			free(ms->tokens[i].value);
@@ -92,16 +91,4 @@ char	*ft_get_env(const char *key, char **envp)
 		i++;
 	}
 	return (NULL);
-}
-
-int	ft_update_envp(t_minishell *ms, char **envp)
-{
-	ft_free_split(ms->env.envp);
-	ms->env.envp = ft_duplicate_envp(envp);
-	if (!ms->env.envp)
-	{
-		perror("malloc");
-		return (1);
-	}
-	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/19 20:38:55 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/20 04:10:56 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,11 @@ int	main(int argc, char **argv, char **envp)
     		break;
 		}
 		add_history(ms.input);
-		ft_handle_and_tokenize_input(&ms);
+		if (ft_handle_and_tokenize_input(&ms)) // Alterar o que faz e o erro!
+		{
+			fprintf(stderr, "unclosed quotes\n");
+			return (1); // nao e para sair! alterar!
+		}		
 		ms.ast_root = ft_parse_ast(ms.tokens);
 		print_ast(ms.ast_root, 5); // Para testar a estrutura da AST
 		if (ms.ast_root)
@@ -59,7 +63,6 @@ int	main(int argc, char **argv, char **envp)
 			close(ms.save_stdin);
 			close(ms.save_stdout);
 		}
-		ft_update_envp(&ms, envp);
 		ft_free_tokens(ms.tokens);
 		ft_free_ast(ms.ast_root);
 		free(ms.input);
