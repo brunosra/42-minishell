@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/19 20:55:57 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/20 00:27:17 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,15 +29,33 @@ static void print_str_arr(char **args)
 void ft_builtin_echo(char **args)
 {
 	int i;
+	int j;
 	int newline;
 
 	i = 1;
+	j = 2;
 	newline = 1;
 	print_str_arr(args);
-	if (args[i] && !ft_strcmp(args[i], "-n"))
+	while (args[i] && !ft_strncmp(args[i], "-n", 2))
 	{
-		newline = 0;
-		i = 2;
+		while (args[i][j] == 'n')
+			j++;
+		if (args[i][j] == '\0')
+		{
+			i++;
+			newline = 0;
+		}
+		else 
+			break ;	
+	}
+	while (args[i] && !ft_strncmp(args[i], "-n", 2))
+	{
+		while (args[i][j] == 'n')
+			j++;
+		if (args[i][j] == '\0')
+			i++;
+		else
+			break ;
 	}
 	while (args[i])
 	{

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/19 18:20:47 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/20 00:54:19 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,9 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 		(*i)--;
 	//	write(1, tokens[*j].value, ft_strlen(tokens[*j].value));
 		tokens[*j].value = ft_strndup(str + start, *i - start);
+		tokens[*j].type = ft_get_token_type(tokens[*j].value, prev_type);
 		(*j)++;
 	//	write(1, &str[*i], 1);
-		tokens[*j].type = ft_get_token_type(tokens[*j].value, prev_type);
 /* 		if (tokens[*j].type == TOKEN_VARIABLE)
 			ft_revalue_token_varaiable(tokens[*j].value); */
 		return (++(*i));

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute_ast.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/19 21:00:42 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/19 22:50:46 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,7 +209,7 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 	printf("node token: %s\n", node->token->value);
 	if (!ft_strcmp(node->token->value, "echo"))
 		ft_builtin_echo(node->cmd_ready);
-	if (!ft_strcmp(node->token->value, "env"))
+	if (!ft_strcmp(node->token->value, "env") && node->cmd_ready[1] == NULL)
 		ft_builtin_env(ms->env.envp);
 	// if (!ft_strcmp(node->token->value, "pwd"))
 	// 	return (printf("builtin: pwd -->"), 1);
@@ -236,7 +236,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 			ft_find_executable(ms, node->cmd_ready[0]);
 			if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
 			{
-				write(2, &node->cmd_ready[0], strlen(node->cmd_ready[0]));
+				write(2, node->cmd_ready[0], strlen(node->cmd_ready[0]));
 				write(2, ": command not found\n", 20);
 				exit(127);
 			}

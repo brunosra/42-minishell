@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/19 20:29:35 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/19 23:21:16 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 int		ft_revalue_token_variable(t_minishell *ms);
 char	*ft_get_env(const char *key, char **envp);
 char	**ft_duplicate_envp(char **envp);
-int		ft_update_envp(t_minishell *ms, char **envp);
 
 char	**ft_duplicate_envp(char **envp)
 {
@@ -92,16 +91,4 @@ char	*ft_get_env(const char *key, char **envp)
 		i++;
 	}
 	return (NULL);
-}
-
-int	ft_update_envp(t_minishell *ms, char **envp)
-{
-	ft_free_split(ms->env.envp);
-	ms->env.envp = ft_duplicate_envp(envp);
-	if (!ms->env.envp)
-	{
-		perror("malloc");
-		return (1);
-	}
-	return (0);
 }
