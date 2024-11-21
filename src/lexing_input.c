@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/21 05:22:30 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/21 06:09:07 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,21 +22,21 @@ t_token	*ft_tokenize_input(char *str, int n_args, int i, int j)
 	int 	n_tokens;
 
 	n_tokens = 0;
-	tokens = malloc(sizeof(t_token) * (n_args + 1)); // Aloca espaço para os tokens
+	tokens = malloc(sizeof(t_token) * (n_args + 1));
 	if (!tokens)
 		return (NULL);
 	while (str[i])
 	{
-		while (str[i] == ' ') // Ignora espaços
+		while (str[i] == ' ')
 			i++;		
-		if (str[i] == '\0') // Final da string
+		if (str[i] == '\0')
 			break ;
 		i = ft_tokenize(str, &i, tokens, &j);
 		n_tokens++;
 		if (n_tokens == n_args)
 			break ;
 	}
-	tokens[j].value = NULL; // Finaliza com NULL
+	tokens[j].value = NULL;
 	return (tokens);
 }
 
@@ -55,17 +55,11 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 	if (str[*i] == '"' || str[*i] == '\'') // Caso tenha aspas
 	{
 		*i = ft_handle_quotes(str, *i, &start, &end); // Trata as aspas
-		// if (*i == -1)
-		// 	return (-1);
- 		// start++; //tirar para conter as aspas
-		// (*i)--;
-	//	write(1, tokens[*j].value, ft_strlen(tokens[*j].value));
 		tokens[*j].value = ft_strndup(str + start, end - start);
+	//	write(1, tokens[*j].value, ft_strlen(tokens[*j].value));
 		tokens[*j].type = ft_get_token_type(tokens[*j].value, prev_type);
 		(*j)++;
 	//	write(1, &str[*i], 1);
-/* 		if (tokens[*j].type == TOKEN_VARIABLE)
-			ft_revalue_token_varaiable(tokens[*j].value); */
 		return (++(*i));
 	}
  	else if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<')
@@ -86,11 +80,7 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 	tokens[*j].value = ft_strndup(str + start, *i - start);
 //	write(1, tokens[*j].value, ft_strlen(tokens[*j].value));
 	tokens[*j].type = ft_get_token_type(tokens[*j].value, prev_type);
-/* 	if (tokens[*j].type == TOKEN_VARIABLE)
-	{
-		tokens[*j].value = ft_revalue_token_varaiable(tokens[*j].value);
-	}
- */	(*j)++;
+ 	(*j)++;
 	return (*i);
 }
 
