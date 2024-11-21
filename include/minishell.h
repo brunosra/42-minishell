@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/19 23:21:27 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/21 04:17:37 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ int	ft_handle_and_tokenize_input(t_minishell *ms);
 int		ft_count_args(char *str);
 int		ft_check_quotes(char *str);
 /* void	ft_get_additional_input(char **str); */
-int		ft_handle_quotes(char *str, int i);
+int		ft_handle_quotes(char *str, int i, int *start, int *end);
 int		ft_handle_argument(char *str, int i);
 
 /**__LEXING_INPUT__**/

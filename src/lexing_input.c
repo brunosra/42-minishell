@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/20 00:54:19 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/21 05:22:30 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,22 +43,24 @@ t_token	*ft_tokenize_input(char *str, int n_args, int i, int j)
 int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 {
 	int		start;
+	int		end;
 	t_type	prev_type;
 
 	start = *i;
+	end = -1;
 	if (*j > 0)
     	prev_type = tokens[*j - 1].type;
 	else
     	prev_type = TOKEN_VARIABLE;
 	if (str[*i] == '"' || str[*i] == '\'') // Caso tenha aspas
 	{
-		*i = ft_handle_quotes(str, *i); // Trata as aspas
-		if (*i == -1)
-			return (-1);
- 		start++; //tirar para conter as aspas
-		(*i)--;
+		*i = ft_handle_quotes(str, *i, &start, &end); // Trata as aspas
+		// if (*i == -1)
+		// 	return (-1);
+ 		// start++; //tirar para conter as aspas
+		// (*i)--;
 	//	write(1, tokens[*j].value, ft_strlen(tokens[*j].value));
-		tokens[*j].value = ft_strndup(str + start, *i - start);
+		tokens[*j].value = ft_strndup(str + start, end - start);
 		tokens[*j].type = ft_get_token_type(tokens[*j].value, prev_type);
 		(*j)++;
 	//	write(1, &str[*i], 1);
@@ -119,7 +121,7 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 		return (TOKEN_VARIABLE);
 	else if ((prev_type == TOKEN_COMMAND || prev_type == TOKEN_BUILTIN || prev_type == TOKEN_ARGUMENT))
 		return (TOKEN_ARGUMENT);
-	else if (((str[0] == '"' || str[0] == '\'') && prev_type != TOKEN_COMMAND) || prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT || prev_type == TOKEN_HEREDOC)
+	else if (((str[0] == '"' || str[0] == '\'') && (prev_type != TOKEN_COMMAND && prev_type != TOKEN_VARIABLE)) || (prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT || prev_type == TOKEN_HEREDOC))
 		return (TOKEN_FILENAME);
 	else if (ft_check_builtins(str))
 		return (TOKEN_BUILTIN);
