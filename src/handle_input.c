@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:39:44 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/20 01:11:04 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/21 06:00:22 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int			ft_count_args(char *str);
 int			ft_check_quotes(char *str);
 /* void		ft_get_additional_input(char **str); */
-int			ft_handle_quotes(char *str, int i);
+int			ft_handle_quotes(char *str, int i, int *start, int *end);
 int			ft_handle_argument(char *str, int i);
 
 int	ft_count_args(char *str)
@@ -42,7 +42,7 @@ int	ft_count_args(char *str)
 		}
 		else if (str[i] == '"' || str[i] == '\'') // Caso tenha aspas
 		{
-			i = ft_handle_quotes(str, i); // Trata as aspas
+			i = ft_handle_quotes(str, i, 0, 0); // Trata as aspas
 			if (i == -1)
 				return (-1);
 		}
@@ -69,7 +69,9 @@ int	ft_check_quotes(char *str)
 			quote_type = '\0';
 		i++;
 	}
-	return (quote_type != '\0');
+	if (quote_type != '\0')
+		return (1);
+	return (0);
 }
 
 /* void	ft_get_additional_input(char **str)
@@ -91,17 +93,47 @@ int	ft_check_quotes(char *str)
 	}
 } */
 
-int	ft_handle_quotes(char *str, int i)
+int	ft_handle_quotes(char *str, int i, int *start, int *end)
 {
+	char	single_quote;
+	char	double_quote;
 	char	quote_type;
 
 	quote_type = str[i];
-	i++;
-	while (str[i] && str[i] != quote_type)
+	double_quote = '"';
+	single_quote = '\'';
+	if (str[i] && str[i] == quote_type)
+	{
+		while (str[i] && str[i] == quote_type)
+			i++;
+		if ((str[i] != quote_type && (str[i] == double_quote || str[i] == single_quote)) || (str[i] != quote_type && (str[i] != double_quote || str[i] != single_quote)))
+		{
+			if (start)
+				*start = i;
+			if (str[i] != quote_type && (str[i] == double_quote || str[i] == single_quote))
+				i++;
+		}
+		while (str[i] && (str[i] == double_quote || str[i] == single_quote))
+			i++;
+		if (start && str[*start] != quote_type && str[*start] != double_quote && str[*start] != single_quote)
+		{
+			if (start)
+				*start = i;
+		}
+	}
+	while (str[i] && str[i] != quote_type )
 		i++;
-	if (str[i] == '\0')
-		return (-1);
-	i++;
+	if (end)
+		*end = i;
+	while (str[i] && (str[i] == double_quote || str[i] == single_quote))
+	{
+		if (str[i] != quote_type && (str[i] == double_quote || str[i] == single_quote) )
+		{
+			if (end)
+				*end = i + 1;
+		}
+		i++;
+	}
 	return (i);
 }
 

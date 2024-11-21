@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/19 22:50:46 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/20 19:20:49 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,6 +233,14 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 			ft_exec_builtins(node, ms);
 		else
 		{
+			if (node->cmd_ready[0][0] == '/' || 
+				(node->cmd_ready[0][0] == '.' && node->cmd_ready[0][1] == '/') || 
+				!ft_strncmp(node->cmd_ready[0], "../", 3)) 
+			{
+				execve(node->cmd_ready[0], node->cmd_ready, ms->env.envp);
+				perror("execve");
+				exit(127);
+			}
 			ft_find_executable(ms, node->cmd_ready[0]);
 			if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
 			{
@@ -241,7 +249,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 				exit(127);
 			}
 			execve(ms->env.full_path, node->cmd_ready, ms->env.envp);
-			perror("execvp");
+			perror("execve");
 		}
 		exit(1);
 	}
