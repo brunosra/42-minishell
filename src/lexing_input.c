@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/23 02:57:44 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/23 04:07:05 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,21 +24,21 @@ t_token	*ft_tokenize_input(char *str, int n_args, int i, int j)
 	int 	n_tokens;
 
 	n_tokens = 0;
-	tokens = malloc(sizeof(t_token) * (n_args + 1)); // Aloca espaço para os tokens
+	tokens = malloc(sizeof(t_token) * (n_args + 1));
 	if (!tokens)
 		return (NULL);
 	while (str[i])
 	{
-		while (str[i] == ' ') // Ignora espaços
+		while (str[i] == ' ')
 			i++;		
-		if (str[i] == '\0') // Final da string
+		if (str[i] == '\0')
 			break ;
 		i = ft_tokenize(str, &i, tokens, &j);
 		n_tokens++;
 		if (n_tokens == n_args)
 			break ;
 	}
-	tokens[j].value = NULL; // Finaliza com NULL
+	tokens[j].value = NULL;
 	return (tokens);
 }
 
@@ -47,32 +47,20 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 	int		start;
 	int		end;
 	t_type	prev_type;
-	// char	*value;
 
-	// value = NULL;
 	start = *i;
 	end = -1;
 	if (*j > 0)
     	prev_type = tokens[*j - 1].type;
 	else
     	prev_type = TOKEN_VARIABLE;
-	if (str[*i] == '"' || str[*i] == '\'') // Caso tenha aspas
+	if (str[*i] == '"' || str[*i] == '\'')
 	{
-		*i = ft_handle_quotes(str, *i, &start, &end); // Trata as aspas
-		// if (*i == -1)
-		// 	return (-1);
- 		// start++; //tirar para conter as aspas
-		// (*i)--;
-	//	write(1, tokens[*j].value, ft_strlen(tokens[*j].value));
+		*i = ft_handle_quotes(str, *i, &start, &end);
 		tokens[*j].value = ft_strndup(str + start, end - start);
-		// value = tokens[*j].value;
 		tokens[*j].value = ft_revalue_quoted_value(tokens[*j].value);
-		// free(value);
 		tokens[*j].type = ft_get_token_type(tokens[*j].value, prev_type);
 		(*j)++;
-	//	write(1, &str[*i], 1);
-/* 		if (tokens[*j].type == TOKEN_VARIABLE)
-			ft_revalue_token_varaiable(tokens[*j].value); */
 		return (++(*i));
 	}
  	else if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<')
@@ -91,13 +79,8 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 		}	
 	}
 	tokens[*j].value = ft_strndup(str + start, *i - start);
-//	write(1, tokens[*j].value, ft_strlen(tokens[*j].value));
 	tokens[*j].type = ft_get_token_type(tokens[*j].value, prev_type);
-/* 	if (tokens[*j].type == TOKEN_VARIABLE)
-	{
-		tokens[*j].value = ft_revalue_token_varaiable(tokens[*j].value);
-	}
- */	(*j)++;
+	(*j)++;
 	return (*i);
 }
 
@@ -119,7 +102,7 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 	if (!ft_strcmp(str, "||") || !ft_strcmp(str, "&&"))
 	{
 		fprintf(stderr, "./minishell: syntax error near unexpected token `||'\n"); //substituir por ft_putstr_fd
-		exit(1); // limpar antes
+		exit(1); // limpar antes de sair
 	}
 	if (prev_type == TOKEN_OPERATOR)
 		return (TOKEN_COMMAND);
@@ -162,7 +145,6 @@ char	*ft_revalue_quoted_value(char *value)
 		return (NULL);
 	while (value[i])
 	{
-		// Detecta o início de uma sequência de aspas
 		if (value[i] == '"' || value[i] == '\'')
 		{
 			quote_type = value[i];
@@ -173,36 +155,21 @@ char	*ft_revalue_quoted_value(char *value)
 				i++;
 				continue ;
 			}
-
-			// Avança até encontrar o fechamento da aspa correspondente
 			while (value[i] && value[i] != quote_type )
 				i++;
-
-/* 			// Se as aspas estão vazias, ignore-as
-			if (start == &value[i])
-			{
-				i++;
-				continue;
-			}
- */
-			// Inclui o conteúdo com as aspas
 			if (value[i] == quote_type)
 				i++;
 			end = &value[i];
 			arg = ft_substr(value, start - value, end - start);
-			// i++;
 		}
-		else
+		else // Processa texto fora das aspas
 		{
-			// Processa texto fora das aspas
 			start = &value[i];
 			while (value[i] && value[i] != '"' && value[i] != '\'')
 				i++;
 			end = &value[i];
 			arg = ft_substr(value, start - value, end - start);
 		}
-
-		// Concatena no resultado final
 		if (!final)
 		{
 			final = ft_strdup(arg);

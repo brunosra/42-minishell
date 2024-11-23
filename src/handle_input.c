@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:39:44 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/23 02:50:02 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/23 04:03:23 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,9 @@ int	ft_count_args(char *str)
 		return (-1); // erro por falta de fechar aspas!
 	while (str[i])
 	{
-		while (str[i] == ' ') // Ignora espaços
+		while (str[i] == ' ')
 			i++;
-		if (str[i] == '\0') // Final da string
+		if (str[i] == '\0')
 			break ;
 		if (str[i] == '|' || str[i] == '<' || str[i] == '>')
 		{
@@ -43,17 +43,17 @@ int	ft_count_args(char *str)
 				i++;
 			
 		}
-		else if (str[i] == '"' || str[i] == '\'') // Caso tenha aspas
+		else if (str[i] == '"' || str[i] == '\'')
 		{
-			i = ft_handle_quotes(str, i, 0, 0); // Trata as aspas
+			i = ft_handle_quotes(str, i, 0, 0);
 			if (i == -1)
 				return (-1);
 		}
 		else
-			i = ft_handle_argument(str, i); // Chama a função auxiliar para avançar o índice no argumento
+			i = ft_handle_argument(str, i); // avançar o índice no argumento
 		count++;
 	}
-	printf("%i\n", count);
+	printf("%i\n", count); // retirar no final
 	return (count);
 }
 
@@ -102,13 +102,10 @@ int ft_handle_quotes(char *str, int i, int *start, int *end)
     char double_quote = '"';
     char quote_type;
 
-    // Verificar se o valor de start deve ser atribuído
     if (start)
         *start = i;
-
     while (str[i])
 	{
-        // Identifica aspas simples ou duplas
         if (str[i] == single_quote || str[i] == double_quote)
 		{
             quote_type = str[i]; // Identifica o tipo de aspa (simples ou dupla)
@@ -118,22 +115,13 @@ int ft_handle_quotes(char *str, int i, int *start, int *end)
 				i++;
 				continue ;
 			}			
-            // Vai até o final do conteúdo entre as aspas
-            while (str[i] && str[i] != quote_type)
-			{
+            while (str[i] && str[i] != quote_type) // Vai até o final do conteúdo entre as aspas
                 i++;
-            }
-
-            // Se encontrar a aspa de fechamento
             if (str[i] == quote_type)
 			{
                 i++; // Avança para passar a aspa de fechamento
-
-                // Se o próximo caractere for um espaço ou NULL, podemos parar
-                if (str[i] == ' ' || str[i] == '\0')
-				{
+                if (str[i] == ' ' || str[i] == '\0') // Se o próximo caractere for um espaço ou NULL, podemos parar
                     break ;
-                }
 				if (str[i] && str[i] != ' ' && str[i] != single_quote && str[i] != double_quote)
 				{
 					while (str[i] && str[i] != ' ' && str[i] != single_quote && str[i] != double_quote)
@@ -144,16 +132,11 @@ int ft_handle_quotes(char *str, int i, int *start, int *end)
             }
         }
 		else
-		{
             i++; // Avança caso não seja uma aspa
-        }
     }
-
-    // Verifica o final do conteúdo
     if (end)
         *end = i;
-
-    return (i); // Retorna o índice após processar as aspas
+    return (i);
 }
 
 int	ft_handle_argument(char *str, int i)

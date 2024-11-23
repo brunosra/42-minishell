@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/22 17:45:04 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/23 04:15:03 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@ t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right);
 t_node	*ft_group_command_tokens(t_token *tokens, int *index);
 int		ft_verify_cmd_node_value(t_node *cmd_node);
 char	*ft_remove_quotes(char *value);
-int ft_value_has_space(char *value);
+/* int ft_value_has_space(char *value);*/
+
 /* Temporaria para testar */
 void	print_ast(t_node *node, int depth);
 
@@ -39,7 +40,6 @@ t_node *ft_parse_ast(t_token *tokens)
 	{
         if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND || tokens[i].type == TOKEN_FILENAME || tokens[i].type == TOKEN_VARIABLE)
 		{
-            // Agrupa o comando e argumentos em um único nó de comando
             if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND)
 				cmd_node = ft_group_command_tokens(tokens, &i);
 			else
@@ -48,18 +48,13 @@ t_node *ft_parse_ast(t_token *tokens)
 				i++;
 			}
             if (!root)
-			{
                 root = cmd_node;
-            }
 			else if (current && (current->token->type == TOKEN_OPERATOR || current->token->type == TOKEN_OUTPUT_REDIRECT || current->token->type == TOKEN_INPUT_REDIRECT || current->token->type == TOKEN_HEREDOC))
-			{
                 current->right = cmd_node;
-            }
             current = cmd_node;
         }
         else if (tokens[i].type == TOKEN_OPERATOR || tokens[i].type == TOKEN_OUTPUT_REDIRECT || tokens[i].type == TOKEN_INPUT_REDIRECT || tokens[i].type == TOKEN_HEREDOC)
 		{
-            // Processa operadores como |, >, <, >>, <<
             if (!ft_strcmp(tokens[i].value, "|"))
 			{
                 op_node = ft_create_operator_node(&tokens[i], root, NULL);
@@ -79,29 +74,6 @@ t_node *ft_parse_ast(t_token *tokens)
     return (root);
 }
 
-// Função para agrupar tokens em um único nó de comando
-/* t_node *ft_group_command_tokens(t_token *tokens, int *index)
-{
-    t_node *cmd_node;
-	char	*temp;
-    
-	temp = NULL;
-	cmd_node = ft_create_cmd_node(&tokens[*index]);
-	(*index)++;
-    while (tokens[*index].value && tokens[*index].type == TOKEN_ARGUMENT)
-	{
-        temp = ft_strjoin(cmd_node->token->value, " ");
-	//	write(1, cmd_node->token->value, ft_strlen(cmd_node->token->value));
-	//	free(cmd_node->token->value);
-		cmd_node->token->value = ft_strjoin(temp, tokens[*index].value);
-        free(temp); 
-        (*index)++;
-    }
-	cmd_node->cmd_ready = ft_split(cmd_node->token->value, ' ');
-    return (cmd_node);
-}
- */
-
 t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 {
 	t_node	*cmd_node;
@@ -111,10 +83,8 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 	int		j;
 	int		n_args_cmd_nd_values;
 
-	// Cria o nó de comando
 	cmd_node = ft_create_cmd_node(&tokens[*index]);
 	cmd_nd_value = NULL;
-	// Conta o número de argumentos e o comando inicial
 	arg_count = 1;
 	i = 0;
 	j = 0;
@@ -139,11 +109,8 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 		ft_free_split(cmd_nd_value);
 		arg_count--;
 	}
-	else if (/* !ft_value_has_space(cmd_node->token->value) && */ (*cmd_node->token->value == '"' || *cmd_node->token->value == '\''))
-	{
+	else if (*cmd_node->token->value == '"' || *cmd_node->token->value == '\'')
 		cmd_node->token->value = ft_remove_quotes(cmd_node->token->value);
-	}
-	// Reinicia o índice para armazenar comando e argumentos
 	*index -= arg_count; // Ajusta o índice para voltar ao início do comando
 	i = j;
 	if (n_args_cmd_nd_values != 1)
@@ -158,16 +125,15 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 		}
 		else
 			cmd_node->cmd_ready[i] = ft_strdup(tokens[*index].value);
-	//	write(1, cmd_node->cmd_ready[i], ft_strlen(cmd_node->cmd_ready[i]));
 		i++;
 		(*index)++;
 	}
-	cmd_node->cmd_ready[i] = NULL; // Finaliza com NULL para o formato execve
+	cmd_node->cmd_ready[i] = NULL;
 
 	return (cmd_node);
 }
 
-int ft_value_has_space(char *value)
+/* int ft_value_has_space(char *value)
 {
 	int i;
 
@@ -181,6 +147,7 @@ int ft_value_has_space(char *value)
 	return (1);
 	
 }
+ */
 
 char	*ft_remove_quotes(char *value)
 {
@@ -235,7 +202,7 @@ char	*ft_remove_quotes(char *value)
 	return (new_value);
 }
 
-int ft_verify_cmd_node_value(t_node *cmd_node) // alterar
+int ft_verify_cmd_node_value(t_node *cmd_node)
 {
 	int i;
 	int count;
