@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/21 04:17:37 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/22 05:18:24 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,13 +94,16 @@ int		ft_handle_argument(char *str, int i);
 t_token	*ft_tokenize_input(char *str, int n_args, int i, int j);
 int		ft_tokenize(char *str, int *i, t_token *tokens, int *j);
 t_type	ft_get_token_type(char *str, t_type prev_type);
+char	*ft_revalue_quoted_value(char *value);
 
 /**__PARSING_AST_(Abstract Syntax Tree)__**/
 t_node	*ft_parse_ast(t_token *tokens); // muito grande!
 t_node	*ft_create_cmd_node(t_token *token);
 t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right);
 t_node	*ft_group_command_tokens(t_token *tokens, int *index);
-
+int		ft_verify_cmd_node_value(t_node *cmd_node);
+char	*ft_remove_quotes(char *value);
+int ft_value_has_space(char *value);
 /* Temporaria para testar */
 void	print_ast(t_node *node, int depth);
 

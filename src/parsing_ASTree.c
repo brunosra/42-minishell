@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/19 00:25:55 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/22 17:45:04 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@ t_node	*ft_parse_ast(t_token *tokens);
 t_node	*ft_create_cmd_node(t_token *token);
 t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right);
 t_node	*ft_group_command_tokens(t_token *tokens, int *index);
+int		ft_verify_cmd_node_value(t_node *cmd_node);
+char	*ft_remove_quotes(char *value);
+int ft_value_has_space(char *value);
 /* Temporaria para testar */
 void	print_ast(t_node *node, int depth);
 
@@ -104,30 +107,57 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 	t_node	*cmd_node;
 	int		arg_count;
 	int		i;
+	char 	**cmd_nd_value;
+	int		j;
+	int		n_args_cmd_nd_values;
 
 	// Cria o nó de comando
 	cmd_node = ft_create_cmd_node(&tokens[*index]);
-
+	cmd_nd_value = NULL;
 	// Conta o número de argumentos e o comando inicial
 	arg_count = 1;
+	i = 0;
+	j = 0;
+	n_args_cmd_nd_values = ft_verify_cmd_node_value(cmd_node);
 	(*index)++;
 	while (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE))
 	{
 		arg_count++;
 		(*index)++;
 	}
-
-	// Aloca `cmd_ready` para o comando e argumentos + espaço para o NULL final
-	cmd_node->cmd_ready = malloc(sizeof(char *) * (arg_count + 1));
+	cmd_node->cmd_ready = malloc(sizeof(char *) * (arg_count + (n_args_cmd_nd_values - 1) + 1));
 	if (!cmd_node->cmd_ready)
 		return (NULL);
-
+	if (n_args_cmd_nd_values > 1)
+	{
+		cmd_nd_value = ft_split(cmd_node->token->value, ' ');
+		while (cmd_nd_value[j])
+		{
+			cmd_node->cmd_ready[j] = ft_strdup(cmd_nd_value[j]);
+			j++;
+		}
+		ft_free_split(cmd_nd_value);
+		arg_count--;
+	}
+	else if (/* !ft_value_has_space(cmd_node->token->value) && */ (*cmd_node->token->value == '"' || *cmd_node->token->value == '\''))
+	{
+		cmd_node->token->value = ft_remove_quotes(cmd_node->token->value);
+	}
 	// Reinicia o índice para armazenar comando e argumentos
 	*index -= arg_count; // Ajusta o índice para voltar ao início do comando
-	i = 0;
+	i = j;
+	if (n_args_cmd_nd_values != 1)
+		arg_count += n_args_cmd_nd_values;
 	while (i < arg_count)
 	{
-		cmd_node->cmd_ready[i] = ft_strdup(tokens[*index].value);
+		if (i > j)
+		{
+			if (tokens[*index].value[0] == '"' || tokens[*index].value[0] == '\'')
+				tokens[*index].value = ft_remove_quotes(tokens[*index].value);
+			cmd_node->cmd_ready[i] = ft_strdup(tokens[*index].value);
+		}
+		else
+			cmd_node->cmd_ready[i] = ft_strdup(tokens[*index].value);
 	//	write(1, cmd_node->cmd_ready[i], ft_strlen(cmd_node->cmd_ready[i]));
 		i++;
 		(*index)++;
@@ -137,6 +167,96 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 	return (cmd_node);
 }
 
+int ft_value_has_space(char *value)
+{
+	int i;
+
+	i = 0;
+	if (!*value)
+		return (-1);
+	while (value[i] && value[i] != ' ')
+		i++;
+	if (value[i] == '\0')
+		return (0);
+	return (1);
+	
+}
+
+char	*ft_remove_quotes(char *value)
+{
+	int		i;
+	int		start;
+	char	quote_type;
+	char	*new_value;
+	char	*temp;
+	char	*sub;
+
+	i = 0;
+	new_value = NULL;
+	while (value[i])
+	{
+		if (value[i] == '\'' || value[i] == '\"')
+		{
+			quote_type = value[i++];
+			start = i;
+			while (value[i] && value[i] != quote_type)
+				i++;
+			sub = ft_substr(value, start, i - start);
+			if (new_value == NULL)
+				new_value = ft_strdup(sub);
+			else
+			{
+				temp = new_value;
+				new_value = ft_strjoin(new_value, sub);
+				free(temp);
+			}
+			free(sub);
+			if (value[i])
+				i++;
+		}
+		else
+		{
+			start = i;
+			while (value[i] && value[i] != '\'' && value[i] != '\"')
+				i++;
+			sub = ft_substr(value, start, i - start);
+			if (new_value == NULL)
+				new_value = ft_strdup(sub);
+			else
+			{
+				temp = new_value;
+				new_value = ft_strjoin(new_value, sub);
+				free(temp);
+			}
+			free(sub);
+		}
+	}
+	free(value);
+	return (new_value);
+}
+
+int ft_verify_cmd_node_value(t_node *cmd_node) // alterar
+{
+	int i;
+	int count;
+	char *value;
+
+	i = 0;
+	count = 0;
+	value = cmd_node->token->value;
+	if (value[i] == '"' || value[i] == '\'')
+		return (1);
+	while (value[i])
+	{
+		if (value[i] && value[i] != ' ')
+			count++;
+		while (value[i] && value[i] != ' ')
+			i++;
+		while (value[i] && value[i] == ' ')
+			i++;	
+	}
+	return (count);
+}
 
 t_node	*ft_create_cmd_node(t_token *token)
 {

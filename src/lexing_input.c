@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/21 06:09:07 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/23 02:57:44 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 t_token			*ft_tokenize_input(char *str, int n_args, int i, int j);
 int				ft_tokenize(char *str, int *i, t_token *tokens, int *j);
 t_type			ft_get_token_type(char *str, t_type prev_type);
+char			*ft_revalue_quoted_value(char *value);
+
 
 t_token	*ft_tokenize_input(char *str, int n_args, int i, int j)
 {
@@ -22,21 +24,21 @@ t_token	*ft_tokenize_input(char *str, int n_args, int i, int j)
 	int 	n_tokens;
 
 	n_tokens = 0;
-	tokens = malloc(sizeof(t_token) * (n_args + 1));
+	tokens = malloc(sizeof(t_token) * (n_args + 1)); // Aloca espaço para os tokens
 	if (!tokens)
 		return (NULL);
 	while (str[i])
 	{
-		while (str[i] == ' ')
+		while (str[i] == ' ') // Ignora espaços
 			i++;		
-		if (str[i] == '\0')
+		if (str[i] == '\0') // Final da string
 			break ;
 		i = ft_tokenize(str, &i, tokens, &j);
 		n_tokens++;
 		if (n_tokens == n_args)
 			break ;
 	}
-	tokens[j].value = NULL;
+	tokens[j].value = NULL; // Finaliza com NULL
 	return (tokens);
 }
 
@@ -45,7 +47,9 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 	int		start;
 	int		end;
 	t_type	prev_type;
+	// char	*value;
 
+	// value = NULL;
 	start = *i;
 	end = -1;
 	if (*j > 0)
@@ -55,17 +59,26 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 	if (str[*i] == '"' || str[*i] == '\'') // Caso tenha aspas
 	{
 		*i = ft_handle_quotes(str, *i, &start, &end); // Trata as aspas
-		tokens[*j].value = ft_strndup(str + start, end - start);
+		// if (*i == -1)
+		// 	return (-1);
+ 		// start++; //tirar para conter as aspas
+		// (*i)--;
 	//	write(1, tokens[*j].value, ft_strlen(tokens[*j].value));
+		tokens[*j].value = ft_strndup(str + start, end - start);
+		// value = tokens[*j].value;
+		tokens[*j].value = ft_revalue_quoted_value(tokens[*j].value);
+		// free(value);
 		tokens[*j].type = ft_get_token_type(tokens[*j].value, prev_type);
 		(*j)++;
 	//	write(1, &str[*i], 1);
+/* 		if (tokens[*j].type == TOKEN_VARIABLE)
+			ft_revalue_token_varaiable(tokens[*j].value); */
 		return (++(*i));
 	}
  	else if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<')
 	{
 		(*i)++;
-		if (str[*i] == '>' || str[*i] == '<')
+		if (str[*i] == '>' || str[*i] == '<' || str[*i] == '|')
 			(*i)++;
 	}
 	else
@@ -80,7 +93,11 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 	tokens[*j].value = ft_strndup(str + start, *i - start);
 //	write(1, tokens[*j].value, ft_strlen(tokens[*j].value));
 	tokens[*j].type = ft_get_token_type(tokens[*j].value, prev_type);
- 	(*j)++;
+/* 	if (tokens[*j].type == TOKEN_VARIABLE)
+	{
+		tokens[*j].value = ft_revalue_token_varaiable(tokens[*j].value);
+	}
+ */	(*j)++;
 	return (*i);
 }
 
@@ -99,6 +116,13 @@ int ft_check_builtins(char *str)
 
 t_type	ft_get_token_type(char *str, t_type prev_type)
 {
+	if (!ft_strcmp(str, "||") || !ft_strcmp(str, "&&"))
+	{
+		fprintf(stderr, "./minishell: syntax error near unexpected token `||'\n"); //substituir por ft_putstr_fd
+		exit(1); // limpar antes
+	}
+	if (prev_type == TOKEN_OPERATOR)
+		return (TOKEN_COMMAND);
 	if (!ft_strcmp(str, "|"))
 		return (TOKEN_OPERATOR);
 	else if (!ft_strcmp(str, ">") || !ft_strcmp(str, ">>"))
@@ -111,9 +135,88 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 		return (TOKEN_VARIABLE);
 	else if ((prev_type == TOKEN_COMMAND || prev_type == TOKEN_BUILTIN || prev_type == TOKEN_ARGUMENT))
 		return (TOKEN_ARGUMENT);
-	else if (((str[0] == '"' || str[0] == '\'') && (prev_type != TOKEN_COMMAND && prev_type != TOKEN_VARIABLE)) || (prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT || prev_type == TOKEN_HEREDOC))
+	else if (((str[0] == '"' || str[0] == '\'') && (prev_type != TOKEN_COMMAND && prev_type != TOKEN_VARIABLE && prev_type != TOKEN_OPERATOR)) || (prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT || prev_type == TOKEN_HEREDOC))
 		return (TOKEN_FILENAME);
 	else if (ft_check_builtins(str))
 		return (TOKEN_BUILTIN);
 	return (TOKEN_COMMAND);
 }
+
+char	*ft_revalue_quoted_value(char *value)
+{
+	int		i;
+	char	quote_type;
+	char	*start;
+	char	*end;
+	char	*arg;
+	char	*final;
+	char	*temp;
+
+	i = 0;
+	final = NULL;
+	temp = NULL;
+	arg = NULL;
+	end = NULL;
+	start = NULL;
+	if (!value)
+		return (NULL);
+	while (value[i])
+	{
+		// Detecta o início de uma sequência de aspas
+		if (value[i] == '"' || value[i] == '\'')
+		{
+			quote_type = value[i];
+			start = &value[i];
+			i++;
+			if (value[i] == quote_type)
+			{
+				i++;
+				continue ;
+			}
+
+			// Avança até encontrar o fechamento da aspa correspondente
+			while (value[i] && value[i] != quote_type )
+				i++;
+
+/* 			// Se as aspas estão vazias, ignore-as
+			if (start == &value[i])
+			{
+				i++;
+				continue;
+			}
+ */
+			// Inclui o conteúdo com as aspas
+			if (value[i] == quote_type)
+				i++;
+			end = &value[i];
+			arg = ft_substr(value, start - value, end - start);
+			// i++;
+		}
+		else
+		{
+			// Processa texto fora das aspas
+			start = &value[i];
+			while (value[i] && value[i] != '"' && value[i] != '\'')
+				i++;
+			end = &value[i];
+			arg = ft_substr(value, start - value, end - start);
+		}
+
+		// Concatena no resultado final
+		if (!final)
+		{
+			final = ft_strdup(arg);
+			free(arg);
+		}
+		else
+		{
+			temp = final;
+			final = ft_strjoin(final, arg);
+			free(temp);
+			free(arg);
+		}
+	}
+	free(value);
+	return (final);
+}
+
