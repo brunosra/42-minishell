@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/25 01:46:21 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/25 04:47:19 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,12 +121,18 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 		{
 			// if (tokens[*index].value[0] == '"' || tokens[*index].value[0] == '\'')
 				tokens[*index].value = ft_remove_quotes(tokens[*index].value);
-			cmd_node->cmd_ready[i] = ft_strdup(tokens[*index].value);
+			if (tokens[*index].value)
+				cmd_node->cmd_ready[i] = ft_strdup(tokens[*index].value);
+			else
+				cmd_node->cmd_ready[i] = ft_strdup(""); // talvez seja para mudar!
 		}
 		else
 		{
 			// tokens[*index].value = ft_remove_quotes(tokens[*index].value);
-			cmd_node->cmd_ready[i] = ft_strdup(tokens[*index].value);
+			if (tokens[*index].value)
+				cmd_node->cmd_ready[i] = ft_strdup(tokens[*index].value);
+			else
+				cmd_node->cmd_ready[i] = ft_strdup(""); // talvez seja para mudar!
 		}
 		i++;
 		(*index)++;

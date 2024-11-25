@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/25 01:21:58 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/25 04:38:57 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ char	**ft_duplicate_envp(char **envp);
 int		ft_check_if_expand(char *str, char *ptr);
 int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
 char	*ft_get_env_value(const char *str, char **envp, char **key);
-
+int		ft_remove_str(char **value, char *key, char *ptr);
 
 char	**ft_duplicate_envp(char **envp)
 {
@@ -76,9 +76,12 @@ int	ft_revalue_token_variable(t_minishell *ms)
 						ft_putstr_fd("Erro: Variável '", 2); // ALterar isto!!!
 						ft_putstr_fd(ms->tokens[i].value, 2); // ALterar isto!!!
 						ft_putstr_fd("' não encontrada", 2); // ALterar isto!!!
-						return (1);
+						// env_value = ft_strdup("");
 					}
+					if (!env_value)
+						ft_remove_str(&ms->tokens[i].value, key, ptr);
 					// free(ms->tokens[i].value);
+					else
 					/* ms->tokens[i].value =  */ft_replace_str(&ms->tokens[i].value, key, ptr, env_value);
 					if (*key)
 						free(key);
@@ -209,5 +212,40 @@ int	ft_check_if_expand(char *str, char *ptr)
 		i++;
 	}
 
+	return (0);
+}
+
+int	ft_remove_str(char **value, char *key, char *ptr)
+{
+	char	*new_value;
+	char	*start;
+	char	*end;
+	size_t	new_len;
+
+	if (!value || !*value || !key || !ptr)
+		return (1);
+	start = ft_substr(*value, 0, ptr - *value);
+	if (!start)
+		return (1);
+	end = ft_strdup(++ptr + ft_strlen(key) + 1);
+	if (!end)
+	{
+		free(start);
+		return (1);
+	}
+	new_len = ft_strlen(start) + ft_strlen(end) + 1;
+	new_value = malloc(new_len);
+	if (!new_value)
+	{
+		free(start);
+		free(end);
+		return (1);
+	}
+	ft_strlcpy(new_value, start, new_len);
+	ft_strlcat(new_value, end, new_len);
+	free(start);
+	free(end);
+	free(*value);
+	*value = new_value;
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/25 00:24:35 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/25 04:31:07 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,6 +143,6 @@ char	**ft_duplicate_envp(char **envp);
 int		ft_check_if_expand(char *str, char *ptr);
 int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
 char	*ft_get_env_value(const char *str, char **envp, char **key);
-
+int		ft_remove_str(char **value, char *key, char *ptr);
 
 #endif

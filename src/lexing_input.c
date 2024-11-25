@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/25 02:12:08 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/25 04:58:05 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,10 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 	{
 		*i = ft_handle_quotes(str, *i, &start, &end);
 		tokens[*j].value = ft_strndup(str + start, end - start);
-		tokens[*j].value = ft_revalue_quoted_value(tokens[*j].value);
+		if (end - start == 2)
+			tokens[*j].value = ft_strdup("\0");
+		else
+			tokens[*j].value = ft_revalue_quoted_value(tokens[*j].value);
 		tokens[*j].type = ft_get_token_type(tokens[*j].value, prev_type);
 		(*j)++;
 		return (++(*i));
@@ -99,13 +102,13 @@ int ft_check_builtins(char *str)
 
 t_type	ft_get_token_type(char *str, t_type prev_type)
 {
+	if (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL) // TOKEN NULL mas + if ou mudar a posicao!
+		return (TOKEN_COMMAND);
 	if (!ft_strcmp(str, "||") || !ft_strcmp(str, "&&"))
 	{
 		fprintf(stderr, "./minishell: syntax error near unexpected token `||'\n"); //substituir por ft_putstr_fd
 		exit(1); // limpar antes de sair
 	}
-	if (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL) // TOKEN NULL mas + if ou mudar a posicao!
-		return (TOKEN_COMMAND);
 	if (!ft_strcmp(str, "|"))
 		return (TOKEN_OPERATOR);
 	else if (!ft_strcmp(str, ">") || !ft_strcmp(str, ">>"))
