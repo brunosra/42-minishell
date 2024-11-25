@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/23 04:15:03 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/25 01:46:21 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,12 +119,15 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 	{
 		if (i > j)
 		{
-			if (tokens[*index].value[0] == '"' || tokens[*index].value[0] == '\'')
+			// if (tokens[*index].value[0] == '"' || tokens[*index].value[0] == '\'')
 				tokens[*index].value = ft_remove_quotes(tokens[*index].value);
 			cmd_node->cmd_ready[i] = ft_strdup(tokens[*index].value);
 		}
 		else
+		{
+			// tokens[*index].value = ft_remove_quotes(tokens[*index].value);
 			cmd_node->cmd_ready[i] = ft_strdup(tokens[*index].value);
+		}
 		i++;
 		(*index)++;
 	}
@@ -184,7 +187,7 @@ char	*ft_remove_quotes(char *value)
 		else
 		{
 			start = i;
-			while (value[i] && value[i] != '\'' && value[i] != '\"')
+			while (value[i] && value[i] != '\'' && value[i] != '\"')  // VER O QUE ALTERA!
 				i++;
 			sub = ft_substr(value, start, i - start);
 			if (new_value == NULL)

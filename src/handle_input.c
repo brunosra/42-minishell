@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:39:44 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/23 04:03:23 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/24 21:55:26 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,8 @@ int ft_handle_quotes(char *str, int i, int *start, int *end)
 
 int	ft_handle_argument(char *str, int i)
 {
-	while (str[i] && str[i] != ' ' && str[i] != '"' && str[i] != '\'' && str[i] != '|' && str[i] != '>' && str[i] != '<')
-		i++; // Avança até o próximo espaço ou aspa
+	while (str[i] && str[i] != ' ' && /* str[i] != '"' && str[i] != '\'' && */ str[i] != '|' && str[i] != '>' && str[i] != '<')
+		i++;
 	return (i);
+
 }
