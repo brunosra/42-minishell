@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/21 04:17:37 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/25 04:31:07 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ typedef enum e_token_type
 	TOKEN_INPUT_REDIRECT,
 	TOKEN_HEREDOC,
 	TOKEN_BUILTIN,
+	TOKEN_NULL,
 }	t_type;
 
 typedef struct s_token
@@ -94,13 +95,18 @@ int		ft_handle_argument(char *str, int i);
 t_token	*ft_tokenize_input(char *str, int n_args, int i, int j);
 int		ft_tokenize(char *str, int *i, t_token *tokens, int *j);
 t_type	ft_get_token_type(char *str, t_type prev_type);
+char	*ft_revalue_quoted_value(char *value);
+int		ft_verify_variable_value(char *str);
+
 
 /**__PARSING_AST_(Abstract Syntax Tree)__**/
 t_node	*ft_parse_ast(t_token *tokens); // muito grande!
 t_node	*ft_create_cmd_node(t_token *token);
 t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right);
 t_node	*ft_group_command_tokens(t_token *tokens, int *index);
-
+int		ft_verify_cmd_node_value(t_node *cmd_node);
+char	*ft_remove_quotes(char *value);
+int ft_value_has_space(char *value);
 /* Temporaria para testar */
 void	print_ast(t_node *node, int depth);
 
@@ -134,5 +140,9 @@ void	ft_free_split(char **str);
 int		ft_revalue_token_variable(t_minishell *ms);
 char	*ft_get_env(const char *key, char **envp);
 char	**ft_duplicate_envp(char **envp);
+int		ft_check_if_expand(char *str, char *ptr);
+int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
+char	*ft_get_env_value(const char *str, char **envp, char **key);
+int		ft_remove_str(char **value, char *key, char *ptr);
 
 #endif

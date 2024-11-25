@@ -1,6 +1,7 @@
 {
 	"files.associations": {
-		"minishell.h": "c"
+		"minishell.h": "c",
+		"type_traits": "c"
 	},
 	"editor.insertSpaces": false,
 	"editor.detectIndentation": false,

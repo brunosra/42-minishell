@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/20 19:20:49 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/25 05:11:58 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,6 +221,11 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 
 int	ft_execute_command(t_node *node, t_minishell *ms)
 {
+	if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
+	{
+		ft_putstr_fd(": command not found\n", STDERR_FILENO);
+		return (127); // Código de erro para "command not found"
+	}
 	ms->pid = fork();
 	if (ms->pid == -1)
 	{
@@ -244,8 +249,8 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 			ft_find_executable(ms, node->cmd_ready[0]);
 			if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
 			{
-				write(2, node->cmd_ready[0], strlen(node->cmd_ready[0]));
-				write(2, ": command not found\n", 20);
+				ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
+				ft_putstr_fd(": command not found\n", STDERR_FILENO);
 				exit(127);
 			}
 			execve(ms->env.full_path, node->cmd_ready, ms->env.envp);
@@ -273,7 +278,7 @@ int	ft_find_executable(t_minishell *ms, char *cmd)
 		ms->env.full_path = malloc(ft_strlen(ms->env.paths[i]) + ft_strlen(cmd) + 2); // +2 para '/' e '\0'
 		if (!ms->env.full_path)
 		{
-			ft_free_split(ms->env.paths); /* TODO */
+			ft_free_split(ms->env.paths);
 			return (1);
 		}
 		ft_strcpy(ms->env.full_path, ms->env.paths[i]);
