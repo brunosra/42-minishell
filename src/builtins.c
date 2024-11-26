@@ -6,15 +6,17 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/20 00:27:17 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/26 02:25:23 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-/* void ft_builtin_echo(char **args);
-void ft_builtin_pwd(void);
-void ft_builtin_exit(char **args); */
+int		ft_builtin_echo(char **args);
+void	ft_builtin_pwd(void); // deve retornar int
+void	ft_builtin_exit(char **args); 
+void	ft_builtin_env(char **args); // deve retornar int
+
 
 /* JUST FOR TEST */
 static void print_str_arr(char **args)
@@ -26,7 +28,7 @@ static void print_str_arr(char **args)
 		printf("[%d]: %s\n", i, args[i]);
 }
 
-void ft_builtin_echo(char **args)
+int ft_builtin_echo(char **args)
 {
 	int i;
 	int j;
@@ -68,8 +70,8 @@ void ft_builtin_echo(char **args)
 		}
 	}
 	if (newline)
-		printf("\n");
-	return ;
+		printf("\n");	
+	return (0);
 }
 
 void ft_builtin_pwd(void)

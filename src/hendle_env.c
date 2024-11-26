@@ -6,13 +6,14 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/25 04:38:57 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/26 01:21:44 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
 int		ft_revalue_token_variable(t_minishell *ms);
+int		ft_check_balanced_quotes(char *str, int idx);
 char	*ft_get_env(const char *key, char **envp);
 char	**ft_duplicate_envp(char **envp);
 int		ft_check_if_expand(char *str, char *ptr);
@@ -66,11 +67,9 @@ int	ft_revalue_token_variable(t_minishell *ms)
 			ptr = ft_strchr(ms->tokens[i].value, '$');
 			while (ptr != NULL)
 			{
-				if (ft_check_if_expand(ms->tokens[i].value, ptr))
+				if (ft_check_if_expand(ms->tokens[i].value, ptr) == 1)
 				{
-			
 					env_value = ft_get_env_value(ptr, ms->env.envp, &key);
-
 					if (!env_value) // ALterar isto!!!
 					{
 						ft_putstr_fd("Erro: Variável '", 2); // ALterar isto!!!
@@ -94,6 +93,11 @@ int	ft_revalue_token_variable(t_minishell *ms)
 					if (!ptr)
 						break ;
 				}
+				else if (ft_check_if_expand(ms->tokens[i].value, ptr) == 2)
+				{
+					key = ft_strdup("$?");
+					ft_replace_str(&ms->tokens[i].value, key, ptr, ft_itoa(ms->exit_code));
+				}
 				else
 				{
 					ptr++;
@@ -101,7 +105,6 @@ int	ft_revalue_token_variable(t_minishell *ms)
 					if (!ptr)
 						break ;
 				}
-
 			}
 		}
 	}
@@ -181,6 +184,30 @@ char	*ft_get_env(const char *key, char **envp)
 	return (NULL);
 }
 
+int	ft_check_balanced_quotes(char *str, int idx)
+{
+	int		i;
+	char	quote_type;
+	int		is_balanced;
+
+	i = 0;
+	quote_type = '\0';
+	is_balanced = 1;
+	while (i < idx && str[i])
+	{
+		if (str[i] == '"' || str[i] == '\'')
+		{
+			if (quote_type == str[i])
+				quote_type = '\0'; // Fecha aspas
+			else if (quote_type == '\0')
+				quote_type = str[i]; // Abre aspas
+		}
+		i++;
+	}
+	if (quote_type != '\0')
+		is_balanced = 0; // Par de aspas não está fechado
+	return (is_balanced);
+}
 
 
 int	ft_check_if_expand(char *str, char *ptr)
@@ -193,7 +220,7 @@ int	ft_check_if_expand(char *str, char *ptr)
 
 	while (str[i])
 	{
-		if ((str[i] == '"' || str[i] == '\''))
+		if (str[i] == '"' || str[i] == '\'')
 		{
 			if (quote_type == str[i])
 				quote_type = '\0'; // Fecha aspas
@@ -202,18 +229,47 @@ int	ft_check_if_expand(char *str, char *ptr)
 			i++;
 			continue;
 		}
-		if (&str[i] == ptr) // Verifica se a posição atual é o ponteiro
+
+		if (&str[i] == ptr) // Verifica se é o ponteiro para $
 		{
-			if (quote_type != '\'') // Expande fora de aspas simples
-				return (1);
-			else
+			if (str[i + 1] == '?') // Trata caso especial do $?
+				return (2); // Retorna 2 para indicar $? (exit status)
+
+			// Verifica se há aspas consecutivas logo após $
+			if (str[i + 1] == '\'' || str[i + 1] == '"')
+			/* if ((str[i + 1] == '"' && str[i + 2] == '"') ||
+				(str[i + 1] == '\'' && str[i + 2] == '\'') || (str[i + 1] == '"' && str[i + 2] == '\'') || (str[i + 1] == '\'' && str[i + 2] == '"'))
+			 */{
+				// Verifica se essas aspas pertencem ao mesmo par
+				if (ft_check_balanced_quotes(str, i))
+					return (1); // Expande para string vazia
+				return (0); // Aspas pertencem a pares separados
+			}
+
+			// Aspas simples: não expande
+			if (quote_type == '\'')
 				return (0);
+
+			// Verifica caracteres que invalidam a expansão
+			if (!str[i + 1] || str[i + 1] == ' ' || str[i + 1] == '$' ||
+				str[i + 1] == '.' || str[i + 1] == ',' || str[i + 1] == '!' ||
+				str[i + 1] == '?' || str[i + 1] == ';' || str[i + 1] == ':' ||
+				str[i + 1] == '~' || str[i + 1] == '^' || str[i + 1] == '-' ||
+				str[i + 1] == '+' || str[i + 1] == '*' || str[i + 1] == '/')
+				return (0); // Retorna 0 para indicar que $ é literal
+
+			// Caso contrário, expande
+			return (1);
 		}
+
 		i++;
 	}
 
-	return (0);
+	return (0); // Retorna 0 se não encontrar $ para expandir
 }
+
+
+
 
 int	ft_remove_str(char **value, char *key, char *ptr)
 {

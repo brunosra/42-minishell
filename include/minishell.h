@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/25 04:31:07 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/26 02:10:26 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,10 +76,11 @@ typedef struct s_minishell
 	int					save_stdin;
 	int					save_stdout;
 	int 				n_args;
-	int					n_tokens;
+	// int					n_tokens;
 	int					pid;
 	struct	sigaction	sa;
 	int					pipefd[2];
+	int					exit_code;
 }				t_minishell;
 
 /**__HANDLE_and_LEXING_INPUT__**/
@@ -124,7 +125,7 @@ int	ft_find_executable(t_minishell *ms, char *cmd);
 int		ft_check_builtins(char *str);
 void 	ft_builtin_exit(char **args);
 void 	ft_builtin_pwd(void);
-void 	ft_builtin_echo(char **args);
+int 	ft_builtin_echo(char **args);
 void	ft_builtin_env(char **args);
 
 /**__SIGNAL__**/
@@ -138,6 +139,7 @@ void	ft_free_split(char **str);
 
 /**__HANDLE_ENV__ **/
 int		ft_revalue_token_variable(t_minishell *ms);
+int		ft_check_balanced_quotes(char *str, int idx);
 char	*ft_get_env(const char *key, char **envp);
 char	**ft_duplicate_envp(char **envp);
 int		ft_check_if_expand(char *str, char *ptr);

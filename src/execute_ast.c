@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/25 05:11:58 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/26 02:30:18 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,10 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms);
 int	ft_handle_pipe(t_node *node, t_minishell *ms);
 int	ft_execute_command(t_node *node, t_minishell *ms);
 int	ft_find_executable(t_minishell *ms, char *cmd);
-void ft_free_split(char **str);
 
 int	ft_execute_ast(t_node *node, t_minishell *ms)
 {
-	if (!node)
+	if (!node || !ms->n_args)
 		return (1);
 	if (node->token->type == TOKEN_OUTPUT_REDIRECT)
 		return (ft_handle_output_redirect(node, ms));
@@ -208,7 +207,7 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 {
 	printf("node token: %s\n", node->token->value);
 	if (!ft_strcmp(node->token->value, "echo"))
-		ft_builtin_echo(node->cmd_ready);
+		ms->exit_code = ft_builtin_echo(node->cmd_ready);
 	if (!ft_strcmp(node->token->value, "env") && node->cmd_ready[1] == NULL)
 		ft_builtin_env(ms->env.envp);
 	// if (!ft_strcmp(node->token->value, "pwd"))
@@ -216,7 +215,7 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 	// if (!ft_strcmp(node->token->value, "exit"))
 	// 	return (printf("builtin: exit -->"), 1);
 	// if (!ft_strcmp(node->token->value, "cd"))
-	return (ft_execute_ast(node->left, ms));
+	return (ms->exit_code);
 }
 
 int	ft_execute_command(t_node *node, t_minishell *ms)
@@ -224,18 +223,22 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
 	{
 		ft_putstr_fd(": command not found\n", STDERR_FILENO);
+		ms->exit_code = 127;
 		return (127); // Código de erro para "command not found"
 	}
 	ms->pid = fork();
 	if (ms->pid == -1)
 	{
 		perror("fork");
+		ms->exit_code = 1; // Código genérico para erro de fork
 		return (1);
 	}
 	if (ms->pid == 0)
 	{
 		if (ft_check_builtins(node->token->value))
-			ft_exec_builtins(node, ms);
+		{
+			exit (ft_exec_builtins(node, ms)); // Executa builtins, caso seja válido
+		}
 		else
 		{
 			if (node->cmd_ready[0][0] == '/' || 
@@ -246,7 +249,6 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 				perror("execve");
 				exit(127);
 			}
-			ft_find_executable(ms, node->cmd_ready[0]);
 			if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
 			{
 				ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
@@ -255,11 +257,18 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 			}
 			execve(ms->env.full_path, node->cmd_ready, ms->env.envp);
 			perror("execve");
+			exit(127);
 		}
-		exit(1);
+		exit(1); // Falha inesperada pois nunca devera aqui chegar
 	}
-	waitpid(ms->pid, &ms->status, 0);
-	return (0);
+	waitpid(ms->pid, &ms->status, 0); // Processo pai: aguarda o processo filho
+	if (WIFEXITED(ms->status)) // Processo terminou normalmente
+		ms->exit_code = WEXITSTATUS(ms->status); // Captura o código de saída do filho
+	else if (WIFSIGNALED(ms->status)) // Processo foi terminado por um sinal
+		ms->exit_code = 128 + WTERMSIG(ms->status); // Código do sinal + 128
+	else
+		ms->exit_code = 1; // Caso inesperado, erro genérico
+	return (ms->exit_code);
 }
 
 int	ft_find_executable(t_minishell *ms, char *cmd)
