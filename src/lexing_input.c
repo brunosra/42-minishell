@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/25 04:58:05 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/26 22:30:06 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,21 +102,19 @@ int ft_check_builtins(char *str)
 
 t_type	ft_get_token_type(char *str, t_type prev_type)
 {
-	if (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL) // TOKEN NULL mas + if ou mudar a posicao!
-		return (TOKEN_COMMAND);
-	if (!ft_strcmp(str, "||") || !ft_strcmp(str, "&&"))
-	{
-		fprintf(stderr, "./minishell: syntax error near unexpected token `||'\n"); //substituir por ft_putstr_fd
-		exit(1); // limpar antes de sair
-	}
-	if (!ft_strcmp(str, "|"))
-		return (TOKEN_OPERATOR);
+	if (!ft_strcmp(str, "<"))
+		return (TOKEN_INPUT_REDIRECT);
 	else if (!ft_strcmp(str, ">") || !ft_strcmp(str, ">>"))
 		return (TOKEN_OUTPUT_REDIRECT);
-	else if (!ft_strcmp(str, "<"))
-		return (TOKEN_INPUT_REDIRECT);
 	else if (!ft_strcmp(str, "<<"))
 		return (TOKEN_HEREDOC);
+	else if (!ft_strcmp(str, "||") || !ft_strcmp(str, "&&"))
+	{
+		fprintf(stderr, "./minishell: syntax error near unexpected token `||'\n"); //substituir por ft_putstr_fd  || nao pode sair aqui!
+		exit(1); // limpar antes de sair
+	}
+	else if (!ft_strcmp(str, "|"))
+		return (TOKEN_OPERATOR);
 	else if (str[0] == '$' || ft_strchr(str, '$'))
 	{
 		if (str[0] == '$')
@@ -124,7 +122,9 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 		if (ft_verify_variable_value(str))
 			return (TOKEN_VARIABLE);
 	}
-	if ((prev_type == TOKEN_COMMAND || prev_type == TOKEN_BUILTIN || prev_type == TOKEN_ARGUMENT || prev_type == TOKEN_VARIABLE))
+	else if (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL) // TOKEN NULL mas + if ou mudar a posicao!
+		return (TOKEN_COMMAND);
+	else if ((prev_type == TOKEN_COMMAND || prev_type == TOKEN_BUILTIN || prev_type == TOKEN_ARGUMENT || prev_type == TOKEN_VARIABLE))
 		return (TOKEN_ARGUMENT);
 	else if (((str[0] == '"' || str[0] == '\'') && (prev_type != TOKEN_COMMAND && prev_type != TOKEN_VARIABLE && prev_type != TOKEN_OPERATOR && prev_type != TOKEN_NULL)) || (prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT || prev_type == TOKEN_HEREDOC))
 		return (TOKEN_FILENAME);

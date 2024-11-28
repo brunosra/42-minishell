@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:39:44 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/24 21:55:26 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/27 17:59:13 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,14 @@ int	ft_count_args(char *str)
 			break ;
 		if (str[i] == '|' || str[i] == '<' || str[i] == '>')
 		{
-			if (str[i + 1])
+/* 			if (str[i + 1])
+			{ */
 				i++;
-			if (str[i + 1] && (str[i] == '<' || str[i] == '>'))
-				i++;
+				if (str[i + 1] && (str[i] == '<' || str[i] == '>'))
+					i++;
+/* 			}
 			else if (!str[i + 1])
-				i++;
+				i++; */
 			
 		}
 		else if (str[i] == '"' || str[i] == '\'')
@@ -113,7 +115,9 @@ int ft_handle_quotes(char *str, int i, int *start, int *end)
 			if (str[i] && str[i] == quote_type)
 			{
 				i++;
-				continue ;
+				if (str[i - 2] != '$')
+					continue ;
+				break;
 			}			
             while (str[i] && str[i] != quote_type) // Vai até o final do conteúdo entre as aspas
                 i++;
