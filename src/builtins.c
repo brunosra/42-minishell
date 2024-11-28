@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/28 21:05:01 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/28 21:48:31 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ int		ft_builtin_echo(char **args);
 void	ft_builtin_pwd(t_minishell *ms); // deve retornar int
 void	ft_builtin_exit(char **args); 
 void 	ft_builtin_env(t_minishell *ms); // deve retornar int
+int		ft_builtin_cd(t_minishell *ms);
 
 
 /* JUST FOR TEST */
@@ -119,11 +120,12 @@ void ft_builtin_env(t_minishell *ms)
 	}
 }
 
-// void ft_builtin_cd(char *path)
-// {
-// 	int ret;
-
-// 	if (path[1])
-// 		ret = chdir(path);
-// 	if (ret)
-// }
+int ft_builtin_cd(t_minishell *ms)
+{
+	if (cd ..)
+		exit(printf("[cd error]: too many arguments\n"));
+	if (!ms->ast_root->cmd_ready[1])
+		return (chdir("~"));
+	else
+		return (chdir(ms->ast_root->cmd_ready[1]));
+}

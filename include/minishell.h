@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/28 20:58:14 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/28 21:44:56 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,6 +132,7 @@ void 	ft_builtin_exit(char **args);
 void	ft_builtin_pwd(t_minishell *ms);
 int 	ft_builtin_echo(char **args);
 void	ft_builtin_env(t_minishell *ms);
+int		ft_builtin_cd(t_minishell *ms);
 
 /**__SIGNAL__**/
 void 	ft_signal_handler(int signum);
