@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/28 20:31:44 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/28 20:58:14 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ int	ft_is_valid_file(char *filepath, int mode);
 /**__BUILTINS__**/
 int		ft_check_builtins(char *str);
 void 	ft_builtin_exit(char **args);
-void 	ft_builtin_pwd(void);
+void	ft_builtin_pwd(t_minishell *ms);
 int 	ft_builtin_echo(char **args);
 void	ft_builtin_env(t_minishell *ms);
 

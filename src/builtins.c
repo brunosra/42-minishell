@@ -6,14 +6,14 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/28 20:50:19 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/28 21:05:01 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
 int		ft_builtin_echo(char **args);
-void	ft_builtin_pwd(void); // deve retornar int
+void	ft_builtin_pwd(t_minishell *ms); // deve retornar int
 void	ft_builtin_exit(char **args); 
 void 	ft_builtin_env(t_minishell *ms); // deve retornar int
 
@@ -74,17 +74,6 @@ int ft_builtin_echo(char **args)
 	return (0);
 }
 
-void ft_builtin_pwd(void)
-{
-	char cwd[1024]; // VER!! malloc!?
-
-	if (getcwd(cwd, sizeof(cwd)))
-		printf("%s\n", cwd);
-	else
-		perror("pwd");
-	return ;
-}
-
 void ft_builtin_exit(char **args)
 {
 	int exit_code;
@@ -93,6 +82,22 @@ void ft_builtin_exit(char **args)
 	if (args[1])
 		exit_code = ft_atoi(args[1]);
 	exit(exit_code);
+}
+
+void ft_builtin_pwd(t_minishell *ms)
+{	
+	char cwd[1024]; // VER!! malloc!?
+
+	if (ms->ast_root->cmd_ready[1])
+		exit(printf("[pwd error]: doesn't support arguments\n"));
+	else
+	{
+		if (getcwd(cwd, sizeof(cwd)) != NULL)
+			printf("CWD IS: %s\n", cwd);
+		else
+			perror("pwd");
+		return ;
+	}
 }
 
 void ft_builtin_env(t_minishell *ms)

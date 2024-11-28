@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/28 20:42:30 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/28 20:55:27 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -320,6 +320,8 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 		ms->exit_code = ft_builtin_echo(node->cmd_ready);
 	if (!ft_strcmp(node->token->value, "env"))
 		ft_builtin_env(ms);
+	if (!ft_strcmp(node->token->value, "pwd"))
+		ft_builtin_pwd(ms);
 	// if (!ft_strcmp(node->token->value, "pwd"))
 	// 	return (printf("builtin: pwd -->"), 1);
 	// if (!ft_strcmp(node->token->value, "exit"))
