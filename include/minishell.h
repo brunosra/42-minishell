@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/26 02:10:26 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/28 04:30:14 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,18 @@
 # define MINISHELL_H
 
 # include "../libft/libft.h"
+# include "errors.h"
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <sys/wait.h>
+# include <sys/stat.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <signal.h>
 # include <unistd.h>
 # include <fcntl.h>
 # include <string.h>
-# include "errors.h"
+# include <errno.h>
 
 typedef struct s_ast_node t_node;
 
@@ -56,6 +58,7 @@ typedef struct s_ast_node
 	char	**cmd_ready;
 	t_node *left;
 	t_node *right;
+	t_node	*prev;
 }	t_node;
 
 typedef struct s_env
@@ -120,6 +123,8 @@ int	ft_execute_command(t_node *node, t_minishell *ms);
 int	ft_handle_heredoc(t_node *node, t_minishell *ms);
 //int	ft_handle_builtins(t_node *node, t_minishell *ms); //nao existe pois nao?
 int	ft_find_executable(t_minishell *ms, char *cmd);
+int	ft_invalid_right_token_value(char *value);
+int	ft_is_valid_file(char *filepath, int mode);
 
 /**__BUILTINS__**/
 int		ft_check_builtins(char *str);
@@ -136,6 +141,8 @@ void	ft_free_tokens(t_token *tokens);
 void	ft_free_ast(t_node *root);
 /* void	ft_free_env(t_env *env); */
 void	ft_free_split(char **str);
+char	*ft_strjoin_free(char *s1, char *s2, int free_s1, int free_s2);
+
 
 /**__HANDLE_ENV__ **/
 int		ft_revalue_token_variable(t_minishell *ms);
