@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/28 04:30:14 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/28 20:31:44 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ int		ft_check_builtins(char *str);
 void 	ft_builtin_exit(char **args);
 void 	ft_builtin_pwd(void);
 int 	ft_builtin_echo(char **args);
-void	ft_builtin_env(char **args);
+void	ft_builtin_env(t_minishell *ms);
 
 /**__SIGNAL__**/
 void 	ft_signal_handler(int signum);

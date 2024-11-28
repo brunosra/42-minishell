@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/26 02:25:23 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/28 20:50:19 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int		ft_builtin_echo(char **args);
 void	ft_builtin_pwd(void); // deve retornar int
 void	ft_builtin_exit(char **args); 
-void	ft_builtin_env(char **args); // deve retornar int
+void 	ft_builtin_env(t_minishell *ms); // deve retornar int
 
 
 /* JUST FOR TEST */
@@ -95,15 +95,22 @@ void ft_builtin_exit(char **args)
 	exit(exit_code);
 }
 
-void ft_builtin_env(char **args)
+void ft_builtin_env(t_minishell *ms)
 {
 	char **env;
-
-	env = args;
-	while (*env != 0)
+	
+	env = ms->env.envp;
+	if (ms->ast_root->cmd_ready[1])
 	{
-		printf("%s\n", *env);
-		env++;
+		exit(printf("[env error]: doesn't support arguments\n"));
+	}
+	else
+	{
+		while (*env != 0)
+		{
+			printf("%s\n", *env);
+			env++;
+		}
 	}
 }
 
