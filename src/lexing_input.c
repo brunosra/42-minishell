@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexing_input.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/26 22:30:06 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/28 20:44:36 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,8 @@ int ft_check_builtins(char *str)
 		return (printf("builtin: exit -->"), 1);
 	if (!ft_strcmp(str, "cd"))
 		return (printf("builtin: cd -->"), 1);
+	if (!ft_strcmp(str, "env"))
+		return (printf("builtin: env -->"), 1);
 	return (0);
 }
 

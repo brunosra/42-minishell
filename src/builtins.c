@@ -3,19 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/26 02:25:23 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/28 21:48:31 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
 int		ft_builtin_echo(char **args);
-void	ft_builtin_pwd(void); // deve retornar int
+void	ft_builtin_pwd(t_minishell *ms); // deve retornar int
 void	ft_builtin_exit(char **args); 
-void	ft_builtin_env(char **args); // deve retornar int
+void 	ft_builtin_env(t_minishell *ms); // deve retornar int
+int		ft_builtin_cd(t_minishell *ms);
 
 
 /* JUST FOR TEST */
@@ -74,17 +75,6 @@ int ft_builtin_echo(char **args)
 	return (0);
 }
 
-void ft_builtin_pwd(void)
-{
-	char cwd[1024]; // VER!! malloc!?
-
-	if (getcwd(cwd, sizeof(cwd)))
-		printf("%s\n", cwd);
-	else
-		perror("pwd");
-	return ;
-}
-
 void ft_builtin_exit(char **args)
 {
 	int exit_code;
@@ -95,23 +85,47 @@ void ft_builtin_exit(char **args)
 	exit(exit_code);
 }
 
-void ft_builtin_env(char **args)
-{
-	char **env;
+void ft_builtin_pwd(t_minishell *ms)
+{	
+	char cwd[1024]; // VER!! malloc!?
 
-	env = args;
-	while (*env != 0)
+	if (ms->ast_root->cmd_ready[1])
+		exit(printf("[pwd error]: doesn't support arguments\n"));
+	else
 	{
-		printf("%s\n", *env);
-		env++;
+		if (getcwd(cwd, sizeof(cwd)) != NULL)
+			printf("CWD IS: %s\n", cwd);
+		else
+			perror("pwd");
+		return ;
 	}
 }
 
-// void ft_builtin_cd(char *path)
-// {
-// 	int ret;
+void ft_builtin_env(t_minishell *ms)
+{
+	char **env;
+	
+	env = ms->env.envp;
+	if (ms->ast_root->cmd_ready[1])
+	{
+		exit(printf("[env error]: doesn't support arguments\n"));
+	}
+	else
+	{
+		while (*env != 0)
+		{
+			printf("%s\n", *env);
+			env++;
+		}
+	}
+}
 
-// 	if (path[1])
-// 		ret = chdir(path);
-// 	if (ret)
-// }
+int ft_builtin_cd(t_minishell *ms)
+{
+	if (cd ..)
+		exit(printf("[cd error]: too many arguments\n"));
+	if (!ms->ast_root->cmd_ready[1])
+		return (chdir("~"));
+	else
+		return (chdir(ms->ast_root->cmd_ready[1]));
+}
