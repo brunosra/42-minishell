@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/28 21:44:56 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/30 03:52:29 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,7 @@ t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right);
 t_node	*ft_group_command_tokens(t_token *tokens, int *index);
 int		ft_verify_cmd_node_value(t_node *cmd_node);
 char	*ft_remove_quotes(char *value);
-int ft_value_has_space(char *value);
+char 	**ft_remove_null_values(char **cmd_ready, int arg_count);
 /* Temporaria para testar */
 void	print_ast(t_node *node, int depth);
 
@@ -128,12 +128,12 @@ int	ft_is_valid_file(char *filepath, int mode);
 
 /**__BUILTINS__**/
 int		ft_check_builtins(char *str);
-void 	ft_builtin_exit(char **args);
+int		ft_builtin_exit(char **args, t_minishell *ms);
 void	ft_builtin_pwd(t_minishell *ms);
 int 	ft_builtin_echo(char **args);
 void	ft_builtin_env(t_minishell *ms);
-int		ft_builtin_cd(t_minishell *ms);
-
+/* int		ft_builtin_cd(t_minishell *ms);
+ */
 /**__SIGNAL__**/
 void 	ft_signal_handler(int signum);
 
@@ -153,6 +153,6 @@ char	**ft_duplicate_envp(char **envp);
 int		ft_check_if_expand(char *str, char *ptr);
 int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
 char	*ft_get_env_value(const char *str, char **envp, char **key);
-int		ft_remove_str(char **value, char *key, char *ptr);
-
+/* int		ft_remove_str(char **value, char *key, char *ptr);
+ */
 #endif

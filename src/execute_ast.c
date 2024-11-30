@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute_ast.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/28 21:33:51 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/30 04:50:29 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -318,17 +318,14 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 	printf("node token: %s\n", node->token->value);
 	if (!ft_strcmp(node->token->value, "echo"))
 		ms->exit_code = ft_builtin_echo(node->cmd_ready);
+	if (!ft_strcmp(node->token->value, "exit"))
+	 	ft_builtin_exit(node->cmd_ready, ms);
 	if (!ft_strcmp(node->token->value, "env"))
-		ft_builtin_env(ms);
+		/* ms->exit_code = */ ft_builtin_env(ms);
 	if (!ft_strcmp(node->token->value, "pwd"))
-		ft_builtin_pwd(ms);
-	if (!ft_strcmp(node->token->value, "cd"))
-		ft_builtin_cd(ms);
-	// if (!ft_strcmp(node->token->value, "pwd"))
-	// 	return (printf("builtin: pwd -->"), 1);
-	// if (!ft_strcmp(node->token->value, "exit"))
-	// 	return (printf("builtin: exit -->"), 1);
-	// if (!ft_strcmp(node->token->value, "cd"))
+		/* ms->exit_code =  */ft_builtin_pwd(ms);
+/* 	if (!ft_strcmp(node->token->value, "cd"))
+		ft_builtin_cd(ms); */
 	return (ms->exit_code);
 }
 
@@ -349,7 +346,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	}
 	if (ms->pid == 0)
 	{
-		if (ft_check_builtins(node->token->value))
+		if (ft_check_builtins(node->token->value)) // Nao precisamos, pois ja demos o tipo ao token! entao basta apenas if (node->token->type == TOKEN_BUILTIN
 		{
 			exit (ft_exec_builtins(node, ms)); // Executa builtins, caso seja válido
 		}
@@ -360,8 +357,10 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 				!ft_strncmp(node->cmd_ready[0], "../", 3)) 
 			{
 				execve(node->cmd_ready[0], node->cmd_ready, ms->env.envp);
-				perror("execve");
-				exit(127);
+				ft_putstr_fd("minishell: ", STDERR_FILENO);
+				ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
+				ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
+				exit(126);
 			}
 			if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
 			{
@@ -376,6 +375,13 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 		exit(1); // Falha inesperada pois nunca devera aqui chegar
 	}
 	waitpid(ms->pid, &ms->status, 0); // Processo pai: aguarda o processo filho
+	if (node->token->type == TOKEN_BUILTIN && !ft_strcmp(node->cmd_ready[0], "exit"))
+	{
+		ft_free_tokens(ms->tokens);
+		ft_free_ast(ms->ast_root);
+		free(ms->input);
+		exit(ms->status);
+	}
 	if (WIFEXITED(ms->status)) // Processo terminou normalmente
 		ms->exit_code = WEXITSTATUS(ms->status); // Captura o código de saída do filho
 	else if (WIFSIGNALED(ms->status)) // Processo foi terminado por um sinal
