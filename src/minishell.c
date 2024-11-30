@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/20 04:10:56 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/29 18:57:41 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ int	main(int argc, char **argv, char **envp)
 
 	(void)argv;
 	(void)argc;
+	ms.exit_code = 0;
 	ms.sa.sa_handler = ft_signal_handler;
 	sigemptyset(&ms.sa.sa_mask);
 	ms.sa.sa_flags = SA_RESTART;

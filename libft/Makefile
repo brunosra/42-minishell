@@ -17,7 +17,7 @@ RM = @rm -rf
 
 CC = @cc
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g
 
 MK_LIB = ar rcs
 

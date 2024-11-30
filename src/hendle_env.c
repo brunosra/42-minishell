@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/26 01:21:44 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/30 03:51:13 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@ char	**ft_duplicate_envp(char **envp);
 int		ft_check_if_expand(char *str, char *ptr);
 int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
 char	*ft_get_env_value(const char *str, char **envp, char **key);
-int		ft_remove_str(char **value, char *key, char *ptr);
-
+/* int		ft_remove_str(char **value, char *key, char *ptr);
+ */
 char	**ft_duplicate_envp(char **envp)
 {
 	int		i;
@@ -62,7 +62,7 @@ int	ft_revalue_token_variable(t_minishell *ms)
 		return (1);
 	while (ms->tokens[++i].value)
 	{
-		if (ms->tokens[i].type == TOKEN_VARIABLE)
+		if (ms->tokens[i].type == TOKEN_VARIABLE || ms->tokens[i].type == TOKEN_COMMAND)
 		{
 			ptr = ft_strchr(ms->tokens[i].value, '$');
 			while (ptr != NULL)
@@ -74,13 +74,13 @@ int	ft_revalue_token_variable(t_minishell *ms)
 					{
 						ft_putstr_fd("Erro: Variável '", 2); // ALterar isto!!!
 						ft_putstr_fd(ms->tokens[i].value, 2); // ALterar isto!!!
-						ft_putstr_fd("' não encontrada", 2); // ALterar isto!!!
-						// env_value = ft_strdup("");
+						ft_putstr_fd("' não encontrada\n", 2); // ALterar isto!!!
+						env_value = ft_strdup("");
 					}
-					if (!env_value)
+/* 					if (*env_value == '\0' && ft_strlen(ms->tokens[i].value) == ft_strlen(key + 1))
 						ft_remove_str(&ms->tokens[i].value, key, ptr);
 					// free(ms->tokens[i].value);
-					else
+					else */
 					/* ms->tokens[i].value =  */ft_replace_str(&ms->tokens[i].value, key, ptr, env_value);
 					if (*key)
 						free(key);
@@ -95,7 +95,8 @@ int	ft_revalue_token_variable(t_minishell *ms)
 				}
 				else if (ft_check_if_expand(ms->tokens[i].value, ptr) == 2)
 				{
-					key = ft_strdup("$?");
+					key = ft_strdup("?");
+					// printf("%lu\n", ft_strlen(ft_itoa(ms->exit_code)));
 					ft_replace_str(&ms->tokens[i].value, key, ptr, ft_itoa(ms->exit_code));
 				}
 				else
@@ -123,7 +124,10 @@ char	*ft_get_env_value(const char *str, char **envp, char **key)
 	start = i;
 	while (str[i] && (ft_isalnum(str[i]) || str[i] == '_'))
 		i++;
-	*key = ft_substr(str, start, i - start);
+/* 	if (str[i] != ' ')
+		*key = ft_substr(str, start, i - 1 - start);
+	else */
+		*key = ft_substr(str, start, i - start);
 	if (!*key)
 		return (NULL);
 	value = ft_get_env(*key, envp);
@@ -139,15 +143,26 @@ int	ft_replace_str(char **value, char *key, char *ptr, char *env_value)
 
 	if (!value || !*value || !key || !ptr || !env_value)
 		return (1);
+	if (ft_strlen(*value) == ft_strlen(key) + 1)
+	{
+		new_value = ft_strdup(env_value);
+		free(*value);
+		*value = new_value;
+		return (0);
+	}	
 	start = ft_substr(*value, 0, ptr - *value);
 	if (!start)
 		return (1);
+	printf("%lu\n", ft_strlen(key));
 	end = ft_strdup(ptr + ft_strlen(key) + 1);
 	if (!end)
 	{
 		free(start);
 		return (1);
 	}
+	printf("%lu\n", ft_strlen(start));
+	printf("%lu\n", ft_strlen(env_value));
+	printf("%lu\n", ft_strlen(end));
 	new_len = ft_strlen(start) + ft_strlen(env_value) + ft_strlen(end) + 1;
 	new_value = malloc(new_len);
 	if (!new_value)
@@ -271,7 +286,7 @@ int	ft_check_if_expand(char *str, char *ptr)
 
 
 
-int	ft_remove_str(char **value, char *key, char *ptr)
+/* int	ft_remove_str(char **value, char *key, char *ptr)
 {
 	char	*new_value;
 	char	*start;
@@ -305,3 +320,4 @@ int	ft_remove_str(char **value, char *key, char *ptr)
 	*value = new_value;
 	return (0);
 }
+ */
