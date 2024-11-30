@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/30 04:50:29 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/30 04:59:47 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -375,19 +375,19 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 		exit(1); // Falha inesperada pois nunca devera aqui chegar
 	}
 	waitpid(ms->pid, &ms->status, 0); // Processo pai: aguarda o processo filho
-	if (node->token->type == TOKEN_BUILTIN && !ft_strcmp(node->cmd_ready[0], "exit"))
-	{
-		ft_free_tokens(ms->tokens);
-		ft_free_ast(ms->ast_root);
-		free(ms->input);
-		exit(ms->status);
-	}
 	if (WIFEXITED(ms->status)) // Processo terminou normalmente
 		ms->exit_code = WEXITSTATUS(ms->status); // Captura o código de saída do filho
 	else if (WIFSIGNALED(ms->status)) // Processo foi terminado por um sinal
 		ms->exit_code = 128 + WTERMSIG(ms->status); // Código do sinal + 128
 	else
 		ms->exit_code = 1; // Caso inesperado, erro genérico
+	if (node->token->type == TOKEN_BUILTIN && !ft_strcmp(node->cmd_ready[0], "exit"))
+	{
+		ft_free_tokens(ms->tokens);
+		ft_free_ast(ms->ast_root);
+		free(ms->input);
+		exit(ms->exit_code);
+	}
 	return (ms->exit_code);
 }
 
