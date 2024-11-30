@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/30 23:32:10 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/30 23:37:16 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ int ft_builtin_exit(char **args, t_minishell *ms)
 	i = 0;
 	while (args[i])	
 		i++;
-	if (i > 2)
+	if (i > 2 && ft_atoll(args[1], 0, 0))
 	{
 		ft_putstr_fd("exit\nminishell: exit: too many arguments\n", STDERR_FILENO);
 		exit(1);
