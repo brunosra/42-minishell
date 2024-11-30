@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/29 18:51:45 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/30 06:16:49 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,17 +72,26 @@ int ft_builtin_echo(char **args)
 	}
 	if (newline)
 		printf("\n");	
-	return (0);
+	exit(0);
 }
 
 int ft_builtin_exit(char **args, t_minishell *ms)
 {
-	if (args[1])
-		ms->exit_code = ft_atoi(args[1]); 
+	if (args[2][0])
+	{
+		ft_putstr_fd("exit\nbash: exit: too many arguments\n", STDERR_FILENO);
+		exit(1);
+	}
+	if (args[1][0])
+	{
+		ms->exit_code = ft_atoi(args[1]);
+		exit(ms->exit_code);
+	} 
 /* 	ft_free_tokens(ms->tokens);
 	ft_free_ast(ms->ast_root);
 	free(ms->input); */
-	return (ms->exit_code); // Precisa limpar antes de sair!
+	ms->exit_code = 0;
+	exit(ms->exit_code); // Precisa limpar antes de sair!
 }
 
 void ft_builtin_pwd(t_minishell *ms) // Tem de retornar um int
