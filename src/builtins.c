@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/30 06:16:49 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/30 23:32:10 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,9 @@
 int		ft_builtin_echo(char **args);
 void	ft_builtin_pwd(t_minishell *ms); // deve retornar int
 int		ft_builtin_exit(char **args, t_minishell *ms);
+int		ft_value_is_numeric(char *str);
+long long ft_atoll(char *str, int i, long long res);
+
 void 	ft_builtin_env(t_minishell *ms); // deve retornar int
 /* int		ft_builtin_cd(t_minishell *ms);
  */
@@ -77,21 +80,93 @@ int ft_builtin_echo(char **args)
 
 int ft_builtin_exit(char **args, t_minishell *ms)
 {
-	if (args[2][0])
+	int mod;
+	int i;
+
+	mod = 0;
+	i = 0;
+	while (args[i])	
+		i++;
+	if (i > 2)
 	{
-		ft_putstr_fd("exit\nbash: exit: too many arguments\n", STDERR_FILENO);
+		ft_putstr_fd("exit\nminishell: exit: too many arguments\n", STDERR_FILENO);
 		exit(1);
 	}
-	if (args[1][0])
+	else if (ft_value_is_numeric(args[1]))
 	{
-		ms->exit_code = ft_atoi(args[1]);
+		mod = ft_atoll(args[1], 0, 0) % 256;
+		ms->exit_code = mod;
 		exit(ms->exit_code);
-	} 
-/* 	ft_free_tokens(ms->tokens);
-	ft_free_ast(ms->ast_root);
-	free(ms->input); */
-	ms->exit_code = 0;
+	}
+	else if (!ft_value_is_numeric(args[1]))
+	{
+		ft_putstr_fd("exit\nminishell: exit: ", STDERR_FILENO);
+		ft_putstr_fd(args[1], STDERR_FILENO);
+		ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
+		exit(2);
+	}
+	else
+		ms->exit_code = 0;
 	exit(ms->exit_code); // Precisa limpar antes de sair!
+}
+
+long long ft_atoll(char *str, int i, long long res)
+{
+    int sig;
+
+    sig = 1;
+    while ((str[i] >= 9 && str[i] <= 13) || str[i] == ' ')
+        i++;
+    if (str[i] == '+' || str[i] == '-')
+    {
+        if (str[i] == '-')
+            sig = -1;
+        i++;
+    }
+    if (str[i] >= '0' && str[i] <= '9')
+	{
+		while (str[i] >= '0' && str[i] <= '9')
+    	{
+        	if (res > (LLONG_MAX / 10) || (res == LLONG_MAX / 10 && (str[i] - '0') > (LLONG_MAX % 10)))
+        	{
+				ft_putstr_fd("exit\nminishell: exit: ", STDERR_FILENO);
+				ft_putstr_fd(str, STDERR_FILENO);
+				ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
+				exit(2);
+			}
+        	res = res * 10 + (str[i] - '0');
+        	i++;
+    	}
+		if (str[i] != '\0')
+		{
+			ft_putstr_fd("exit\nminishell: exit: ", STDERR_FILENO);
+			ft_putstr_fd(str, STDERR_FILENO);
+			ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
+			exit(2);
+		}
+	}
+	else
+	{
+		ft_putstr_fd("exit\nminishell: exit: ", STDERR_FILENO);
+		ft_putstr_fd(str, STDERR_FILENO);
+		ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
+		exit(2);
+	}
+	return (res * sig);
+}
+
+int ft_value_is_numeric(char *str)
+{
+	int i;
+
+	i = 0;	
+	while (str[i])
+	{
+		if (ft_isdigit(str[i]))
+			return (1);
+		i++;
+	}
+	return (0);
 }
 
 void ft_builtin_pwd(t_minishell *ms) // Tem de retornar um int

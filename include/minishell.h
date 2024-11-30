@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/30 03:52:29 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/11/30 23:05:19 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 # include <fcntl.h>
 # include <string.h>
 # include <errno.h>
+# include <limits.h>
 
 typedef struct s_ast_node t_node;
 
@@ -131,6 +132,8 @@ int		ft_check_builtins(char *str);
 int		ft_builtin_exit(char **args, t_minishell *ms);
 void	ft_builtin_pwd(t_minishell *ms);
 int 	ft_builtin_echo(char **args);
+int		ft_value_is_numeric(char *str);
+long long ft_atoll(char *str, int i, long long res);
 void	ft_builtin_env(t_minishell *ms);
 /* int		ft_builtin_cd(t_minishell *ms);
  */
