@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/30 06:16:49 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/01 22:31:15 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
 int		ft_builtin_echo(char **args);
-void	ft_builtin_pwd(t_minishell *ms); // deve retornar int
+void	ft_builtin_pwd(); // deve retornar int
 int		ft_builtin_exit(char **args, t_minishell *ms);
 void 	ft_builtin_env(t_minishell *ms); // deve retornar int
 /* int		ft_builtin_cd(t_minishell *ms);
@@ -28,6 +28,13 @@ static void print_str_arr(char **args)
 	while (args[++i])
 		printf("[%d]: %s\n", i, args[i]);
 }
+
+/**
+ * @brief 		Builtin Echo
+ * 
+ * @param args	what should be written in the command line
+ * @return int	exit_code
+ */
 
 int ft_builtin_echo(char **args)
 {
@@ -94,20 +101,24 @@ int ft_builtin_exit(char **args, t_minishell *ms)
 	exit(ms->exit_code); // Precisa limpar antes de sair!
 }
 
-void ft_builtin_pwd(t_minishell *ms) // Tem de retornar um int
+/**
+ * @brief	pwd - print name of current/working directory
+ * 
+ * @return int	exit_code
+ * *			0	success
+ * *			1	error
+ * TODO:		Check if malloc() is needed on cwd var.
+ */
+
+int	ft_builtin_pwd() // Tem de retornar um int
 {	
 	char cwd[1024]; // VER!! malloc!?
-
-	if (ms->ast_root->cmd_ready[1])
-		exit(printf("[pwd error]: doesn't support arguments\n")); // O pwd do bash ignora os restantes argumentos!
+	if (getcwd(cwd, sizeof(cwd)) != NULL)
+		printf("CWD IS: %s\n", cwd);
 	else
-	{
-		if (getcwd(cwd, sizeof(cwd)) != NULL)
-			printf("CWD IS: %s\n", cwd);
-		else
-			perror("pwd");
-		return ;
-	}
+		perror("pwd");
+	return (EX_OK);
+	// }
 }
 
 void ft_builtin_env(t_minishell *ms) // Tem de retornar um int

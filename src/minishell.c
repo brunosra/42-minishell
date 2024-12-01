@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/29 18:57:41 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/01 19:22:16 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	main(int argc, char **argv, char **envp)
 		ms.save_stdout = dup(STDOUT_FILENO);
 		if (ms.save_stdin == -1 || ms.save_stdout == -1)
 			return(perror("dup"), 1);
-		ms.input = readline("minishell$ ");
+		ms.input = readline(RD"minishell"RST"$ ");
 		if (ms.input == NULL) // Saída do loop ao receber EOF (Ctrl+D)
 		{
     		printf("Recebido NULL de readline. Saindo...\n");
