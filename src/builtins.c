@@ -114,7 +114,7 @@ int ft_builtin_exit(char **args, t_minishell *ms)
 	}
 	else
 		ms->exit_code = 0;
-	exit(ms->exit_code); // Precisa limpar antes de sair!
+	exit(ms->exit_code);
 }
 
 long long ft_atoll(char *str, int i, long long res)
