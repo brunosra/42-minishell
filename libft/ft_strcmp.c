@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 16:49:29 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/08 23:39:47 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/02 05:52:34 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ int	ft_strcmp(char *s1, char *s2)
 	int	i;
 
 	i = 0;
+	if (!s1 || !s2)
+		return (-1);
 	while (s1[i] != '\0' && s2[i])
 	{
 		if (s1[i] == s2[i])

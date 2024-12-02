@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/30 02:44:35 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/02 06:24:03 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ t_token	*ft_tokenize_input(char *str, int n_args, int i, int j)
 			break ;
 	}
 	tokens[j].value = NULL;
+	tokens[j].type = TOKEN_NULL;
 	return (tokens);
 }
 

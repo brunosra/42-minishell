@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/02 03:01:45 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/02 06:11:23 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -336,7 +336,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	valid = -1;
 	if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
 	{
-		ft_putstr_fd(": command not found\n", STDERR_FILENO);
+		ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
 		ms->exit_code = 127;
 		return (127); // Código de erro para "command not found"
 	}
