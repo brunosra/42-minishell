@@ -27,6 +27,7 @@
 # include <fcntl.h>
 # include <string.h>
 # include <errno.h>
+# include <limits.h>
 
 typedef struct s_ast_node t_node;
 
@@ -132,6 +133,8 @@ int		ft_check_builtins(char *str);
 int		ft_builtin_exit(char **args, t_minishell *ms);
 void	ft_builtin_pwd(t_minishell *ms);
 int 	ft_builtin_echo(char **args);
+int		ft_value_is_numeric(char *str);
+long long ft_atoll(char *str, int i, long long res);
 void	ft_builtin_env(t_minishell *ms);
 /* int		ft_builtin_cd(t_minishell *ms);
  */

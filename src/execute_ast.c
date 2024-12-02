@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/30 06:08:53 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/02 06:11:23 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -322,8 +322,8 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 	 	ft_builtin_exit(node->cmd_ready, ms);
 	if (!ft_strcmp(node->token->value, "env"))
 		/* ms->exit_code = */ ft_builtin_env(ms);
-	if (!ft_strcmp(node->token->value, "pwd"))
-		/* ms->exit_code =  */ft_builtin_pwd(ms);
+	// if (!ft_strcmp(node->token->value, "pwd"))
+	// 	/* ms->exit_code =  */ft_builtin_pwd(ms);
 /* 	if (!ft_strcmp(node->token->value, "cd"))
 		ft_builtin_cd(ms); */
 	return (ms->exit_code);
@@ -331,9 +331,12 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 
 int	ft_execute_command(t_node *node, t_minishell *ms)
 {
+	int	valid;
+
+	valid = -1;
 	if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
 	{
-		ft_putstr_fd(": command not found\n", STDERR_FILENO);
+		ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
 		ms->exit_code = 127;
 		return (127); // Código de erro para "command not found"
 	}
@@ -346,42 +349,48 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	}
 	if (ms->pid == 0)
 	{
-		if (ft_check_builtins(node->token->value)) // Nao precisamos, pois ja demos o tipo ao token! entao basta apenas if (node->token->type == TOKEN_BUILTIN
+		if (node->token->type == TOKEN_BUILTIN)
+			exit(ft_exec_builtins(node, ms));
+		if (node->cmd_ready[0][0] == '/' || 									// Caminho absoluto ou relativo
+			(node->cmd_ready[0][0] == '.' && node->cmd_ready[0][1] == '/') || 
+			!ft_strncmp(node->cmd_ready[0], "../", 3)) 
 		{
-			exit (ft_exec_builtins(node, ms)); // Executa builtins, caso seja válido
+			valid = ft_is_valid_file(node->cmd_ready[0], X_OK); // Verifica se o arquivo é válido
+/* 			if (valid == 126) // Arquivo acessível, mas não executável
+			{
+    			node->cmd_ready[0] = "/bin/sh";
+    			execve("/bin/sh", node->cmd_ready, ms->env.envp);
+    			ft_putstr_fd("minishell: ", STDERR_FILENO);
+    			ft_putstr_fd(node->cmd_ready[1], STDERR_FILENO);
+    			ft_putstr_fd(": Cannot execute\n", STDERR_FILENO);
+    			exit(2); // Se execve falhar, assume erro grave e retorna 2 (erro de sintaxe no shell)
+			} */
+			if (valid != 0)
+				exit(valid); // Retorna o erro correspondente (127 ou 126)
+			execve(node->cmd_ready[0], node->cmd_ready, ms->env.envp); // Executa diretamente se for válido
+			ft_putstr_fd("minishell: ", STDERR_FILENO);
+			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
+			ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
+			exit(126);
 		}
-		else
+		if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
 		{
-			if (node->cmd_ready[0][0] == '/' || 
-				(node->cmd_ready[0][0] == '.' && node->cmd_ready[0][1] == '/') || 
-				!ft_strncmp(node->cmd_ready[0], "../", 3)) 
-			{
-				execve(node->cmd_ready[0], node->cmd_ready, ms->env.envp);
-				ft_putstr_fd("minishell: ", STDERR_FILENO);
-				ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
-				ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
-				exit(126);
-			}
-			if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
-			{
-				ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
-				ft_putstr_fd(": command not found\n", STDERR_FILENO);
-				exit(127);
-			}
-			execve(ms->env.full_path, node->cmd_ready, ms->env.envp);
-			perror("execve");
+			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
+			ft_putstr_fd(": command not found\n", STDERR_FILENO);
 			exit(127);
 		}
-		exit(1); // Falha inesperada pois nunca devera aqui chegar
+		execve(ms->env.full_path, node->cmd_ready, ms->env.envp); // Executa o executável encontrado
+		perror("execve");
+		exit(127);
 	}
-	waitpid(ms->pid, &ms->status, 0); // Processo pai: aguarda o processo filho
+	waitpid(ms->pid, &ms->status, 0);
 	if (WIFEXITED(ms->status)) // Processo terminou normalmente
-		ms->exit_code = WEXITSTATUS(ms->status); // Captura o código de saída do filho
+		ms->exit_code = WEXITSTATUS(ms->status);
 	else if (WIFSIGNALED(ms->status)) // Processo foi terminado por um sinal
-		ms->exit_code = 128 + WTERMSIG(ms->status); // Código do sinal + 128
+		ms->exit_code = 128 + WTERMSIG(ms->status);
 	else
-		ms->exit_code = 1; // Caso inesperado, erro genérico
-	if (node->token->type == TOKEN_BUILTIN && !ft_strcmp(node->cmd_ready[0], "exit") && ms->exit_code != 1)
+		ms->exit_code = 1;
+	if (node->token->type == TOKEN_BUILTIN && !ft_strcmp(node->cmd_ready[0], "exit") && ms->exit_code != 1) // Finaliza o shell se for exit
 	{
 		ft_free_tokens(ms->tokens);
 		ft_free_ast(ms->ast_root);
@@ -393,55 +402,45 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 
 int	ft_find_executable(t_minishell *ms, char *cmd)
 {
-	int		i;
+	int	i;
 
 	i = 0;
 	ms->env.env_paths = getenv("PATH");
 	if (!ms->env.env_paths)
-		return (1);
-	ms->env.paths = ft_split(ms->env.env_paths, ':'); // Divide PATH em diretórios
+		return (127); // PATH não encontrado
+	ms->env.paths = ft_split(ms->env.env_paths, ':');
 	if (!ms->env.paths)
-		return (1);
+		return (127); // Falha ao dividir o PATH
 	while (ms->env.paths[i])
 	{
-		ms->env.full_path = malloc(ft_strlen(ms->env.paths[i]) + ft_strlen(cmd) + 2); // +2 para '/' e '\0'
+		ms->env.full_path = malloc(ft_strlen(ms->env.paths[i]) + ft_strlen(cmd) + 2);
 		if (!ms->env.full_path)
 		{
 			ft_free_split(ms->env.paths);
-			return (1);
+			return (127);
 		}
 		ft_strcpy(ms->env.full_path, ms->env.paths[i]);
 		ft_strcat(ms->env.full_path, "/");
 		ft_strcat(ms->env.full_path, cmd);
-		if (access(ms->env.full_path, X_OK) == 0) // Verifica se é executável
+		if (access(ms->env.full_path, X_OK) == 0)
 		{
 			ft_free_split(ms->env.paths);
-			return (0);
+			return (0); // Comando encontrado
 		}
 		free(ms->env.full_path);
 		i++;
 	}
 	ft_free_split(ms->env.paths);
-	return (127);
+	return (127); // Comando não encontrado
 }
 
 int	ft_invalid_right_token_value(char *value)
 {
-	if (!value)
-		return (1);
-	if (ft_strcmp(value, ">") == 0)
-		return (1);
-	if (ft_strcmp(value, ">>") == 0)
-		return (1);
-	if (ft_strcmp(value, "<") == 0)
-		return (1);
-	if (ft_strcmp(value, "<<") == 0)
-		return (1);
-	if (ft_strcmp(value, "|") == 0)
-		return (1);
-	if (ft_strcmp(value, "&&") == 0)
-		return (1);
-	if (ft_strcmp(value, "||") == 0)
+	if (!value || 
+		ft_strcmp(value, ">") == 0 || ft_strcmp(value, ">>") == 0 || 
+		ft_strcmp(value, "<") == 0 || ft_strcmp(value, "<<") == 0 || 
+		ft_strcmp(value, "|") == 0 || ft_strcmp(value, "&&") == 0 || 
+		ft_strcmp(value, "||") == 0)
 		return (1);
 	return (0);
 }
@@ -449,38 +448,53 @@ int	ft_invalid_right_token_value(char *value)
 int	ft_is_valid_file(char *filepath, int mode)
 {
 	struct stat	file_stat;
-
-	if (!filepath)
+	
+	if (!filepath) // Verifica se o caminho é válido
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", STDERR_FILENO);
 		return (1);
 	}
-	if (stat(filepath, &file_stat) == -1) 	// Verifica se o arquivo existe
-
+	if (stat(filepath, &file_stat) == -1) // Verifica se o arquivo existe
 	{
 		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		ft_putstr_fd(filepath, STDERR_FILENO);
 		ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
-		return (1);
-	}	
-	if (S_ISDIR(file_stat.st_mode)) // Verifica se o caminho é um diretório
+		return (127); // Código de erro para arquivo inexistente
+	}
+	if (S_ISDIR(file_stat.st_mode)) 	// Verifica se é um diretório
 	{
 		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		ft_putstr_fd(filepath, STDERR_FILENO);
 		ft_putstr_fd(": Is a directory\n", STDERR_FILENO);
-		return (1);
+		return (126); // Código de erro para diretório
 	}
-	if (mode == O_RDONLY) // Leitura 	// Verifica permissões de acesso
+/* 	if (file_stat.st_mode & S_IXUSR)
+	{ */
+		if (mode == X_OK) // Verifica permissões de execução
+		{
+			if (access(filepath, X_OK) == -1)
+			{
+				ft_putstr_fd("minishell: ", STDERR_FILENO);
+				ft_putstr_fd(filepath, STDERR_FILENO);
+				ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
+				return (126); // Código de erro para permissão negada
+			}
+			return (0);
+		}
+/* 		return (0);
+	} */
+	if (mode == O_RDONLY) 	// Verifica permissões de leitura
 	{
 		if (access(filepath, R_OK) == -1)
 		{
 			ft_putstr_fd("minishell: ", STDERR_FILENO);
 			ft_putstr_fd(filepath, STDERR_FILENO);
 			ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
-			return (1);
+			return (126); // Código de erro para permissão negada
 		}
+		return (0);
 	}
-	else if (mode == O_WRONLY || mode == (O_WRONLY | O_CREAT) || mode == (O_WRONLY | O_APPEND)) // Escrita
+	if (mode == O_WRONLY || mode == (O_WRONLY | O_CREAT) || mode == (O_WRONLY | O_APPEND)) // Escrita
 	{
 		if (access(filepath, W_OK) == -1)
 		{
@@ -489,9 +503,9 @@ int	ft_is_valid_file(char *filepath, int mode)
 				ft_putstr_fd("minishell: ", STDERR_FILENO);
 				ft_putstr_fd(filepath, STDERR_FILENO);
 				ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
-				return (1);
+				return (126);
 			}
-		}
+		}	
 	}
 	return (0); // Arquivo válido
 }

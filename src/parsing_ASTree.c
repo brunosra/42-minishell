@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/30 04:49:35 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/02 06:34:18 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,17 @@ t_node *ft_parse_ast(t_token *tokens)
     current = NULL;
     cmd_node = NULL;
     op_node = NULL;
-	while (tokens[i].value)
+	
+	while (/* tokens[i].value  || */tokens[i].type != TOKEN_NULL) 
 	{
         printf("token_value = %s\n", tokens[i].value);
 		printf("token_type = %d\n", tokens[i].type);
+		if(!tokens[i].value && tokens[i].type == TOKEN_COMMAND)
+		{	
+			tokens[i].value = ft_strdup("");
+/* 			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
+			return (NULL); // Código de erro para "command not found" */
+		}
 		if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND || tokens[i].type == TOKEN_FILENAME || tokens[i].type == TOKEN_VARIABLE)
 		{
 			if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND)
