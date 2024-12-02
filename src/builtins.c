@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/01 22:31:15 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/02 01:35:11 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,7 +176,7 @@ int ft_value_is_numeric(char *str)
 	return (0);
 }
 
-void ft_builtin_pwd(t_minishell *ms) // Tem de retornar um int
+// void ft_builtin_pwd(t_minishell *ms) // Tem de retornar um int
 /**
  * @brief	pwd - print name of current/working directory
  * 
@@ -186,7 +186,7 @@ void ft_builtin_pwd(t_minishell *ms) // Tem de retornar um int
  * TODO:		Check if malloc() is needed on cwd var.
  */
 
-int	ft_builtin_pwd() // Tem de retornar um int
+/* int	ft_builtin_pwd() // Tem de retornar um int
 {	
 	char cwd[1024]; // VER!! malloc!?
 	if (getcwd(cwd, sizeof(cwd)) != NULL)
@@ -196,7 +196,7 @@ int	ft_builtin_pwd() // Tem de retornar um int
 	return (EX_OK);
 	// }
 }
-
+ */
 void ft_builtin_env(t_minishell *ms) // Tem de retornar um int
 {
 	char **env;
