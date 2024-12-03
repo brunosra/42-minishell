@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/01 22:17:43 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/03 02:50:41 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ void	ft_builtin_pwd(t_minishell *ms);
 int 	ft_builtin_echo(char **args);
 int		ft_value_is_numeric(char *str);
 long long ft_atoll(char *str, int i, long long res);
-void	ft_builtin_env(t_minishell *ms);
+void 	ft_builtin_env(char **args, t_minishell *ms); // deve retornar int
 /* int		ft_builtin_cd(t_minishell *ms);
  */
 /**__SIGNAL__**/

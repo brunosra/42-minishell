@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/02 05:47:46 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/03 02:54:31 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,12 @@ int		ft_builtin_exit(char **args, t_minishell *ms);
 int		ft_value_is_numeric(char *str);
 long long ft_atoll(char *str, int i, long long res);
 
-void 	ft_builtin_env(t_minishell *ms); // deve retornar int
+void 	ft_builtin_env(char **args, t_minishell *ms); // deve retornar int
 /* int		ft_builtin_cd(t_minishell *ms);
  */
 
 /* JUST FOR TEST */
-static void print_str_arr(char **args)
+/* static void print_str_arr(char **args)
 {
 	int i;
 
@@ -32,7 +32,7 @@ static void print_str_arr(char **args)
 		printf("[%d]: %s\n", i, args[i]);
 }
 
-/**
+ *//**
  * @brief 		Builtin Echo
  * 
  * @param args	what should be written in the command line
@@ -48,7 +48,7 @@ int ft_builtin_echo(char **args)
 	i = 1;
 	j = 2;
 	newline = 1;
-	print_str_arr(args);
+	// print_str_arr(args);
 	while (args[i] && !ft_strncmp(args[i], "-n", 2))
 	{
 		while (args[i][j] == 'n')
@@ -199,12 +199,12 @@ int ft_value_is_numeric(char *str)
 	// }
 }
  */
-void ft_builtin_env(t_minishell *ms) // Tem de retornar um int
+void 	ft_builtin_env(char **args, t_minishell *ms)
 {
 	char **env;
 	
 	env = ms->env.envp;
-	if (ms->ast_root->cmd_ready[1])
+	if (args[1])
 	{
 		exit(printf("[env error]: doesn't support arguments\n")); // Talvez fosse melhor ignorar os restabtes argumentos! Ou enviar uma mensagem de erro mas nao sair do programa!
 	}
@@ -216,6 +216,7 @@ void ft_builtin_env(t_minishell *ms) // Tem de retornar um int
 			env++;
 		}
 	}
+	exit(0);
 }
 
 /* int ft_builtin_cd(t_minishell *ms)

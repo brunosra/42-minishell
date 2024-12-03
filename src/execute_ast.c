@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/02 06:11:23 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/03 05:55:10 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,18 @@ int	ft_execute_command(t_node *node, t_minishell *ms);
 int	ft_find_executable(t_minishell *ms, char *cmd);
 int	ft_invalid_right_token_value(char *value);
 int	ft_is_valid_file(char *filepath, int mode);
+static void	ft_swap_output_redirects(t_node *node);
 
 int	ft_execute_ast(t_node *node, t_minishell *ms)
 {
 	if (!node || !ms->n_args)
 		return (1);
 	if (node->token->type == TOKEN_OUTPUT_REDIRECT)
+	{
+		if (node->prev->token->type != TOKEN_OUTPUT_REDIRECT)
+			ft_swap_output_redirects(node);
 		return (ft_handle_output_redirect(node, ms));
+	}
 	else if (node->token->type == TOKEN_INPUT_REDIRECT)
 		return (ft_handle_input_redirect(node, ms));
 	else if (node->token->type == TOKEN_HEREDOC)
@@ -39,6 +44,27 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
 	else if (node->token->type == TOKEN_COMMAND)
 		return (ft_execute_command(node, ms));
 	return (0);
+}
+
+static void	ft_swap_output_redirects(t_node *node)
+{
+	t_node	*current;
+	char	*temp_value;
+
+	if (!node || node->token->type != TOKEN_OUTPUT_REDIRECT)
+		return;
+
+	current = node;
+	while (current && current->left && current->left->token->type == TOKEN_OUTPUT_REDIRECT)
+		current = current->left;
+
+	// Troca os valores do último nó (mais profundo) com o atual
+	if (current != node)
+	{
+		temp_value = current->right->token->value;
+		current->right->token->value = node->right->token->value;
+		node->right->token->value = temp_value;
+	}
 }
 
 int	ft_handle_heredoc(t_node *node, t_minishell *ms)
@@ -315,13 +341,13 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 
 int	ft_exec_builtins(t_node *node, t_minishell *ms)
 {
-	printf("node token: %s\n", node->token->value);
+	// printf("node token: %s\n", node->token->value);
 	if (!ft_strcmp(node->token->value, "echo"))
 		ms->exit_code = ft_builtin_echo(node->cmd_ready);
 	if (!ft_strcmp(node->token->value, "exit"))
 	 	ft_builtin_exit(node->cmd_ready, ms);
 	if (!ft_strcmp(node->token->value, "env"))
-		/* ms->exit_code = */ ft_builtin_env(ms);
+		/* ms->exit_code = */ ft_builtin_env(node->cmd_ready, ms);
 	// if (!ft_strcmp(node->token->value, "pwd"))
 	// 	/* ms->exit_code =  */ft_builtin_pwd(ms);
 /* 	if (!ft_strcmp(node->token->value, "cd"))
