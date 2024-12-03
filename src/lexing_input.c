@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/02 06:24:03 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/03 02:39:06 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,13 +93,13 @@ int ft_check_builtins(char *str)
 	if (!ft_strcmp(str, "echo"))
 		return (1);
 	if (!ft_strcmp(str, "pwd"))
-		return (printf("builtin: pwd -->"), 1);
+		return (/* printf("builtin: pwd -->"), */ 1);
 	if (!ft_strcmp(str, "exit"))
-		return (printf("builtin: exit -->"), 1);
+		return (/* printf("builtin: exit -->"), */ 1);
 	if (!ft_strcmp(str, "cd"))
-		return (printf("builtin: cd -->"), 1);
+		return (/* printf("builtin: cd -->"), */ 1);
 	if (!ft_strcmp(str, "env"))
-		return (printf("builtin: env -->"), 1);
+		return (/* printf("builtin: env -->"), */ 1);
 	return (0);
 }
 
@@ -128,6 +128,8 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 			return (TOKEN_VARIABLE);
 		if (ft_verify_variable_value(str))
 			return (TOKEN_VARIABLE);
+		else
+			return (TOKEN_ARGUMENT);
 	}
 	else if ((prev_type == TOKEN_COMMAND || prev_type == TOKEN_BUILTIN || prev_type == TOKEN_ARGUMENT || prev_type == TOKEN_VARIABLE))
 		return (TOKEN_ARGUMENT);

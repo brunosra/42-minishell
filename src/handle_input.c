@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:39:44 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/27 17:59:13 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/03 02:18:58 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ int	ft_count_args(char *str)
 			i = ft_handle_argument(str, i); // avançar o índice no argumento
 		count++;
 	}
-	printf("%i\n", count); // retirar no final
+	// printf("%i\n", count); // retirar no final
 	return (count);
 }
 

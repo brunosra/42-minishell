@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/02 06:34:18 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/03 02:59:50 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,8 @@ t_node *ft_parse_ast(t_token *tokens)
 	
 	while (/* tokens[i].value  || */tokens[i].type != TOKEN_NULL) 
 	{
-        printf("token_value = %s\n", tokens[i].value);
-		printf("token_type = %d\n", tokens[i].type);
+        // printf("token_value = %s\n", tokens[i].value);
+		// printf("token_type = %d\n", tokens[i].type);
 		if(!tokens[i].value && tokens[i].type == TOKEN_COMMAND)
 		{	
 			tokens[i].value = ft_strdup("");
@@ -50,6 +50,10 @@ t_node *ft_parse_ast(t_token *tokens)
 		}
 		if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND || tokens[i].type == TOKEN_FILENAME || tokens[i].type == TOKEN_VARIABLE)
 		{
+			if (tokens[i].type == TOKEN_FILENAME)
+			{
+				tokens[i].value = ft_remove_quotes(tokens[i].value);
+			}
 			if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND)
 				cmd_node = ft_group_command_tokens(tokens, &i);
 			else

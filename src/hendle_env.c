@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/30 03:51:13 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/03 02:44:12 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,10 +72,10 @@ int	ft_revalue_token_variable(t_minishell *ms)
 					env_value = ft_get_env_value(ptr, ms->env.envp, &key);
 					if (!env_value) // ALterar isto!!!
 					{
-						ft_putstr_fd("Erro: Variável '", 2); // ALterar isto!!!
+/* 						ft_putstr_fd("Erro: Variável '", 2); // ALterar isto!!!
 						ft_putstr_fd(ms->tokens[i].value, 2); // ALterar isto!!!
 						ft_putstr_fd("' não encontrada\n", 2); // ALterar isto!!!
-						env_value = ft_strdup("");
+ */						env_value = ft_strdup("");
 					}
 /* 					if (*env_value == '\0' && ft_strlen(ms->tokens[i].value) == ft_strlen(key + 1))
 						ft_remove_str(&ms->tokens[i].value, key, ptr);
@@ -98,6 +98,10 @@ int	ft_revalue_token_variable(t_minishell *ms)
 					key = ft_strdup("?");
 					// printf("%lu\n", ft_strlen(ft_itoa(ms->exit_code)));
 					ft_replace_str(&ms->tokens[i].value, key, ptr, ft_itoa(ms->exit_code));
+					free(key);
+					ptr = ft_strchr(ms->tokens[i].value, '$');
+					if (!ptr)
+						break ;
 				}
 				else
 				{
@@ -153,16 +157,16 @@ int	ft_replace_str(char **value, char *key, char *ptr, char *env_value)
 	start = ft_substr(*value, 0, ptr - *value);
 	if (!start)
 		return (1);
-	printf("%lu\n", ft_strlen(key));
+	// printf("%lu\n", ft_strlen(key));
 	end = ft_strdup(ptr + ft_strlen(key) + 1);
 	if (!end)
 	{
 		free(start);
 		return (1);
 	}
-	printf("%lu\n", ft_strlen(start));
-	printf("%lu\n", ft_strlen(env_value));
-	printf("%lu\n", ft_strlen(end));
+	// printf("%lu\n", ft_strlen(start));
+	// printf("%lu\n", ft_strlen(env_value));
+	// printf("%lu\n", ft_strlen(end));
 	new_len = ft_strlen(start) + ft_strlen(env_value) + ft_strlen(end) + 1;
 	new_value = malloc(new_len);
 	if (!new_value)

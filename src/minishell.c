@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/01 19:22:16 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/03 03:52:06 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,12 @@ int	main(int argc, char **argv, char **envp)
 			return (1); // nao e para sair! alterar!
 		}		
 		ms.ast_root = ft_parse_ast(ms.tokens);
-		print_ast(ms.ast_root, 5); // Para testar a estrutura da AST
+		//print_ast(ms.ast_root, 5); // Para testar a estrutura da AST
 		if (ms.ast_root)
 		{
 			ms.status = ft_execute_ast(ms.ast_root, &ms);
-			if (ms.status != 0)
-				fprintf(stderr, "Erro na execução do comando: status %d\n", ms.status);
+			// if (ms.status != 0)
+			// 	fprintf(stderr, "Erro na execução do comando: status %d\n", ms.status);
 			if (dup2(ms.save_stdin, STDIN_FILENO) == -1 || dup2(ms.save_stdout, STDOUT_FILENO) == -1)
 			{
 				perror("dup2");
