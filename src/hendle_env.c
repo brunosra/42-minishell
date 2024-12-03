@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/03 02:44:12 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/03 05:13:47 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,8 @@ int	ft_revalue_token_variable(t_minishell *ms)
 						perror("");
 						return (1);
 					}
+					if (ms->tokens[i].value[0] == '\0' && ms->tokens[i].type == TOKEN_COMMAND)
+						ms->tokens[i].type = TOKEN_VARIABLE;
 					ptr = ft_strchr(ms->tokens[i].value, '$');
 					if (!ptr)
 						break ;

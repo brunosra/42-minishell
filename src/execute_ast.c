@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/03 03:51:50 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/03 05:55:10 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
 		return (1);
 	if (node->token->type == TOKEN_OUTPUT_REDIRECT)
 	{
-		ft_swap_output_redirects(node);
+		if (node->prev->token->type != TOKEN_OUTPUT_REDIRECT)
+			ft_swap_output_redirects(node);
 		return (ft_handle_output_redirect(node, ms));
 	}
 	else if (node->token->type == TOKEN_INPUT_REDIRECT)
