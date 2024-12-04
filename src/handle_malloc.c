@@ -6,11 +6,11 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 22:18:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/11/28 10:58:40 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/04 08:25:49 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../include/minishell.h"
 
 void	ft_free_tokens(t_token *tokens);
 void	ft_free_ast(t_node *root);
