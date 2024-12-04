@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/04 05:58:45 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/04 21:46:00 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -295,7 +295,7 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 {
 	// if (!node->right)
 	// 	return (ft_execute_ast(node->left, ms));
-	if (ft_invalid_right_token_value(node->right->token->value) == 1)
+/* 	if (ft_invalid_right_token_value(node->right->token->value) == 1)
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
 		if (node->right->token->value)
@@ -304,6 +304,12 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 			ft_putstr_fd("newline", STDERR_FILENO);
 		ft_putstr_fd("'\n", STDERR_FILENO);
 		ms->exit_code = 258;
+		return (1);
+	} */
+	if (!node->right)
+	{
+		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", STDERR_FILENO);
+		ms->exit_code = 258; // Código de erro para erro de sintaxe
 		return (1);
 	}
 	if (pipe(ms->pipefd) == -1)

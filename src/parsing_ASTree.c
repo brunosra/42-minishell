@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/04 06:23:48 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/04 19:03:24 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,9 +84,31 @@ t_node *ft_parse_ast(t_token *tokens)
 				{
 					root->prev = op_node;
 				}
-				root = op_node;
-				current = op_node;
-				i++;
+				if (tokens[i].type == TOKEN_INPUT_REDIRECT && current->prev->right == current && current->prev->token->type == TOKEN_OPERATOR)
+				{
+					root = current->prev;
+					root->right = op_node;
+					op_node->left = current;
+					op_node->prev = root;
+					root->prev = root;
+					current = op_node;
+					i++;
+				}
+/* 				else if (tokens[i].type == TOKEN_OPERATOR && current->prev->right == current && current->prev->token->type == TOKEN_INPUT_REDIRECT)
+				{
+					root = op_node;
+					root->right = current->prev;
+					op_node->left = current;
+					op_node->prev = root;
+					current = op_node;
+					i++;
+				} */
+				else
+				{
+					root = op_node;
+					current = op_node;
+					i++;
+				}
             /* } */
 /* 			else if (!ft_strcmp(tokens[i].value, ">") || !ft_strcmp(tokens[i].value, "<") || !ft_strcmp(tokens[i].value, ">>") || !ft_strcmp(tokens[i].value, "<<"))
 			{
