@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/03 05:55:10 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/04 05:58:45 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms);
 int	ft_find_executable(t_minishell *ms, char *cmd);
 int	ft_invalid_right_token_value(char *value);
 int	ft_is_valid_file(char *filepath, int mode);
-static void	ft_swap_output_redirects(t_node *node);
+static void	ft_swap_redirects_values(t_node *node, t_type type);
 
 int	ft_execute_ast(t_node *node, t_minishell *ms)
 {
@@ -30,11 +30,15 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
 	if (node->token->type == TOKEN_OUTPUT_REDIRECT)
 	{
 		if (node->prev->token->type != TOKEN_OUTPUT_REDIRECT)
-			ft_swap_output_redirects(node);
+			ft_swap_redirects_values(node, TOKEN_OUTPUT_REDIRECT);
 		return (ft_handle_output_redirect(node, ms));
 	}
 	else if (node->token->type == TOKEN_INPUT_REDIRECT)
+	{
+		if (node->prev->token->type != TOKEN_INPUT_REDIRECT)
+			ft_swap_redirects_values(node, TOKEN_INPUT_REDIRECT);
 		return (ft_handle_input_redirect(node, ms));
+	}
 	else if (node->token->type == TOKEN_HEREDOC)
 		return (ft_handle_heredoc(node, ms));
 	else if (node->token->type == TOKEN_OPERATOR)
@@ -46,16 +50,16 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
 	return (0);
 }
 
-static void	ft_swap_output_redirects(t_node *node)
+static void	ft_swap_redirects_values(t_node *node, t_type type)
 {
 	t_node	*current;
 	char	*temp_value;
 
-	if (!node || node->token->type != TOKEN_OUTPUT_REDIRECT)
+	if (!node || node->token->type != type)
 		return;
 
 	current = node;
-	while (current && current->left && current->left->token->type == TOKEN_OUTPUT_REDIRECT)
+	while (current && current->left && current->left->token->type == type)
 		current = current->left;
 
 	// Troca os valores do último nó (mais profundo) com o atual
@@ -265,7 +269,7 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms)
 	}
 	if (ft_is_valid_file(node->right->token->value, O_RDONLY)) 	// Verifica se o arquivo é inválido
 	{
-		ms->exit_code = 1;
+		ms->exit_code = 1; // Checar se existem outputs_redirects para a frente em que os ficheiros precisem de ser criados!!
 		return (1);
 	}
 	fd = open(node->right->token->value, O_RDONLY); // Abre o arquivo para leitura
@@ -396,8 +400,8 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 			execve(node->cmd_ready[0], node->cmd_ready, ms->env.envp); // Executa diretamente se for válido
 			ft_putstr_fd("minishell: ", STDERR_FILENO);
 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
-			ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
-			exit(126);
+			ft_putstr_fd(": command not found\n", STDERR_FILENO);
+			exit(127);
 		}
 		if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
 		{
