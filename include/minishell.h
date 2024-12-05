@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/05 04:54:29 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/05 07:31:24 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@
 # include <errno.h>
 # include <limits.h>
 # include <stdbool.h>
+
+static volatile int	g_sig_received = 0;
 
 typedef struct s_ast_node t_node;
 
@@ -146,7 +148,8 @@ void 	ft_builtin_env(char **args, t_minishell *ms); // deve retornar int
 /* int		ft_builtin_cd(t_minishell *ms);
  */
 /**__SIGNAL__**/
-void 	ft_signal_handler(int signum);
+void	ft_signal_handler(int sig);
+// void	ft_check_signals();
 
 /**__FREE_MALLOCs_**/
 void	ft_free_tokens(t_token *tokens);
