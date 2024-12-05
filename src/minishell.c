@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/04 18:50:03 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/05 05:03:52 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ int	main(int argc, char **argv, char **envp)
 	{
 		ms.save_stdin = dup(STDIN_FILENO);
 		ms.save_stdout = dup(STDOUT_FILENO);
+		ms.swap_input_redirects = false;
+		ms.swap_output_redirects = false;
 		if (ms.save_stdin == -1 || ms.save_stdout == -1)
 			return(perror("dup"), 1);
 		ms.input = readline(RD"minishell"RST"$ ");
@@ -48,7 +50,7 @@ int	main(int argc, char **argv, char **envp)
 			return (1); // nao e para sair! alterar!
 		}		
 		ms.ast_root = ft_parse_ast(ms.tokens);
-	//	print_ast(ms.ast_root, 5); // Para testar a estrutura da AST
+		// print_ast(ms.ast_root, 5); // Para testar a estrutura da AST
 		if (ms.ast_root)
 		{
 			ms.status = ft_execute_ast(ms.ast_root, &ms);
@@ -72,21 +74,6 @@ int	main(int argc, char **argv, char **envp)
 	ft_free_split(ms.env.envp);
 	return (0);
 }
-
-/* int	main(void)
-{
-	char				*input = "echo ola | grep ola";
-	t_minishell			ms;
-
-	ms.tokens = ft_handle_and_tokenize_input(input);
-	ms.ast_root = ft_parse_ast(ms.tokens);
-	print_ast(ms.ast_root, 0);
-	ft_execute_ast(ms.ast_root);
-	ft_free_tokens(ms.tokens);
-	ft_free_ast(ms.ast_root);
-	return (0);
-}
-*/
 
 int	ft_handle_and_tokenize_input(t_minishell *ms)
 {

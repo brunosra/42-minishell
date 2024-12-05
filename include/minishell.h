@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/03 02:50:41 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/05 04:54:29 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 # include <string.h>
 # include <errno.h>
 # include <limits.h>
+# include <stdbool.h>
 
 typedef struct s_ast_node t_node;
 
@@ -61,6 +62,7 @@ typedef struct s_ast_node
 	t_node *left;
 	t_node *right;
 	t_node	*prev;
+	bool	file;
 }	t_node;
 
 typedef struct s_env
@@ -86,6 +88,8 @@ typedef struct s_minishell
 	struct	sigaction	sa;
 	int					pipefd[2];
 	int					exit_code;
+	bool				swap_input_redirects;
+	bool				swap_output_redirects;
 }				t_minishell;
 
 /**__HANDLE_and_LEXING_INPUT__**/
@@ -127,6 +131,9 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms);
 int	ft_find_executable(t_minishell *ms, char *cmd);
 int	ft_invalid_right_token_value(char *value);
 int	ft_is_valid_file(char *filepath, int mode);
+void	ft_remove_created_files(t_node *node);
+void	ft_create_files(t_node *node);
+void	ft_swap_redirects_values(t_node *node, t_type type);
 
 /**__BUILTINS__**/
 int		ft_check_builtins(char *str);
