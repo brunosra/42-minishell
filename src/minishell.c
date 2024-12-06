@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/05 07:35:11 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/05 23:07:41 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ int	main(int argc, char **argv, char **envp)
 	(void)argv;
 	(void)argc;
 	ms.exit_code = 0;
+	ft_ms_struct(&ms, 0);
 	ms.sa.sa_handler = ft_signal_handler;
 	sigemptyset(&ms.sa.sa_mask);
 	ms.sa.sa_flags = SA_RESTART;
@@ -32,7 +33,7 @@ int	main(int argc, char **argv, char **envp)
 		return (perror("malloc"), 1);
 	while (1)
 	{
-		// ft_check_signals();
+		ft_set_main_signals();
 		ms.save_stdin = dup(STDIN_FILENO);
 		ms.save_stdout = dup(STDOUT_FILENO);
 		ms.swap_input_redirects = false;
@@ -43,9 +44,11 @@ int	main(int argc, char **argv, char **envp)
 		if (ms.input == NULL) // Ctrl-D ou EOF
 		{
 			write(STDOUT_FILENO, "exit\n", 5);
-			exit(0);
+			break ;
 		}
-		add_history(ms.input);
+		if (*ms.input)
+			add_history(ms.input);
+		// Verifica sinais recebidos
 		if (ft_handle_and_tokenize_input(&ms)) // Alterar o que faz e o erro!
 		{
 			fprintf(stderr, "unclosed quotes\n");

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/05 05:00:03 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/06 03:04:51 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,12 +142,21 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 		ms->exit_code = 1;
 		return (1);
 	}
+	ft_set_fork_signals();
 	if (ms->pid == 0)
 	{
+		ft_set_heredoc_signals();
 		close(ms->pipefd[0]);
 		while (1)
 		{
 			input = readline("> ");
+/* 			if (input == NULL) // Ctrl-D ou EOF
+			{
+				ft_putstr_fd("minishell: warning: here-document delimited by end-of-file (wanted `", STDERR_FILENO);
+				ft_putstr_fd(node->right->token->value, STDERR_FILENO);
+				write(STDERR_FILENO, "')\n", 3); 
+				break; // Contar heredocs, criar variavel para saber qdo tem de fechar exit 130
+			} */
 			if (!input || ft_strcmp(input, node->right->token->value) == 0)
 				break;
 			if (temp)
@@ -180,6 +189,7 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 	}
 	close(ms->pipefd[0]);
 	waitpid(ms->pid, &ms->status, 0);
+	ft_set_main_signals();
 	if (save_stdout != -1)
 	{
 		if (dup2(save_stdout, STDOUT_FILENO) == -1)
@@ -377,8 +387,10 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 int	ft_execute_command(t_node *node, t_minishell *ms)
 {
 	int	valid;
+	int sig;
 
 	valid = -1;
+	sig = 0;
 	if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
 	{
 		ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
@@ -394,6 +406,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	}
 	if (ms->pid == 0)
 	{
+		//ft_set_fork_signals();
 		if (node->token->type == TOKEN_BUILTIN)
 			exit(ft_exec_builtins(node, ms));
 		if (node->cmd_ready[0][0] == '/' || 									// Caminho absoluto ou relativo
@@ -419,13 +432,20 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 		perror("execve");
 		exit(127);
 	}
+	ft_set_fork_signals();
 	waitpid(ms->pid, &ms->status, 0);
 	if (WIFEXITED(ms->status)) // Processo terminou normalmente
 		ms->exit_code = WEXITSTATUS(ms->status);
 	else if (WIFSIGNALED(ms->status)) // Processo foi terminado por um sinal
-		ms->exit_code = 128 + WTERMSIG(ms->status);
+	{
+		sig = WTERMSIG(ms->status);
+		ms->exit_code = 128 + sig;
+		if (sig == SIGINT)
+			write(STDERR_FILENO, "\n", 1);
+	}
 	else
 		ms->exit_code = 1;
+	ft_set_main_signals();
 	if (ms->exit_code != 0 && node->prev && node->prev->token->type == TOKEN_INPUT_REDIRECT) // Remoção de arquivos criados caso o comando falhe
 	{
 		ft_remove_created_files(node->prev);
