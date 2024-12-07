@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/04 21:46:00 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/06 03:04:51 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,9 @@ int	ft_execute_command(t_node *node, t_minishell *ms);
 int	ft_find_executable(t_minishell *ms, char *cmd);
 int	ft_invalid_right_token_value(char *value);
 int	ft_is_valid_file(char *filepath, int mode);
-static void	ft_swap_redirects_values(t_node *node, t_type type);
+void	ft_swap_redirects_values(t_node *node, t_type type);
+void	ft_remove_created_files(t_node *node);
+void	ft_create_files(t_node *node);
 
 int	ft_execute_ast(t_node *node, t_minishell *ms)
 {
@@ -29,14 +31,20 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
 		return (1);
 	if (node->token->type == TOKEN_OUTPUT_REDIRECT)
 	{
-		if (node->prev->token->type != TOKEN_OUTPUT_REDIRECT)
+		if (ms->swap_output_redirects == false)
+		{
 			ft_swap_redirects_values(node, TOKEN_OUTPUT_REDIRECT);
+			ms->swap_output_redirects = true;
+		}
 		return (ft_handle_output_redirect(node, ms));
 	}
 	else if (node->token->type == TOKEN_INPUT_REDIRECT)
 	{
-		if (node->prev->token->type != TOKEN_INPUT_REDIRECT)
+		if (ms->swap_input_redirects == false)
+		{
 			ft_swap_redirects_values(node, TOKEN_INPUT_REDIRECT);
+			ms->swap_input_redirects = true;
+		}
 		return (ft_handle_input_redirect(node, ms));
 	}
 	else if (node->token->type == TOKEN_HEREDOC)
@@ -50,20 +58,17 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
 	return (0);
 }
 
-static void	ft_swap_redirects_values(t_node *node, t_type type)
+void	ft_swap_redirects_values(t_node *node, t_type type)
 {
 	t_node	*current;
 	char	*temp_value;
 
 	if (!node || node->token->type != type)
 		return;
-
 	current = node;
 	while (current && current->left && current->left->token->type == type)
 		current = current->left;
-
-	// Troca os valores do último nó (mais profundo) com o atual
-	if (current != node)
+	if (current != node) // Troca os valores do último nó (mais profundo) com o atual
 	{
 		temp_value = current->right->token->value;
 		current->right->token->value = node->right->token->value;
@@ -137,12 +142,21 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 		ms->exit_code = 1;
 		return (1);
 	}
+	ft_set_fork_signals();
 	if (ms->pid == 0)
 	{
+		ft_set_heredoc_signals();
 		close(ms->pipefd[0]);
 		while (1)
 		{
 			input = readline("> ");
+/* 			if (input == NULL) // Ctrl-D ou EOF
+			{
+				ft_putstr_fd("minishell: warning: here-document delimited by end-of-file (wanted `", STDERR_FILENO);
+				ft_putstr_fd(node->right->token->value, STDERR_FILENO);
+				write(STDERR_FILENO, "')\n", 3); 
+				break; // Contar heredocs, criar variavel para saber qdo tem de fechar exit 130
+			} */
 			if (!input || ft_strcmp(input, node->right->token->value) == 0)
 				break;
 			if (temp)
@@ -175,6 +189,7 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 	}
 	close(ms->pipefd[0]);
 	waitpid(ms->pid, &ms->status, 0);
+	ft_set_main_signals();
 	if (save_stdout != -1)
 	{
 		if (dup2(save_stdout, STDOUT_FILENO) == -1)
@@ -229,6 +244,8 @@ int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 		ms->exit_code = 1;
 		return (1);
 	}
+	else
+		node->file = true;
 	if (dup2(fd, STDOUT_FILENO) == -1) // Redireciona STDOUT para o arquivo
 	{
 		perror("dup2");
@@ -269,6 +286,8 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms)
 	}
 	if (ft_is_valid_file(node->right->token->value, O_RDONLY)) 	// Verifica se o arquivo é inválido
 	{
+		ft_remove_created_files(node->prev);
+		ft_create_files(node->left);
 		ms->exit_code = 1; // Checar se existem outputs_redirects para a frente em que os ficheiros precisem de ser criados!!
 		return (1);
 	}
@@ -368,8 +387,10 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 int	ft_execute_command(t_node *node, t_minishell *ms)
 {
 	int	valid;
+	int sig;
 
 	valid = -1;
+	sig = 0;
 	if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
 	{
 		ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
@@ -385,6 +406,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	}
 	if (ms->pid == 0)
 	{
+		//ft_set_fork_signals();
 		if (node->token->type == TOKEN_BUILTIN)
 			exit(ft_exec_builtins(node, ms));
 		if (node->cmd_ready[0][0] == '/' || 									// Caminho absoluto ou relativo
@@ -392,15 +414,6 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 			!ft_strncmp(node->cmd_ready[0], "../", 3)) 
 		{
 			valid = ft_is_valid_file(node->cmd_ready[0], X_OK); // Verifica se o arquivo é válido
-/* 			if (valid == 126) // Arquivo acessível, mas não executável
-			{
-    			node->cmd_ready[0] = "/bin/sh";
-    			execve("/bin/sh", node->cmd_ready, ms->env.envp);
-    			ft_putstr_fd("minishell: ", STDERR_FILENO);
-    			ft_putstr_fd(node->cmd_ready[1], STDERR_FILENO);
-    			ft_putstr_fd(": Cannot execute\n", STDERR_FILENO);
-    			exit(2); // Se execve falhar, assume erro grave e retorna 2 (erro de sintaxe no shell)
-			} */
 			if (valid != 0)
 				exit(valid); // Retorna o erro correspondente (127 ou 126)
 			execve(node->cmd_ready[0], node->cmd_ready, ms->env.envp); // Executa diretamente se for válido
@@ -419,13 +432,24 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 		perror("execve");
 		exit(127);
 	}
+	ft_set_fork_signals();
 	waitpid(ms->pid, &ms->status, 0);
 	if (WIFEXITED(ms->status)) // Processo terminou normalmente
 		ms->exit_code = WEXITSTATUS(ms->status);
 	else if (WIFSIGNALED(ms->status)) // Processo foi terminado por um sinal
-		ms->exit_code = 128 + WTERMSIG(ms->status);
+	{
+		sig = WTERMSIG(ms->status);
+		ms->exit_code = 128 + sig;
+		if (sig == SIGINT)
+			write(STDERR_FILENO, "\n", 1);
+	}
 	else
 		ms->exit_code = 1;
+	ft_set_main_signals();
+	if (ms->exit_code != 0 && node->prev && node->prev->token->type == TOKEN_INPUT_REDIRECT) // Remoção de arquivos criados caso o comando falhe
+	{
+		ft_remove_created_files(node->prev);
+	}
 	if (node->token->type == TOKEN_BUILTIN && !ft_strcmp(node->cmd_ready[0], "exit") && ms->exit_code != 1) // Finaliza o shell se for exit
 	{
 		ft_free_tokens(ms->tokens);
@@ -434,6 +458,47 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 		exit(ms->exit_code);
 	}
 	return (ms->exit_code);
+}
+
+void	ft_remove_created_files(t_node *node)
+{
+	if (!node)
+		return ;
+	if (node->token->type == TOKEN_OUTPUT_REDIRECT && node->right && node->right->token->value && node->file == true) // Se for um OUTPUT_REDIRECT, tenta remover o arquivo associado
+	{
+		if (unlink(node->right->token->value) == -1)
+			perror("unlink");
+	}
+	if (node->prev && node->prev->right == node) // Se estivermos em um ramo direito, seguimos para o nó anterior diretamente
+	{
+		ft_remove_created_files(node->prev);
+		return ;
+	}
+	if (node->prev && node->prev->right) // Se estivermos em um ramo esquerdo, verificamos o ramo direito do nó anterior
+		ft_remove_created_files(node->prev->right);
+	if (node->prev) // Continua a recursão para o nó anterior
+		ft_remove_created_files(node->prev);
+}
+
+void	ft_create_files(t_node *node)
+{
+	int fd;
+
+	if (!node)
+		return;
+	if (node->token->type == TOKEN_OUTPUT_REDIRECT && node->right && node->right->token->value && node->file == false)
+	{
+		if (ft_strcmp(node->token->value, ">>") == 0)
+			fd = open(node->right->token->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		else
+			fd = open(node->right->token->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (fd != -1)
+			close(fd);
+		else
+			perror("open");
+	}
+	if (node->left && node->left->token->type == TOKEN_OUTPUT_REDIRECT) // Se o nó à esquerda também for um output redirect, continuar a verificação
+		ft_create_files(node->left);
 }
 
 int	ft_find_executable(t_minishell *ms, char *cmd)
@@ -504,21 +569,17 @@ int	ft_is_valid_file(char *filepath, int mode)
 		ft_putstr_fd(": Is a directory\n", STDERR_FILENO);
 		return (126); // Código de erro para diretório
 	}
-/* 	if (file_stat.st_mode & S_IXUSR)
-	{ */
-		if (mode == X_OK) // Verifica permissões de execução
+	if (mode == X_OK) // Verifica permissões de execução
+	{
+		if (access(filepath, X_OK) == -1)
 		{
-			if (access(filepath, X_OK) == -1)
-			{
-				ft_putstr_fd("minishell: ", STDERR_FILENO);
-				ft_putstr_fd(filepath, STDERR_FILENO);
-				ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
-				return (126); // Código de erro para permissão negada
-			}
-			return (0);
+			ft_putstr_fd("minishell: ", STDERR_FILENO);
+			ft_putstr_fd(filepath, STDERR_FILENO);
+			ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
+			return (126); // Código de erro para permissão negada
 		}
-/* 		return (0);
-	} */
+		return (0);
+	}
 	if (mode == O_RDONLY) 	// Verifica permissões de leitura
 	{
 		if (access(filepath, R_OK) == -1)

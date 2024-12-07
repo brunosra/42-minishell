@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/03 02:50:41 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/06 01:59:40 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,9 @@
 # include <string.h>
 # include <errno.h>
 # include <limits.h>
+# include <stdbool.h>
+
+// volatile sig_atomic_t	g_sig_received = 0;
 
 typedef struct s_ast_node t_node;
 
@@ -61,6 +64,7 @@ typedef struct s_ast_node
 	t_node *left;
 	t_node *right;
 	t_node	*prev;
+	bool	file;
 }	t_node;
 
 typedef struct s_env
@@ -86,6 +90,8 @@ typedef struct s_minishell
 	struct	sigaction	sa;
 	int					pipefd[2];
 	int					exit_code;
+	bool				swap_input_redirects;
+	bool				swap_output_redirects;
 }				t_minishell;
 
 /**__HANDLE_and_LEXING_INPUT__**/
@@ -127,6 +133,9 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms);
 int	ft_find_executable(t_minishell *ms, char *cmd);
 int	ft_invalid_right_token_value(char *value);
 int	ft_is_valid_file(char *filepath, int mode);
+void	ft_remove_created_files(t_node *node);
+void	ft_create_files(t_node *node);
+void	ft_swap_redirects_values(t_node *node, t_type type);
 
 /**__BUILTINS__**/
 int		ft_check_builtins(char *str);
@@ -139,7 +148,12 @@ void 	ft_builtin_env(char **args, t_minishell *ms); // deve retornar int
 /* int		ft_builtin_cd(t_minishell *ms);
  */
 /**__SIGNAL__**/
-void 	ft_signal_handler(int signum);
+void	ft_signal_handler(int sig);
+t_minishell	*ft_ms_struct(t_minishell *ms, int flag);
+void	ft_set_main_signals(void);
+void	ft_set_fork_signals(void);
+void	ft_set_heredoc_signals(void);
+void	ft_signal_heredoc_handler(int sig);
 
 /**__FREE_MALLOCs_**/
 void	ft_free_tokens(t_token *tokens);

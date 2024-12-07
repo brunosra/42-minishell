@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/04 03:12:12 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/05 05:23:06 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 	}
 	else if (!ft_strcmp(str, "|"))
 		return (TOKEN_OPERATOR);
-	else if (str[0] == '$' || ft_strchr(str, '$'))
+	else if (str && (str[0] == '$' || ft_strchr(str, '$')))
 	{
 		if (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL)
 			return (TOKEN_COMMAND);
