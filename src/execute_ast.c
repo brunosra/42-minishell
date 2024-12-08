@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/06 03:04:51 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/08 05:21:05 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,26 @@ int	ft_is_valid_file(char *filepath, int mode);
 void	ft_swap_redirects_values(t_node *node, t_type type);
 void	ft_remove_created_files(t_node *node);
 void	ft_create_files(t_node *node);
+int	ft_collect_heredocs(t_node *node, t_minishell *ms);
+int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
+int	ft_is_whitespace(char *str);
+t_node	*ft_create_node_from_input(char *input);
+
+// int	ft_execute_heredocs(t_node *node, t_minishell *ms);
+
 
 int	ft_execute_ast(t_node *node, t_minishell *ms)
 {
 	if (!node || !ms->n_args)
 		return (1);
+ 	if (node->token->type == TOKEN_EXCEPT)
+	{
+		ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
+		ft_putstr_fd(node->token->value, STDERR_FILENO);
+		ft_putstr_fd("'\n", STDERR_FILENO);
+		ms->exit_code = 2;
+		return (1);
+	}
 	if (node->token->type == TOKEN_OUTPUT_REDIRECT)
 	{
 		if (ms->swap_output_redirects == false)
@@ -47,9 +62,17 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
 		}
 		return (ft_handle_input_redirect(node, ms));
 	}
-	else if (node->token->type == TOKEN_HEREDOC)
+ 	else if (node->token->type == TOKEN_HEREDOC)
+	{
+		if (node->left && node->left->token->type == TOKEN_HEREDOC)
+		{
+			if (ft_collect_heredocs(node, ms))
+				return (1);
+			return (ft_handle_multiple_heredocs(node, ms));
+		}
 		return (ft_handle_heredoc(node, ms));
-	else if (node->token->type == TOKEN_OPERATOR)
+	}
+ 	else if (node->token->type == TOKEN_OPERATOR)
 		return (ft_handle_pipe(node, ms));
 	else if (node->token->type == TOKEN_BUILTIN)
 		return (ft_execute_command(node, ms));
@@ -150,13 +173,14 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 		while (1)
 		{
 			input = readline("> ");
-/* 			if (input == NULL) // Ctrl-D ou EOF
+ 			if (input == NULL) // Ctrl-D ou EOF
 			{
 				ft_putstr_fd("minishell: warning: here-document delimited by end-of-file (wanted `", STDERR_FILENO);
 				ft_putstr_fd(node->right->token->value, STDERR_FILENO);
 				write(STDERR_FILENO, "')\n", 3); 
+				ms->exit_code = 0;
 				break; // Contar heredocs, criar variavel para saber qdo tem de fechar exit 130
-			} */
+			} 
 			if (!input || ft_strcmp(input, node->right->token->value) == 0)
 				break;
 			if (temp)
@@ -283,7 +307,7 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms)
 		ft_putstr_fd("'\n", STDERR_FILENO);
 		ms->exit_code = 2;
 		return (1);
-	}
+	}	
 	if (ft_is_valid_file(node->right->token->value, O_RDONLY)) 	// Verifica se o arquivo é inválido
 	{
 		ft_remove_created_files(node->prev);
@@ -312,24 +336,42 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms)
 
 int	ft_handle_pipe(t_node *node, t_minishell *ms)
 {
-	// if (!node->right)
-	// 	return (ft_execute_ast(node->left, ms));
-/* 	if (ft_invalid_right_token_value(node->right->token->value) == 1)
+	char *input;
+	char *temp;
+
+	temp = NULL;
+	if (!node->right) // Caso de pipe sem lado direito
 	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
-		if (node->right->token->value)
-			ft_putstr_fd(node->right->token->value, STDERR_FILENO);
-		else
-			ft_putstr_fd("newline", STDERR_FILENO);
-		ft_putstr_fd("'\n", STDERR_FILENO);
-		ms->exit_code = 258;
-		return (1);
-	} */
-	if (!node->right)
+		input = readline("> ");
+		if (!input) // Ctrl-D
+		{
+			ft_putstr_fd("minishell: syntax error: unexpected end of file\n", STDERR_FILENO);
+			ms->exit_code = 258; // Código típico de erro de sintaxe
+			return (258);
+		}
+/* 		if (ft_is_whitespace(input)) // Comando vazio
+		{
+			free(input);
+			ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", STDERR_FILENO);
+			ms->exit_code = 258;
+			return (258);
+		}
+ */		temp = ft_strjoin(ms->input, " ");
+		free(ms->input);
+		ms->input = ft_strjoin(temp, input);
+		free(input);
+		free(temp);
+		ft_free_tokens(ms->tokens);
+		ft_free_ast(ms->ast_root);
+		ms->in_pipe++;
+		return (ft_process_input_and_execute(ms));
+	}
+	
+	else if (!node->left)
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", STDERR_FILENO);
-		ms->exit_code = 258; // Código de erro para erro de sintaxe
-		return (1);
+		ms->exit_code = 2; // Código de erro para erro de sintaxe
+		return (2);
 	}
 	if (pipe(ms->pipefd) == -1)
 	{
@@ -606,3 +648,203 @@ int	ft_is_valid_file(char *filepath, int mode)
 	}
 	return (0); // Arquivo válido
 }
+
+
+int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
+{
+	char	*input;
+	char	*temp;
+	char	*final_input;
+	int		save_stdout;
+	int		status;
+	t_node	*current;
+	int		i;
+
+	if (!node || !node->heredoc_stops)
+		return (1);
+
+	save_stdout = -1;
+	temp = NULL;
+	final_input = NULL;
+	i = 0;
+
+	// Salvar STDOUT se necessário
+	if (!isatty(STDOUT_FILENO))
+	{
+		save_stdout = dup(STDOUT_FILENO);
+		if (save_stdout == -1)
+		{
+			perror("dup");
+			return (1);
+		}
+	}
+
+	while (node->heredoc_stops[i])
+	{
+		if (g_interrupt)
+		{
+			ms->exit_code = 130;
+			break;
+		}
+
+		if (pipe(ms->pipefd) == -1)
+		{
+			perror("pipe");
+			return (1);
+		}
+
+		ms->pid = fork();
+		if (ms->pid == -1)
+		{
+			perror("fork");
+			close(ms->pipefd[0]);
+			close(ms->pipefd[1]);
+			return (1);
+		}
+
+		ft_set_fork_signals();
+
+		if (ms->pid == 0)
+		{
+			ft_set_heredoc_signals();
+			close(ms->pipefd[0]);
+			temp = NULL;
+			while (!g_interrupt)
+			{
+				input = readline("> ");
+				if (g_interrupt)
+					exit(130);
+				if (!input)
+				{
+					ft_putstr_fd("minishell: warning: here-document delimited by end-of-file (wanted `", STDERR_FILENO);
+					ft_putstr_fd(node->heredoc_stops[i], STDERR_FILENO);
+					write(STDERR_FILENO, "')\n", 3);
+					break;
+				}
+				if (ft_strcmp(input, node->heredoc_stops[i]) == 0)
+					break;
+
+				if (temp == NULL)
+					temp = ft_strdup(input);
+				else
+				{
+					char *new_temp = ft_strjoin_free(temp, input, 1, 0);
+					temp = ft_strjoin_free(new_temp, "\n", 1, 0);
+				}
+				free(input);
+			}
+			if (temp)
+			{
+				write(ms->pipefd[1], temp, ft_strlen(temp));
+				free(temp);
+			}
+			close(ms->pipefd[1]);
+			exit(0);
+		}
+
+		close(ms->pipefd[1]);
+		waitpid(ms->pid, &status, 0);
+
+		if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
+		{
+			g_interrupt = 1;
+			ms->exit_code = 130;
+			close(ms->pipefd[0]);
+			break;
+		}
+
+		if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
+		{
+			ms->exit_code = 130;
+			close(ms->pipefd[0]);
+			break;
+		}
+
+		if (temp == NULL)
+			final_input = ft_strdup("");
+		else
+		{
+			char *new_final = ft_strjoin_free(final_input, temp, 1, 0);
+			final_input = new_final;
+		}
+		free(temp);
+		temp = NULL;
+		i++;
+	}
+
+	if (final_input != NULL)
+	{
+		write(ms->pipefd[1], final_input, ft_strlen(final_input));
+		free(final_input);
+	}
+	close(ms->pipefd[1]);
+
+	current = node->left;
+	while (current && current->token->type == TOKEN_HEREDOC)
+	{
+		t_node *temp_node = current;
+		current = current->left;
+		free(temp_node);
+	}
+	node->left = current;
+
+	if (save_stdout != -1)
+	{
+		if (dup2(save_stdout, STDOUT_FILENO) == -1)
+		{
+			perror("dup2");
+			close(save_stdout);
+			return (1);
+		}
+		close(save_stdout);
+	}
+
+	g_interrupt = 0;
+	return (ft_execute_ast(node->left, ms));
+}
+
+int	ft_collect_heredocs(t_node *node, t_minishell *ms)
+{
+	t_node	*current;
+	int		count;
+	int		i;
+
+	i = 0;
+	if (!node || node->token->type != TOKEN_HEREDOC)
+		return (0);
+	
+	// Contar heredocs consecutivos
+	count = 0;
+	current = node;
+	while (current && current->token->type == TOKEN_HEREDOC)
+	{
+		count++;
+		current = current->left;
+	}
+
+	// Alocar espaço para os stop tokens
+	node->heredoc_stops = malloc(sizeof(char *) * (count + 1));
+	if (!node->heredoc_stops)
+		return (0);
+
+	// Preencher os stop tokens do último para o primeiro
+	current = node;
+	i = count;
+	while (current && --i >= 0)
+	{
+		if(!current->right)
+		{
+			ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
+			//ft_putstr_fd(current->left->token->value, STDERR_FILENO);
+			ft_putchar_fd(current->left->token->value[0], STDERR_FILENO);
+			ft_putstr_fd("'\n", STDERR_FILENO);
+			ms->exit_code = 2;
+			return (1);
+		}
+		node->heredoc_stops[i] = current->right->token->value;
+		current = current->left;
+	}
+	node->heredoc_stops[count] = NULL; // Terminar com NULL
+	return (0);
+}
+

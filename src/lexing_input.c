@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/05 05:23:06 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/08 05:26:39 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,17 +111,14 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 		return (TOKEN_OUTPUT_REDIRECT);
 	else if (!ft_strcmp(str, "<<"))
 		return (TOKEN_HEREDOC);
-	else if (!ft_strcmp(str, "||") || !ft_strcmp(str, "&&"))
-	{
-		fprintf(stderr, "./minishell: syntax error near unexpected token `||'\n"); //substituir por ft_putstr_fd  || nao pode sair aqui!
-		exit(1); // limpar antes de sair
-	}
 	else if (!ft_strcmp(str, "|"))
 		return (TOKEN_OPERATOR);
 	else if (str && (str[0] == '$' || ft_strchr(str, '$')))
 	{
 		if (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL)
 			return (TOKEN_COMMAND);
+		else if (((str[0] == '"' || str[0] == '\'') && (prev_type != TOKEN_COMMAND && prev_type != TOKEN_BUILTIN && prev_type != TOKEN_VARIABLE && prev_type != TOKEN_OPERATOR && prev_type != TOKEN_EXCEPT)) || (prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT || prev_type == TOKEN_HEREDOC))
+			return (TOKEN_FILENAME);
 		if (str[0] == '$')
 			return (TOKEN_VARIABLE);
 		if (ft_verify_variable_value(str))
@@ -129,6 +126,8 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 		else
 			return (TOKEN_ARGUMENT);
 	}
+	else if (!ft_strcmp(str, "||") || !ft_strcmp(str, "&&"))
+		return (TOKEN_EXCEPT); 
 	else if (ft_check_builtins(str))
 		return (TOKEN_BUILTIN);
 	else if (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL) // TOKEN NULL mas + if ou mudar a posicao!
