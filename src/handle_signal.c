@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/06 02:41:37 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/07 21:42:03 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,10 +108,11 @@ void	ft_signal_heredoc_handler(int sig)
 	ms = ft_ms_struct(NULL, 1);
 	if (sig == SIGINT) // Ctrl-C no heredoc
 	{
+		g_interrupt = 1;
 		write(STDOUT_FILENO, "\n", 1);
 		close(ms->pipefd[0]); // Fecha o arquivo do heredoc
-/* 		free(ms->input); // Libera recursos
-		ft_free_ast(ms->ast_root); */
+ 	//	free(ms->input); // Libera recursos
+	//	ft_free_ast(ms->ast_root);
 		exit(130); // Sai com o código 130
 	}
 }

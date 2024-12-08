@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/05 05:03:32 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/08 04:55:57 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ t_node *ft_parse_ast(t_token *tokens)
     cmd_node = NULL;
     op_node = NULL;
 	
-	while (/* tokens[i].value  || */tokens[i].type != TOKEN_NULL) 
+	while (/* tokens[i].value &&  */tokens[i].type != TOKEN_NULL) 
 	{
         // printf("token_value = %s\n", tokens[i].value);
 		// printf("token_type = %d\n", tokens[i].type);
@@ -63,7 +63,7 @@ t_node *ft_parse_ast(t_token *tokens)
 			}
             if (!root)
                 root = cmd_node;
-			else if (current && (current->token->type == TOKEN_OPERATOR || current->token->type == TOKEN_OUTPUT_REDIRECT || current->token->type == TOKEN_INPUT_REDIRECT || current->token->type == TOKEN_HEREDOC))
+			else if (current && (current->token->type == TOKEN_OPERATOR || current->token->type == TOKEN_OUTPUT_REDIRECT || current->token->type == TOKEN_INPUT_REDIRECT || current->token->type == TOKEN_HEREDOC || current->token->type == TOKEN_EXCEPT))
                 current->right = cmd_node;
 			else /* if (current && current->prev->token->type == TOKEN_INPUT_REDIRECT && tokens[i].type == TOKEN_COMMAND && current->token->type == TOKEN_FILENAME && !current->prev->left) */
 			{
@@ -72,7 +72,7 @@ t_node *ft_parse_ast(t_token *tokens)
 			cmd_node->prev = current;
             current = cmd_node;
         }
-        else if (tokens[i].type == TOKEN_OPERATOR || tokens[i].type == TOKEN_OUTPUT_REDIRECT || tokens[i].type == TOKEN_INPUT_REDIRECT || tokens[i].type == TOKEN_HEREDOC)
+        else if (tokens[i].type == TOKEN_OPERATOR || tokens[i].type == TOKEN_OUTPUT_REDIRECT || tokens[i].type == TOKEN_INPUT_REDIRECT || tokens[i].type == TOKEN_HEREDOC || tokens[i].type == TOKEN_EXCEPT)
 		{
             /* if (!ft_strcmp(tokens[i].value, "|"))
 			{ */
@@ -84,7 +84,7 @@ t_node *ft_parse_ast(t_token *tokens)
 				{
 					root->prev = op_node;
 				}
-				if (tokens[i].type == TOKEN_INPUT_REDIRECT && current->prev && current->prev->right == current && current->prev->token->type == TOKEN_OPERATOR)
+				if (tokens[i].type == TOKEN_INPUT_REDIRECT && current && current->prev && current->prev->right == current && current->prev->token->type == TOKEN_OPERATOR)
 				{
 					root = current->prev;
 					root->right = op_node;
@@ -153,9 +153,9 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 		(*index)++;
 	}
 	stop = *index;
-	while (tokens[*index].value && tokens[*index].type != TOKEN_OPERATOR)
+	while (tokens[*index].value && (tokens[*index].type != TOKEN_OPERATOR && tokens[*index].type != TOKEN_EXCEPT))
 	{
-		if (tokens[*index].type == TOKEN_INPUT_REDIRECT || tokens[*index].type == TOKEN_OUTPUT_REDIRECT || tokens[*index].type == TOKEN_HEREDOC)
+		if (tokens[*index].type == TOKEN_INPUT_REDIRECT || tokens[*index].type == TOKEN_OUTPUT_REDIRECT || tokens[*index].type == TOKEN_HEREDOC || tokens[i].type == TOKEN_FILENAME)
 		{
 			c_except++;
 			(*index)++;
@@ -363,6 +363,7 @@ t_node	*ft_create_cmd_node(t_token *token)
 	node->right = NULL;
 	node->prev = NULL;
 	node->file = false;
+	node->heredoc_stops = NULL;
 	return (node);
 }
 
@@ -379,6 +380,7 @@ t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right)
     node->right = right;
 	node->prev = NULL;
 	node->file = false;
+	node->heredoc_stops = NULL;
     return (node);
 }
 
