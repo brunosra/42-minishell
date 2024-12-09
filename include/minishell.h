@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/08 22:46:47 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/09 02:53:11 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,8 +146,6 @@ void	ft_swap_redirects_values(t_node *node, t_type type);
 // int	ft_execute_heredocs(t_node *node, t_minishell *ms);
 int	ft_collect_heredocs(t_node *node, t_minishell *ms);
 int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
-int	ft_is_whitespace(char *str);
-t_node	*ft_create_node_from_input(char *input);
 
 /**__BUILTINS__**/
 int		ft_check_builtins(char *str);

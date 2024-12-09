@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/08 10:44:56 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/09 03:22:41 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,14 @@ t_node *ft_parse_ast(t_token *tokens)
 				tokens[i].value = ft_remove_quotes(tokens[i].value);
 			}
 			if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND)
+			{
 				cmd_node = ft_group_command_tokens(tokens, &i);
+				if (cmd_node == NULL)
+				{												//ALTERAR// INPUT - "$CASA" | "$ CAMA" | "$USER" | '$HOME' $USER $ "$ HOME" << HOME
+					cmd_node = ft_create_cmd_node(&tokens[i]); // verificar se tem heredocs e se tiver cpnecta o ramos esquerdo a este no, se nao tiver executa o comando!
+					return (cmd_node);
+				} 
+			}
 			else
 			{
 				cmd_node = ft_create_cmd_node(&tokens[i]);
@@ -229,6 +236,8 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 		}
 		else if ((tokens[*index].type == TOKEN_INPUT_REDIRECT || tokens[*index].type == TOKEN_OUTPUT_REDIRECT || tokens[*index].type == TOKEN_HEREDOC || tokens[*index].type == TOKEN_FILENAME))
 			(*index)++;
+		else
+			return (NULL);
 	}
 	if (c_except)
 		*index = stop;
