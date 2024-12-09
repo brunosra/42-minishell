@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/08 05:21:05 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/09 02:45:08 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,8 +197,8 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 		}
 		if (temp)
 		{
+			ft_revalue_heredock_input(&temp, ms);
 			write(ms->pipefd[1], temp, ft_strlen(temp));
-			free(temp);
 		}
 		close(ms->pipefd[1]);
 		exit(0);
@@ -650,186 +650,168 @@ int	ft_is_valid_file(char *filepath, int mode)
 }
 
 
-int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
+int ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
 {
-	char	*input;
-	char	*temp;
-	char	*final_input;
-	int		save_stdout;
-	int		status;
-	t_node	*current;
-	int		i;
+    char *input;
+    int save_stdout;
+    int status;
+    t_node *current;
+    int i;
+    char *new_temp;
 
-	if (!node || !node->heredoc_stops)
-		return (1);
-
-	save_stdout = -1;
-	temp = NULL;
-	final_input = NULL;
-	i = 0;
-
-	// Salvar STDOUT se necessário
-	if (!isatty(STDOUT_FILENO))
-	{
-		save_stdout = dup(STDOUT_FILENO);
-		if (save_stdout == -1)
-		{
-			perror("dup");
-			return (1);
-		}
-	}
-
-	while (node->heredoc_stops[i])
-	{
-		if (g_interrupt)
-		{
-			ms->exit_code = 130;
-			break;
-		}
-
-		if (pipe(ms->pipefd) == -1)
-		{
-			perror("pipe");
-			return (1);
-		}
-
-		ms->pid = fork();
-		if (ms->pid == -1)
-		{
-			perror("fork");
-			close(ms->pipefd[0]);
-			close(ms->pipefd[1]);
-			return (1);
-		}
-
-		ft_set_fork_signals();
-
-		if (ms->pid == 0)
-		{
-			ft_set_heredoc_signals();
-			close(ms->pipefd[0]);
-			temp = NULL;
-			while (!g_interrupt)
-			{
-				input = readline("> ");
-				if (g_interrupt)
-					exit(130);
-				if (!input)
-				{
-					ft_putstr_fd("minishell: warning: here-document delimited by end-of-file (wanted `", STDERR_FILENO);
-					ft_putstr_fd(node->heredoc_stops[i], STDERR_FILENO);
-					write(STDERR_FILENO, "')\n", 3);
-					break;
-				}
-				if (ft_strcmp(input, node->heredoc_stops[i]) == 0)
-					break;
-
-				if (temp == NULL)
-					temp = ft_strdup(input);
-				else
-				{
-					char *new_temp = ft_strjoin_free(temp, input, 1, 0);
-					temp = ft_strjoin_free(new_temp, "\n", 1, 0);
-				}
-				free(input);
-			}
-			if (temp)
-			{
-				write(ms->pipefd[1], temp, ft_strlen(temp));
-				free(temp);
-			}
-			close(ms->pipefd[1]);
-			exit(0);
-		}
-
-		close(ms->pipefd[1]);
-		waitpid(ms->pid, &status, 0);
-
-		if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
-		{
-			g_interrupt = 1;
-			ms->exit_code = 130;
-			close(ms->pipefd[0]);
-			break;
-		}
-
-		if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
-		{
-			ms->exit_code = 130;
-			close(ms->pipefd[0]);
-			break;
-		}
-
-		if (temp == NULL)
-			final_input = ft_strdup("");
-		else
-		{
-			char *new_final = ft_strjoin_free(final_input, temp, 1, 0);
-			final_input = new_final;
-		}
-		free(temp);
-		temp = NULL;
-		i++;
-	}
-
-	if (final_input != NULL)
-	{
-		write(ms->pipefd[1], final_input, ft_strlen(final_input));
-		free(final_input);
-	}
-	close(ms->pipefd[1]);
-
-	current = node->left;
-	while (current && current->token->type == TOKEN_HEREDOC)
-	{
-		t_node *temp_node = current;
-		current = current->left;
-		free(temp_node);
-	}
-	node->left = current;
-
-	if (save_stdout != -1)
-	{
-		if (dup2(save_stdout, STDOUT_FILENO) == -1)
-		{
-			perror("dup2");
-			close(save_stdout);
-			return (1);
-		}
-		close(save_stdout);
-	}
-
-	g_interrupt = 0;
-	return (ft_execute_ast(node->left, ms));
+    save_stdout = -1;
+    ms->temp = NULL;
+    i = 0;
+    new_temp = NULL;
+    if (!node || !node->heredoc_stops)
+        return (1);
+    if (!isatty(STDOUT_FILENO)) // Salvar STDOUT se necessário
+    {
+        save_stdout = dup(STDOUT_FILENO);
+        if (save_stdout == -1)
+        {
+            perror("dup");
+            return (1);
+        }
+    }
+    while (node->heredoc_stops[i]) // Processar todos os heredocs
+    {
+        if (g_interrupt)
+        {
+            ms->exit_code = 130;
+            break;
+        }
+        if (pipe(ms->pipefd) == -1) // Criar o pipe para o heredoc
+        {
+            perror("pipe");
+            return (1);
+        }
+        ms->pid = fork();
+        if (ms->pid == -1)
+        {
+            perror("fork");
+            close(ms->pipefd[0]);
+            close(ms->pipefd[1]);
+            return (1);
+        }
+        ft_set_fork_signals();
+        if (ms->pid == 0)
+        {
+            ft_set_heredoc_signals();
+            close(ms->pipefd[0]);
+            ms->temp = NULL;
+            while (!g_interrupt)
+            {
+                input = readline("> ");
+                if (g_interrupt)
+                    exit(130);
+                if (!input)
+                {
+                    ft_putstr_fd("minishell: warning: here-document delimited by end-of-file (wanted `", STDERR_FILENO);
+                    ft_putstr_fd(node->heredoc_stops[i], STDERR_FILENO);
+                    write(STDERR_FILENO, "')\n", 3);
+                    break;
+                }
+                if (ft_strcmp(input, node->heredoc_stops[i]) == 0)
+                    break;
+                if (ms->temp == NULL)
+                    ms->temp = ft_strdup(input);
+                else
+                {
+                    new_temp = ft_strjoin_free(ms->temp, "\n", 1, 0);
+                    ms->temp = ft_strjoin_free(new_temp, input, 1, 0);
+                }
+                free(input);
+            }
+            if (ms->temp && ms->c_multi_heredocs == i + 1)
+            {
+                new_temp = ft_strjoin_free(ms->temp, "\n", 1, 0);
+				ft_revalue_heredock_input(&new_temp, ms);
+                ft_putstr_fd(new_temp, ms->pipefd[1]);
+                free(new_temp);
+            }
+            close(ms->pipefd[1]);
+            exit(0);
+        }
+        close(ms->pipefd[1]);
+        waitpid(ms->pid, &status, 0);
+        if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
+        {
+            g_interrupt = 1;
+            ms->exit_code = 130;
+            close(ms->pipefd[0]);
+            break;
+        }
+        if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
+        {
+            ms->exit_code = 130;
+            close(ms->pipefd[0]);
+            break;
+        }
+        i++;
+    }
+    if (!WIFSIGNALED(status) && WEXITSTATUS(status) != 130) // Após todos os heredocs, redirecionar o stdin do processo pai para o pipe
+    {
+        if (dup2(ms->pipefd[0], STDIN_FILENO) == -1 && !g_interrupt)
+        {
+            perror("dup2 aqui");
+            close(ms->pipefd[0]);
+            ms->exit_code = 1;
+            return (1);
+        }
+    }
+    close(ms->pipefd[0]);
+    ft_set_main_signals();
+    if (save_stdout != -1) // Restaurar STDOUT se necessário
+    {
+        if (dup2(save_stdout, STDOUT_FILENO) == -1)
+        {
+            perror("dup2 este");
+            close(save_stdout);
+            ms->exit_code = 1;
+            return (1);
+        }
+        close(save_stdout);
+    }
+    current = node->left;
+    while (current && current->token->type == TOKEN_HEREDOC)
+    {
+        t_node *temp_node = current;
+        current = current->left;
+        free(temp_node);
+    }
+    node->left = current;
+    g_interrupt = 0;
+    return (ft_execute_ast(node->left, ms));
 }
+
 
 int	ft_collect_heredocs(t_node *node, t_minishell *ms)
 {
 	t_node	*current;
-	int		count;
 	int		i;
 
 	i = 0;
+	ms->c_multi_heredocs = 0;
 	if (!node || node->token->type != TOKEN_HEREDOC)
 		return (0);
 	
 	// Contar heredocs consecutivos
-	count = 0;
 	current = node;
 	while (current && current->token->type == TOKEN_HEREDOC)
 	{
-		count++;
+		ms->c_multi_heredocs++;
 		current = current->left;
 	}
 
 	// Alocar espaço para os stop tokens
-	node->heredoc_stops = malloc(sizeof(char *) * (count + 1));
+	node->heredoc_stops = malloc(sizeof(char *) * (ms->c_multi_heredocs + 1));
 	if (!node->heredoc_stops)
 		return (0);
 
 	// Preencher os stop tokens do último para o primeiro
 	current = node;
-	i = count;
+	i = ms->c_multi_heredocs;
 	while (current && --i >= 0)
 	{
 		if(!current->right)
@@ -844,7 +826,7 @@ int	ft_collect_heredocs(t_node *node, t_minishell *ms)
 		node->heredoc_stops[i] = current->right->token->value;
 		current = current->left;
 	}
-	node->heredoc_stops[count] = NULL; // Terminar com NULL
+	node->heredoc_stops[ms->c_multi_heredocs] = NULL; // Terminar com NULL
 	return (0);
 }
 

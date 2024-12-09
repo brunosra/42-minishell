@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/08 04:44:19 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/08 22:46:47 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,9 @@ typedef struct s_minishell
 	int					exit_code;
 	bool				swap_input_redirects;
 	bool				swap_output_redirects;
+	int					c_multi_heredocs;
 	int					in_pipe;
+	char				*temp;
 }				t_minishell;
 
 /**__HANDLE_and_LEXING_INPUT__**/
@@ -178,9 +180,10 @@ int		ft_revalue_token_variable(t_minishell *ms);
 int		ft_check_balanced_quotes(char *str, int idx);
 char	*ft_get_env(const char *key, char **envp);
 char	**ft_duplicate_envp(char **envp);
-int		ft_check_if_expand(char *str, char *ptr);
+int	ft_check_if_expand(char *str, char *ptr, int heredoc);
 int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
 char	*ft_get_env_value(const char *str, char **envp, char **key);
+int	ft_revalue_heredock_input(char **input, t_minishell *ms);
 /* int		ft_remove_str(char **value, char *key, char *ptr);
  */
 #endif

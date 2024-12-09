@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/08 05:26:39 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/08 08:02:45 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 	{
 		if (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL)
 			return (TOKEN_COMMAND);
-		else if (((str[0] == '"' || str[0] == '\'') && (prev_type != TOKEN_COMMAND && prev_type != TOKEN_BUILTIN && prev_type != TOKEN_VARIABLE && prev_type != TOKEN_OPERATOR && prev_type != TOKEN_EXCEPT)) || (prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT || prev_type == TOKEN_HEREDOC))
+		else if (((str[0] == '"' || str[0] == '\'') && (prev_type != TOKEN_COMMAND && prev_type != TOKEN_BUILTIN && prev_type != TOKEN_VARIABLE && prev_type != TOKEN_OPERATOR && prev_type != TOKEN_EXCEPT && prev_type != TOKEN_ARGUMENT)) || (prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT || prev_type == TOKEN_HEREDOC))
 			return (TOKEN_FILENAME);
 		if (str[0] == '$')
 			return (TOKEN_VARIABLE);

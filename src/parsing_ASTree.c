@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/08 04:55:57 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/08 10:44:56 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,9 +137,11 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 	int		len_value;
 	int		c_except;
 	int		stop;
+	int		empty;
 
 	cmd_node = ft_create_cmd_node(&tokens[*index]);
 	c_except = 0;
+	empty = 0;
 	cmd_nd_value = NULL;
 	arg_count = 1;
 	i = 0;
@@ -149,13 +151,22 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 	(*index)++;
 	while (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE))
 	{
-		arg_count++;
-		(*index)++;
+		if (tokens[*index].value[0] == '\0')
+		{
+			(*index)++;
+			empty++;
+		}	
+		else
+		{
+			arg_count++;
+			(*index)++;
+		}
+		// printf("%i = %s\n", *index, tokens[*index].value);
 	}
 	stop = *index;
-	while (tokens[*index].value && (tokens[*index].type != TOKEN_OPERATOR && tokens[*index].type != TOKEN_EXCEPT))
+	while (tokens[*index].value && (tokens[*index].type != TOKEN_OPERATOR && tokens[*index].type != TOKEN_EXCEPT && tokens[*index].type != TOKEN_COMMAND))
 	{
-		if (tokens[*index].type == TOKEN_INPUT_REDIRECT || tokens[*index].type == TOKEN_OUTPUT_REDIRECT || tokens[*index].type == TOKEN_HEREDOC || tokens[i].type == TOKEN_FILENAME)
+		if (tokens[*index].type == TOKEN_INPUT_REDIRECT || tokens[*index].type == TOKEN_OUTPUT_REDIRECT || tokens[*index].type == TOKEN_HEREDOC || tokens[*index].type == TOKEN_FILENAME)
 		{
 			c_except++;
 			(*index)++;
@@ -167,8 +178,17 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 		}
 		while (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE))
 		{
-			arg_count++;
-			(*index)++;
+			if (tokens[*index].value[0] == '\0')
+			{
+				(*index)++;
+				empty++;
+			}	
+			else
+			{
+				arg_count++;
+				(*index)++;
+			}
+		// printf("%i = %s\n", *index, tokens[*index].value);
 		}
 	}
 	cmd_node->cmd_ready = malloc(sizeof(char *) * (arg_count + (n_args_cmd_nd_values - 1) + 1));
@@ -187,7 +207,7 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 	}
 	else if (ft_cmp_str_str(cmd_node->token->value, "\"", len_value) || ft_cmp_str_str(cmd_node->token->value, "\'", len_value))
 		cmd_node->token->value = ft_remove_quotes(cmd_node->token->value);
-	*index -= (arg_count + c_except); // Ajusta o índice para voltar ao início do comando
+	*index -= (arg_count + c_except + empty); // Ajusta o índice para voltar ao início do comando
 	i = j;
 	if (n_args_cmd_nd_values != 1)
 		arg_count += n_args_cmd_nd_values;
@@ -195,12 +215,15 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 	{
 		if (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE || tokens[*index].type == TOKEN_COMMAND || tokens[*index].type == TOKEN_BUILTIN))
 		{
+			if (tokens[*index].value[0] == '\0')
+			{
+				(*index)++;
+				continue ;		
+			}	// cmd_node->cmd_ready[i] = ft_strdup(""); // talvez seja para mudar!
 			if (i > j)
 				tokens[*index].value = ft_remove_quotes(tokens[*index].value);
-			if (tokens[*index].value)
+			if (tokens[*index].value/* [0] != '\0' */)
 				cmd_node->cmd_ready[i] = ft_strdup(tokens[*index].value);
-			else
-				cmd_node->cmd_ready[i] = ft_strdup(""); // talvez seja para mudar!
 			i++;
 			(*index)++;
 		}
@@ -227,7 +250,7 @@ char **ft_remove_null_values(char **cmd_ready, int arg_count)
 	new_cmd_ready = NULL;
 	while (cmd_ready[i] != NULL)
 	{
-		// printf("cmd_ready[i][0] = %c\n", cmd_ready[i][0]);
+	//	printf("cmd_ready[i][0] = %c\n", cmd_ready[i][0]);
 		if (cmd_ready[i][0] == '\0')
 			i++;
 		else
@@ -253,7 +276,8 @@ char **ft_remove_null_values(char **cmd_ready, int arg_count)
 		}	
 	}
 	new_cmd_ready[j] = NULL;
-	ft_free_split(cmd_ready);
+	if (*cmd_ready)
+		ft_free_split(cmd_ready);
 	return (new_cmd_ready);
 }
 
@@ -323,7 +347,8 @@ char	*ft_remove_quotes(char *value)
 			free(sub);
 		}
 	}
-	free(value);
+	if (value)
+		free(value);
 	return (new_value);
 }
 
