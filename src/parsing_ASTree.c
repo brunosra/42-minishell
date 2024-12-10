@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/05 05:03:32 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/09 03:22:41 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ t_node *ft_parse_ast(t_token *tokens)
     cmd_node = NULL;
     op_node = NULL;
 	
-	while (/* tokens[i].value  || */tokens[i].type != TOKEN_NULL) 
+	while (/* tokens[i].value &&  */tokens[i].type != TOKEN_NULL) 
 	{
         // printf("token_value = %s\n", tokens[i].value);
 		// printf("token_type = %d\n", tokens[i].type);
@@ -55,7 +55,14 @@ t_node *ft_parse_ast(t_token *tokens)
 				tokens[i].value = ft_remove_quotes(tokens[i].value);
 			}
 			if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND)
+			{
 				cmd_node = ft_group_command_tokens(tokens, &i);
+				if (cmd_node == NULL)
+				{												//ALTERAR// INPUT - "$CASA" | "$ CAMA" | "$USER" | '$HOME' $USER $ "$ HOME" << HOME
+					cmd_node = ft_create_cmd_node(&tokens[i]); // verificar se tem heredocs e se tiver cpnecta o ramos esquerdo a este no, se nao tiver executa o comando!
+					return (cmd_node);
+				} 
+			}
 			else
 			{
 				cmd_node = ft_create_cmd_node(&tokens[i]);
@@ -63,7 +70,7 @@ t_node *ft_parse_ast(t_token *tokens)
 			}
             if (!root)
                 root = cmd_node;
-			else if (current && (current->token->type == TOKEN_OPERATOR || current->token->type == TOKEN_OUTPUT_REDIRECT || current->token->type == TOKEN_INPUT_REDIRECT || current->token->type == TOKEN_HEREDOC))
+			else if (current && (current->token->type == TOKEN_OPERATOR || current->token->type == TOKEN_OUTPUT_REDIRECT || current->token->type == TOKEN_INPUT_REDIRECT || current->token->type == TOKEN_HEREDOC || current->token->type == TOKEN_EXCEPT))
                 current->right = cmd_node;
 			else /* if (current && current->prev->token->type == TOKEN_INPUT_REDIRECT && tokens[i].type == TOKEN_COMMAND && current->token->type == TOKEN_FILENAME && !current->prev->left) */
 			{
@@ -72,7 +79,7 @@ t_node *ft_parse_ast(t_token *tokens)
 			cmd_node->prev = current;
             current = cmd_node;
         }
-        else if (tokens[i].type == TOKEN_OPERATOR || tokens[i].type == TOKEN_OUTPUT_REDIRECT || tokens[i].type == TOKEN_INPUT_REDIRECT || tokens[i].type == TOKEN_HEREDOC)
+        else if (tokens[i].type == TOKEN_OPERATOR || tokens[i].type == TOKEN_OUTPUT_REDIRECT || tokens[i].type == TOKEN_INPUT_REDIRECT || tokens[i].type == TOKEN_HEREDOC || tokens[i].type == TOKEN_EXCEPT)
 		{
             /* if (!ft_strcmp(tokens[i].value, "|"))
 			{ */
@@ -84,7 +91,7 @@ t_node *ft_parse_ast(t_token *tokens)
 				{
 					root->prev = op_node;
 				}
-				if (tokens[i].type == TOKEN_INPUT_REDIRECT && current->prev && current->prev->right == current && current->prev->token->type == TOKEN_OPERATOR)
+				if (tokens[i].type == TOKEN_INPUT_REDIRECT && current && current->prev && current->prev->right == current && current->prev->token->type == TOKEN_OPERATOR)
 				{
 					root = current->prev;
 					root->right = op_node;
@@ -137,9 +144,11 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 	int		len_value;
 	int		c_except;
 	int		stop;
+	int		empty;
 
 	cmd_node = ft_create_cmd_node(&tokens[*index]);
 	c_except = 0;
+	empty = 0;
 	cmd_nd_value = NULL;
 	arg_count = 1;
 	i = 0;
@@ -149,13 +158,22 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 	(*index)++;
 	while (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE))
 	{
-		arg_count++;
-		(*index)++;
+		if (tokens[*index].value[0] == '\0')
+		{
+			(*index)++;
+			empty++;
+		}	
+		else
+		{
+			arg_count++;
+			(*index)++;
+		}
+		// printf("%i = %s\n", *index, tokens[*index].value);
 	}
 	stop = *index;
-	while (tokens[*index].value && tokens[*index].type != TOKEN_OPERATOR)
+	while (tokens[*index].value && (tokens[*index].type != TOKEN_OPERATOR && tokens[*index].type != TOKEN_EXCEPT && tokens[*index].type != TOKEN_COMMAND))
 	{
-		if (tokens[*index].type == TOKEN_INPUT_REDIRECT || tokens[*index].type == TOKEN_OUTPUT_REDIRECT || tokens[*index].type == TOKEN_HEREDOC)
+		if (tokens[*index].type == TOKEN_INPUT_REDIRECT || tokens[*index].type == TOKEN_OUTPUT_REDIRECT || tokens[*index].type == TOKEN_HEREDOC || tokens[*index].type == TOKEN_FILENAME)
 		{
 			c_except++;
 			(*index)++;
@@ -167,8 +185,17 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 		}
 		while (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE))
 		{
-			arg_count++;
-			(*index)++;
+			if (tokens[*index].value[0] == '\0')
+			{
+				(*index)++;
+				empty++;
+			}	
+			else
+			{
+				arg_count++;
+				(*index)++;
+			}
+		// printf("%i = %s\n", *index, tokens[*index].value);
 		}
 	}
 	cmd_node->cmd_ready = malloc(sizeof(char *) * (arg_count + (n_args_cmd_nd_values - 1) + 1));
@@ -187,7 +214,7 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 	}
 	else if (ft_cmp_str_str(cmd_node->token->value, "\"", len_value) || ft_cmp_str_str(cmd_node->token->value, "\'", len_value))
 		cmd_node->token->value = ft_remove_quotes(cmd_node->token->value);
-	*index -= (arg_count + c_except); // Ajusta o índice para voltar ao início do comando
+	*index -= (arg_count + c_except + empty); // Ajusta o índice para voltar ao início do comando
 	i = j;
 	if (n_args_cmd_nd_values != 1)
 		arg_count += n_args_cmd_nd_values;
@@ -195,17 +222,22 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 	{
 		if (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE || tokens[*index].type == TOKEN_COMMAND || tokens[*index].type == TOKEN_BUILTIN))
 		{
+			if (tokens[*index].value[0] == '\0')
+			{
+				(*index)++;
+				continue ;		
+			}	// cmd_node->cmd_ready[i] = ft_strdup(""); // talvez seja para mudar!
 			if (i > j)
 				tokens[*index].value = ft_remove_quotes(tokens[*index].value);
-			if (tokens[*index].value)
+			if (tokens[*index].value/* [0] != '\0' */)
 				cmd_node->cmd_ready[i] = ft_strdup(tokens[*index].value);
-			else
-				cmd_node->cmd_ready[i] = ft_strdup(""); // talvez seja para mudar!
 			i++;
 			(*index)++;
 		}
 		else if ((tokens[*index].type == TOKEN_INPUT_REDIRECT || tokens[*index].type == TOKEN_OUTPUT_REDIRECT || tokens[*index].type == TOKEN_HEREDOC || tokens[*index].type == TOKEN_FILENAME))
 			(*index)++;
+		else
+			return (NULL);
 	}
 	if (c_except)
 		*index = stop;
@@ -227,7 +259,7 @@ char **ft_remove_null_values(char **cmd_ready, int arg_count)
 	new_cmd_ready = NULL;
 	while (cmd_ready[i] != NULL)
 	{
-		// printf("cmd_ready[i][0] = %c\n", cmd_ready[i][0]);
+	//	printf("cmd_ready[i][0] = %c\n", cmd_ready[i][0]);
 		if (cmd_ready[i][0] == '\0')
 			i++;
 		else
@@ -253,7 +285,8 @@ char **ft_remove_null_values(char **cmd_ready, int arg_count)
 		}	
 	}
 	new_cmd_ready[j] = NULL;
-	ft_free_split(cmd_ready);
+	if (*cmd_ready)
+		ft_free_split(cmd_ready);
 	return (new_cmd_ready);
 }
 
@@ -323,7 +356,8 @@ char	*ft_remove_quotes(char *value)
 			free(sub);
 		}
 	}
-	free(value);
+	if (value)
+		free(value);
 	return (new_value);
 }
 
@@ -363,6 +397,7 @@ t_node	*ft_create_cmd_node(t_token *token)
 	node->right = NULL;
 	node->prev = NULL;
 	node->file = false;
+	node->heredoc_stops = NULL;
 	return (node);
 }
 
@@ -379,6 +414,7 @@ t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right)
     node->right = right;
 	node->prev = NULL;
 	node->file = false;
+	node->heredoc_stops = NULL;
     return (node);
 }
 

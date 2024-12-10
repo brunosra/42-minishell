@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 22:18:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/04 08:25:49 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/08 10:52:56 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,11 @@ void ft_free_split(char **str)
 	while (str[i])
 		i++;
 	while (--i >= 0)
-		free(str[i]);
+	{
+//		ft_putstr_fd(str[i], 1);
+		if (str[i][0] != '\0')
+			free(str[i]);
+	}
 	free(str);
 	return ;
 }

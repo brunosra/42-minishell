@@ -23,12 +23,12 @@
 					"description": "Pass signals to the program",
           			"text": "handle SIGINT pass print stop"
 				},
-                {
+/*                  {
                     "description": "Set follow-fork-mode to child",
          			"text": "set follow-fork-mode child", // descomentar para seguir o filho
                     "ignoreFailures": true
-                }
-            ],
+                } */
+           ],
             "logging": {
                 "engineLogging": true
             }

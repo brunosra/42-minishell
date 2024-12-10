@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/06 01:59:40 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/10 09:03:46 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@
 # include <limits.h>
 # include <stdbool.h>
 
-// volatile sig_atomic_t	g_sig_received = 0;
+volatile sig_atomic_t g_interrupt;
 
 typedef struct s_ast_node t_node;
 
@@ -47,6 +47,7 @@ typedef enum e_token_type
 	TOKEN_HEREDOC,
 	TOKEN_BUILTIN,
 	TOKEN_NULL,
+	TOKEN_EXCEPT,
 }	t_type;
 
 typedef struct s_token
@@ -65,6 +66,7 @@ typedef struct s_ast_node
 	t_node *right;
 	t_node	*prev;
 	bool	file;
+	char	**heredoc_stops;
 }	t_node;
 
 typedef struct s_env
@@ -92,10 +94,18 @@ typedef struct s_minishell
 	int					exit_code;
 	bool				swap_input_redirects;
 	bool				swap_output_redirects;
+	int					c_multi_heredocs;
+	bool					in_pipe;
+	char				*temp;
+	int					c_stuck_cats;
 }				t_minishell;
 
 /**__HANDLE_and_LEXING_INPUT__**/
+int	ft_process_input_and_execute(t_minishell *ms);
 int	ft_handle_and_tokenize_input(t_minishell *ms);
+void ft_clean_stuck_cats(t_minishell *ms);
+void ft_find_stuck_cats(t_minishell *ms, t_node *node);
+
 /**__HANDLE_INPUT__**/
 int		ft_count_args(char *str);
 int		ft_check_quotes(char *str);
@@ -136,6 +146,9 @@ int	ft_is_valid_file(char *filepath, int mode);
 void	ft_remove_created_files(t_node *node);
 void	ft_create_files(t_node *node);
 void	ft_swap_redirects_values(t_node *node, t_type type);
+// int	ft_execute_heredocs(t_node *node, t_minishell *ms);
+int	ft_collect_heredocs(t_node *node, t_minishell *ms);
+int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
 
 /**__BUILTINS__**/
 int		ft_check_builtins(char *str);
@@ -168,9 +181,10 @@ int		ft_revalue_token_variable(t_minishell *ms);
 int		ft_check_balanced_quotes(char *str, int idx);
 char	*ft_get_env(const char *key, char **envp);
 char	**ft_duplicate_envp(char **envp);
-int		ft_check_if_expand(char *str, char *ptr);
+int	ft_check_if_expand(char *str, char *ptr, int heredoc);
 int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
 char	*ft_get_env_value(const char *str, char **envp, char **key);
+int	ft_revalue_heredock_input(char **input, t_minishell *ms);
 /* int		ft_remove_str(char **value, char *key, char *ptr);
  */
 #endif

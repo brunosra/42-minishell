@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/05 23:07:41 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/10 09:03:48 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 
 int	main(int argc, char **argv, char **envp);
 int	ft_handle_and_tokenize_input(t_minishell *ms);
+int	ft_process_input_and_execute(t_minishell *ms);
+void ft_clean_stuck_cats(t_minishell *ms);
+void ft_find_stuck_cats(t_minishell *ms, t_node *node);
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -38,6 +41,8 @@ int	main(int argc, char **argv, char **envp)
 		ms.save_stdout = dup(STDOUT_FILENO);
 		ms.swap_input_redirects = false;
 		ms.swap_output_redirects = false;
+		ms.in_pipe = false;
+		ms.c_stuck_cats = 0;
 		if (ms.save_stdin == -1 || ms.save_stdout == -1)
 			return(perror("dup"), 1);
 		ms.input = readline(RD"minishell"RST"$ ");
@@ -48,37 +53,11 @@ int	main(int argc, char **argv, char **envp)
 		}
 		if (*ms.input)
 			add_history(ms.input);
-		// Verifica sinais recebidos
-		if (ft_handle_and_tokenize_input(&ms)) // Alterar o que faz e o erro!
-		{
-			fprintf(stderr, "unclosed quotes\n");
-			continue ;
-		}		
-		ms.ast_root = ft_parse_ast(ms.tokens);
-		// print_ast(ms.ast_root, 5); // Para testar a estrutura da AST
-		if (ms.ast_root)
-		{
-			ms.status = ft_execute_ast(ms.ast_root, &ms);
-			// if (ms.status != 0)
-			// 	fprintf(stderr, "Erro na execução do comando: status %d\n", ms.status);
-			if (dup2(ms.save_stdin, STDIN_FILENO) == -1 || dup2(ms.save_stdout, STDOUT_FILENO) == -1)
-			{
-				perror("dup2");
-				close(ms.save_stdin);
-				close(ms.save_stdout);
-				return (1);
-			}
-			close(ms.save_stdin);
-			close(ms.save_stdout);
-		}
+		if (ft_process_input_and_execute(&ms))
+			continue;
 		ft_free_tokens(ms.tokens);
 		ft_free_ast(ms.ast_root);
 		free(ms.input);
-/* 		if (g_sig_received == 1)
-		{
-			ms.exit_code = 148;
-			g_sig_received = 0; // Ver como fazer!!
-		} */
 	}
 	free(ms.input);
 	ft_free_split(ms.env.envp);
@@ -93,4 +72,83 @@ int	ft_handle_and_tokenize_input(t_minishell *ms)
 	ms->tokens = ft_tokenize_input(ms->input, ms->n_args, 0, 0);
 	ft_revalue_token_variable(ms);
 	return (0);
+}
+
+int	ft_process_input_and_execute(t_minishell *ms)
+{
+	if (ft_handle_and_tokenize_input(ms)) // Lidar com entrada e tokenização
+	{
+		if (ms->exit_code == 2)
+			return (1);
+		else
+		{
+			ft_putstr_fd("minishell: unclosed quotes\n", STDERR_FILENO);
+			return (1);
+		}
+	}
+ 	ms->ast_root = ft_parse_ast(ms->tokens);
+	ft_find_stuck_cats(ms, ms->ast_root);
+//	print_ast(ms->ast_root, 5); // Para testar a estrutura da AST, se necessário
+	if (ms->ast_root)
+	{
+		ms->status = ft_execute_ast(ms->ast_root, ms);
+		if (dup2(ms->save_stdin, STDIN_FILENO) == -1 || dup2(ms->save_stdout, STDOUT_FILENO) == -1)
+		{
+			perror("dup2");
+			close(ms->save_stdin);
+			close(ms->save_stdout);
+			return (1);
+		}
+		if (ms->in_pipe == true)
+			ms->in_pipe = false;
+		else
+		{
+			close(ms->save_stdin);
+			close(ms->save_stdout);
+		}
+		ft_clean_stuck_cats(ms);
+	}
+	return (0);
+}
+
+void ft_clean_stuck_cats(t_minishell *ms)
+{
+	char c;
+
+	if (!ms->c_stuck_cats)
+		return ;
+	while (ms->c_stuck_cats)
+	{
+		while (read(STDIN_FILENO, &c, 1) > 0)
+    	{
+       		if (c == '\n') // Enter pressionado
+				ms->c_stuck_cats--;
+			if (ms->c_stuck_cats == 0)
+				break ;
+		}
+	}
+	ms->exit_code = 0;
+	return ;
+}
+
+void ft_find_stuck_cats(t_minishell *ms, t_node *node)
+{
+	t_node *current;
+	
+	current = node;
+	if (!current)
+		return;
+	if (current->token->type == TOKEN_COMMAND)
+	{
+		if (current->cmd_ready[1] == NULL && (!ft_strcmp(current->cmd_ready[0], "cat") || !ft_strcmp(current->cmd_ready[0], "/bin/cat"))
+		&& current->prev->token->type == TOKEN_OPERATOR && current->prev
+		&& (current->prev->left == current || (current->prev->prev && current->prev->prev->token->type == TOKEN_OPERATOR && current->prev->right == current)))
+			ms->c_stuck_cats++;
+	}
+	if (!current->left && !current->right)
+		return ;
+	ft_find_stuck_cats(ms, current->left);
+	if (!ms->c_stuck_cats)
+		return ;
+	ft_find_stuck_cats(ms, current->right);	
 }
