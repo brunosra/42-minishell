@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/08 05:26:05 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/10 07:30:47 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@ int	main(int argc, char **argv, char **envp);
 int	ft_handle_and_tokenize_input(t_minishell *ms);
 int	ft_process_input_and_execute(t_minishell *ms);
 int	ft_is_invalid_input(char *input);
-
+void ft_clean_stuck_cats(t_minishell *ms);
+void ft_find_stuck_cats(t_minishell *ms, t_node *node);
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -42,6 +43,7 @@ int	main(int argc, char **argv, char **envp)
 		ms.swap_input_redirects = false;
 		ms.swap_output_redirects = false;
 		ms.in_pipe = 0;
+		ms.c_stuck_cats = 0;
 		if (ms.save_stdin == -1 || ms.save_stdout == -1)
 			return(perror("dup"), 1);
 		ms.input = readline(RD"minishell"RST"$ ");
@@ -86,7 +88,8 @@ int	ft_process_input_and_execute(t_minishell *ms)
 		}
 	}
  	ms->ast_root = ft_parse_ast(ms->tokens);
-	// print_ast(ms->ast_root, 5); // Para testar a estrutura da AST, se necessário
+	ft_find_stuck_cats(ms, ms->ast_root);
+//	print_ast(ms->ast_root, 5); // Para testar a estrutura da AST, se necessário
 	if (ms->ast_root)
 	{
 		ms->status = ft_execute_ast(ms->ast_root, ms);
@@ -107,8 +110,51 @@ int	ft_process_input_and_execute(t_minishell *ms)
 			close(ms->save_stdin);
 			close(ms->save_stdout);
 		}
+		ft_clean_stuck_cats(ms);
 	}
 	return (0);
+}
+
+void ft_clean_stuck_cats(t_minishell *ms)
+{
+	char c;
+
+	if (!ms->c_stuck_cats)
+		return ;
+	while (ms->c_stuck_cats)
+	{
+		while (read(STDIN_FILENO, &c, 1) > 0)
+    	{
+       		if (c == '\n') // Enter pressionado
+				ms->c_stuck_cats--;
+			if (ms->c_stuck_cats == 0)
+				break ;
+		}
+	}
+	ms->exit_code = 0;
+	return ;
+}
+
+void ft_find_stuck_cats(t_minishell *ms, t_node *node)
+{
+	t_node *current;
+	
+	current = node;
+	if (!current)
+		return;
+	if (current->token->type == TOKEN_COMMAND)
+	{
+		if (current->cmd_ready[1] == NULL && (!ft_strcmp(current->cmd_ready[0], "cat") || !ft_strcmp(current->cmd_ready[0], "/bin/cat"))
+		&& current->prev->token->type == TOKEN_OPERATOR && current->prev
+		&& (current->prev->left == current || (current->prev->prev && current->prev->prev->token->type == TOKEN_OPERATOR && current->prev->right == current)))
+			ms->c_stuck_cats++;
+	}
+	if (!current->left && !current->right)
+		return ;
+	ft_find_stuck_cats(ms, current->left);
+	if (!ms->c_stuck_cats)
+		return ;
+	ft_find_stuck_cats(ms, current->right);	
 }
 
 int	ft_is_invalid_input(char *input)

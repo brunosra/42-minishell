@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/09 02:53:11 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/10 07:26:24 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,11 +97,14 @@ typedef struct s_minishell
 	int					c_multi_heredocs;
 	int					in_pipe;
 	char				*temp;
+	int					c_stuck_cats;
 }				t_minishell;
 
 /**__HANDLE_and_LEXING_INPUT__**/
 int	ft_process_input_and_execute(t_minishell *ms);
 int	ft_handle_and_tokenize_input(t_minishell *ms);
+void ft_clean_stuck_cats(t_minishell *ms);
+void ft_find_stuck_cats(t_minishell *ms, t_node *node);
 
 /**__HANDLE_INPUT__**/
 int		ft_count_args(char *str);

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/09 02:45:08 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/10 07:29:30 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,6 @@ void	ft_remove_created_files(t_node *node);
 void	ft_create_files(t_node *node);
 int	ft_collect_heredocs(t_node *node, t_minishell *ms);
 int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
-int	ft_is_whitespace(char *str);
-t_node	*ft_create_node_from_input(char *input);
-
-// int	ft_execute_heredocs(t_node *node, t_minishell *ms);
-
 
 int	ft_execute_ast(t_node *node, t_minishell *ms)
 {
@@ -349,14 +344,7 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 			ms->exit_code = 258; // Código típico de erro de sintaxe
 			return (258);
 		}
-/* 		if (ft_is_whitespace(input)) // Comando vazio
-		{
-			free(input);
-			ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", STDERR_FILENO);
-			ms->exit_code = 258;
-			return (258);
-		}
- */		temp = ft_strjoin(ms->input, " ");
+		temp = ft_strjoin(ms->input, " ");
 		free(ms->input);
 		ms->input = ft_strjoin(temp, input);
 		free(input);
@@ -470,6 +458,11 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 			ft_putstr_fd(": command not found\n", STDERR_FILENO);
 			exit(127);
 		}
+		if (node->cmd_ready[1] == NULL && 
+		!ft_strcmp(node->cmd_ready[0], "cat") && node->prev->token->type == TOKEN_OPERATOR
+		&& node->prev && (node->prev->left == node 
+		|| (node->prev->prev && node->prev->prev->token->type == TOKEN_OPERATOR && node->prev->right == node)))
+			exit(13);
 		execve(ms->env.full_path, node->cmd_ready, ms->env.envp); // Executa o executável encontrado
 		perror("execve");
 		exit(127);
