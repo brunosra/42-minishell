@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/08 08:02:45 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/10 08:23:02 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 {
 	if (!ft_strcmp(str, "<"))
 		return (TOKEN_INPUT_REDIRECT);
-	else if (!ft_strcmp(str, ">") || !ft_strcmp(str, ">>"))
+	else if (!ft_strcmp(str, ">") || !ft_strcmp(str, ">>") || !ft_strcmp(str, ">|"))
 		return (TOKEN_OUTPUT_REDIRECT);
 	else if (!ft_strcmp(str, "<<"))
 		return (TOKEN_HEREDOC);

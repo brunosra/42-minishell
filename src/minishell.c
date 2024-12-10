@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/10 07:30:47 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/10 09:03:48 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 int	main(int argc, char **argv, char **envp);
 int	ft_handle_and_tokenize_input(t_minishell *ms);
 int	ft_process_input_and_execute(t_minishell *ms);
-int	ft_is_invalid_input(char *input);
 void ft_clean_stuck_cats(t_minishell *ms);
 void ft_find_stuck_cats(t_minishell *ms, t_node *node);
 
@@ -42,7 +41,7 @@ int	main(int argc, char **argv, char **envp)
 		ms.save_stdout = dup(STDOUT_FILENO);
 		ms.swap_input_redirects = false;
 		ms.swap_output_redirects = false;
-		ms.in_pipe = 0;
+		ms.in_pipe = false;
 		ms.c_stuck_cats = 0;
 		if (ms.save_stdin == -1 || ms.save_stdout == -1)
 			return(perror("dup"), 1);
@@ -52,7 +51,7 @@ int	main(int argc, char **argv, char **envp)
 			write(STDOUT_FILENO, "exit\n", 5);
 			break ;
 		}
-		if (*ms.input && !ft_is_invalid_input(ms.input))
+		if (*ms.input)
 			add_history(ms.input);
 		if (ft_process_input_and_execute(&ms))
 			continue;
@@ -100,11 +99,8 @@ int	ft_process_input_and_execute(t_minishell *ms)
 			close(ms->save_stdout);
 			return (1);
 		}
-		if (ms->in_pipe != 0)
-		{
-			add_history(ms->input);
-			ms->in_pipe--;
-		}
+		if (ms->in_pipe == true)
+			ms->in_pipe = false;
 		else
 		{
 			close(ms->save_stdin);
@@ -155,26 +151,4 @@ void ft_find_stuck_cats(t_minishell *ms, t_node *node)
 	if (!ms->c_stuck_cats)
 		return ;
 	ft_find_stuck_cats(ms, current->right);	
-}
-
-int	ft_is_invalid_input(char *input)
-{
-	int	i;
-
-	if (!input || *input == '\0') // Verifica se a entrada é vazia ou nula
-		return (1);
-	i = ft_strlen(input) - 1;
-	while (i >= 0 && (input[i] == ' ' || input[i] == '\t')) 
-		i--;
-	if (i >= 0 && input[i] == '|') // Verifica se a entrada termina com '|'
-	{
-		if (input[i - 1] == '|')
-			return (0);// Verifica se há algo válido antes do '|'
-		while (--i >= 0)
-		{
-			if (input[i] != ' ' && input[i] != '\t') // Algum caractere válido antes do '|'
-				return (1); // Entrada válida
-		}
-	}
-	return (0); // Entrada válida (não termina com `|`)
 }

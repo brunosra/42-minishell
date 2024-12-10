@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/10 07:26:24 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/10 09:03:46 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ typedef struct s_minishell
 	bool				swap_input_redirects;
 	bool				swap_output_redirects;
 	int					c_multi_heredocs;
-	int					in_pipe;
+	bool					in_pipe;
 	char				*temp;
 	int					c_stuck_cats;
 }				t_minishell;

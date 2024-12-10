@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/10 07:29:30 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/10 09:03:10 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -351,7 +351,7 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 		free(temp);
 		ft_free_tokens(ms->tokens);
 		ft_free_ast(ms->ast_root);
-		ms->in_pipe++;
+		ms->in_pipe = true;
 		return (ft_process_input_and_execute(ms));
 	}
 	
