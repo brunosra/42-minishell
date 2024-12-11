@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/03 06:16:02 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/08 07:55:27 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,12 @@ int		ft_revalue_token_variable(t_minishell *ms);
 int		ft_check_balanced_quotes(char *str, int idx);
 char	*ft_get_env(const char *key, char **envp);
 char	**ft_duplicate_envp(char **envp);
-int		ft_check_if_expand(char *str, char *ptr);
+int	ft_check_if_expand(char *str, char *ptr, int heredoc);
 int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
 char	*ft_get_env_value(const char *str, char **envp, char **key);
-/* int		ft_remove_str(char **value, char *key, char *ptr);
- */
+int	ft_revalue_heredock_input(char **input, t_minishell *ms);
+
+
 char	**ft_duplicate_envp(char **envp)
 {
 	int		i;
@@ -62,26 +63,17 @@ int	ft_revalue_token_variable(t_minishell *ms)
 		return (1);
 	while (ms->tokens[++i].value)
 	{
-		if (ms->tokens[i].type == TOKEN_VARIABLE || ms->tokens[i].type == TOKEN_COMMAND)
+		if (ms->tokens[i].type == TOKEN_VARIABLE || ms->tokens[i].type == TOKEN_COMMAND || ms->tokens[i].type == TOKEN_FILENAME || ms->tokens[i].type == TOKEN_ARGUMENT)
 		{
 			ptr = ft_strchr(ms->tokens[i].value, '$');
 			while (ptr != NULL)
 			{
-				if (ft_check_if_expand(ms->tokens[i].value, ptr) == 1)
+				if (ft_check_if_expand(ms->tokens[i].value, ptr, 0) == 1)
 				{
 					env_value = ft_get_env_value(ptr, ms->env.envp, &key);
-					if (!env_value) // ALterar isto!!!
-					{
-/* 						ft_putstr_fd("Erro: Variável '", 2); // ALterar isto!!!
-						ft_putstr_fd(ms->tokens[i].value, 2); // ALterar isto!!!
-						ft_putstr_fd("' não encontrada\n", 2); // ALterar isto!!!
- */						env_value = ft_strdup("");
-					}
-/* 					if (*env_value == '\0' && ft_strlen(ms->tokens[i].value) == ft_strlen(key + 1))
-						ft_remove_str(&ms->tokens[i].value, key, ptr);
-					// free(ms->tokens[i].value);
-					else */
-					/* ms->tokens[i].value =  */ft_replace_str(&ms->tokens[i].value, key, ptr, env_value);
+					if (!env_value) 
+ 						env_value = ft_strdup("");
+					ft_replace_str(&ms->tokens[i].value, key, ptr, env_value);
 					if (*key)
 						free(key);
 					if (!ms->tokens[i].value)
@@ -95,7 +87,7 @@ int	ft_revalue_token_variable(t_minishell *ms)
 					if (!ptr)
 						break ;
 				}
-				else if (ft_check_if_expand(ms->tokens[i].value, ptr) == 2)
+				else if (ft_check_if_expand(ms->tokens[i].value, ptr, 0) == 2)
 				{
 					key = ft_strdup("?");
 					// printf("%lu\n", ft_strlen(ft_itoa(ms->exit_code)));
@@ -130,10 +122,7 @@ char	*ft_get_env_value(const char *str, char **envp, char **key)
 	start = i;
 	while (str[i] && (ft_isalnum(str[i]) || str[i] == '_'))
 		i++;
-/* 	if (str[i] != ' ')
-		*key = ft_substr(str, start, i - 1 - start);
-	else */
-		*key = ft_substr(str, start, i - start);
+	*key = ft_substr(str, start, i - start);
 	if (!*key)
 		return (NULL);
 	value = ft_get_env(*key, envp);
@@ -231,14 +220,13 @@ int	ft_check_balanced_quotes(char *str, int idx)
 }
 
 
-int	ft_check_if_expand(char *str, char *ptr)
+int	ft_check_if_expand(char *str, char *ptr, int heredoc)
 {
 	int		i;
 	char	quote_type;
 
 	i = 0;
 	quote_type = '\0';
-
 	while (str[i])
 	{
 		if (str[i] == '"' || str[i] == '\'')
@@ -250,80 +238,85 @@ int	ft_check_if_expand(char *str, char *ptr)
 			i++;
 			continue;
 		}
-
 		if (&str[i] == ptr) // Verifica se é o ponteiro para $
 		{
-			if (str[i + 1] == '?') // Trata caso especial do $?
-				return (2); // Retorna 2 para indicar $? (exit status)
-
-			// Verifica se há aspas consecutivas logo após $
 			if (str[i + 1] == '\'' || str[i + 1] == '"')
-			/* if ((str[i + 1] == '"' && str[i + 2] == '"') ||
-				(str[i + 1] == '\'' && str[i + 2] == '\'') || (str[i + 1] == '"' && str[i + 2] == '\'') || (str[i + 1] == '\'' && str[i + 2] == '"'))
-			 */{
-				// Verifica se essas aspas pertencem ao mesmo par
+			{
 				if (ft_check_balanced_quotes(str, i))
 					return (1); // Expande para string vazia
 				return (0); // Aspas pertencem a pares separados
 			}
-
-			// Aspas simples: não expande
-			if (quote_type == '\'')
+			if (quote_type == '\'' && !heredoc) // Aspas simples: não expande
 				return (0);
-
-			// Verifica caracteres que invalidam a expansão
+			if (str[i + 1] == '?') // Trata caso especial do $?
+				return (2);
 			if (!str[i + 1] || str[i + 1] == ' ' || str[i + 1] == '$' ||
 				str[i + 1] == '.' || str[i + 1] == ',' || str[i + 1] == '!' ||
 				str[i + 1] == '?' || str[i + 1] == ';' || str[i + 1] == ':' ||
 				str[i + 1] == '~' || str[i + 1] == '^' || str[i + 1] == '-' ||
-				str[i + 1] == '+' || str[i + 1] == '*' || str[i + 1] == '/')
+				str[i + 1] == '+' || str[i + 1] == '*' || str[i + 1] == '/') // Verifica caracteres que invalidam a expansão
 				return (0); // Retorna 0 para indicar que $ é literal
-
-			// Caso contrário, expande
 			return (1);
 		}
-
 		i++;
 	}
-
 	return (0); // Retorna 0 se não encontrar $ para expandir
 }
 
-
-
-
-/* int	ft_remove_str(char **value, char *key, char *ptr)
+int	ft_revalue_heredock_input(char **input, t_minishell *ms)
 {
-	char	*new_value;
-	char	*start;
-	char	*end;
-	size_t	new_len;
+	char	*env_value;
+	char	*ptr;
+	char	*key;
 
-	if (!value || !*value || !key || !ptr)
+	env_value = NULL;
+	key = NULL;
+	ptr = NULL;
+	if (!ms || !input || !ms->env.envp)
 		return (1);
-	start = ft_substr(*value, 0, ptr - *value);
-	if (!start)
-		return (1);
-	end = ft_strdup(++ptr + ft_strlen(key) + 1);
-	if (!end)
+	while (input)
 	{
-		free(start);
-		return (1);
+		ptr = ft_strchr(*input, '$');
+		while (ptr != NULL)
+		{
+			if (ft_check_if_expand(*input, ptr, 1) == 1)
+			{
+				env_value = ft_get_env_value(ptr, ms->env.envp, &key);
+				if (!env_value) 
+ 					env_value = ft_strdup("");
+				ft_replace_str(input, key, ptr, env_value);
+				if (*key)
+					free(key);
+				if (!input)
+				{
+					perror("");
+					return (1);
+				}
+				ptr = ft_strchr(*input, '$');
+				if (!ptr)
+					break ;
+			}
+			else if (ft_check_if_expand(*input, ptr, 1) == 2)
+			{
+				key = ft_strdup("?");
+				// printf("%lu\n", ft_strlen(ft_itoa(ms->exit_code)));
+				ft_replace_str(input, key, ptr, ft_itoa(ms->exit_code));
+				free(key);
+				ptr = ft_strchr(*input, '$');
+				if (!ptr)
+					break ;
+			}
+			else
+			{
+				ptr++;
+				ptr = ft_strchr(ptr, '$');
+				if (!ptr)
+					break ;
+			}
+		}
+		if (!ptr)
+			return (0);
 	}
-	new_len = ft_strlen(start) + ft_strlen(end) + 1;
-	new_value = malloc(new_len);
-	if (!new_value)
-	{
-		free(start);
-		free(end);
-		return (1);
-	}
-	ft_strlcpy(new_value, start, new_len);
-	ft_strlcat(new_value, end, new_len);
-	free(start);
-	free(end);
-	free(*value);
-	*value = new_value;
 	return (0);
 }
- */
+
