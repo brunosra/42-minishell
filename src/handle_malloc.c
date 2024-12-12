@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 22:18:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/08 10:52:56 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/11 06:02:43 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,11 @@ void	ft_free_tokens(t_token *tokens)
 	if (!tokens)
 		return ;
 	while (tokens[++i].value)
+	{
 		free(tokens[i].value);
+		if (tokens[i].old_value)
+			free(tokens[i].old_value);
+	}
 	free(tokens);
 	return ;
 }

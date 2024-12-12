@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/10 09:03:10 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/12 03:02:07 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,7 +192,8 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 		}
 		if (temp)
 		{
-			ft_revalue_heredock_input(&temp, ms);
+			if (node->right && node->right->token->old_value[0] != '"' && node->right->token->old_value[0] != '\'')
+				ft_revalue_heredock_input(&temp, ms);
 			write(ms->pipefd[1], temp, ft_strlen(temp));
 		}
 		close(ms->pipefd[1]);
@@ -335,7 +336,13 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 	char *temp;
 
 	temp = NULL;
-	if (!node->right) // Caso de pipe sem lado direito
+	if (!node->left)
+	{
+		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", STDERR_FILENO);
+		ms->exit_code = 2; // Código de erro para erro de sintaxe
+		return (2);
+	}
+	else if (!node->right) // Caso de pipe sem lado direito
 	{
 		input = readline("> ");
 		if (!input) // Ctrl-D
@@ -355,12 +362,6 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 		return (ft_process_input_and_execute(ms));
 	}
 	
-	else if (!node->left)
-	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", STDERR_FILENO);
-		ms->exit_code = 2; // Código de erro para erro de sintaxe
-		return (2);
-	}
 	if (pipe(ms->pipefd) == -1)
 	{
 		perror("pipe");
@@ -386,7 +387,8 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 		exit(ft_execute_ast(node->left, ms));
 	}
 	close(ms->pipefd[1]);
-	if (dup2(ms->pipefd[0], STDIN_FILENO) == -1)
+	waitpid(ms->pid, &ms->status, 0); // VER IMPLICACOES! funciona paea os stuck_cats e para "$CASA" | '$HOME' | $USER $ | "$ HOME" << o!!!
+	if (dup2(ms->pipefd[0], STDIN_FILENO) == -1) // Mas nao para broken pipes! ver como resolver!
 	{
 		perror("dup2");
 		ms->exit_code = 1;
@@ -394,7 +396,7 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 		return (1);
 	}
 	close(ms->pipefd[0]);
-	ms->exit_code = 0; // Pipe bem-sucedido
+	ms->exit_code = 0;
 	return (ft_execute_ast(node->right, ms));
 }
 
@@ -459,8 +461,8 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 			exit(127);
 		}
 		if (node->cmd_ready[1] == NULL && 
-		!ft_strcmp(node->cmd_ready[0], "cat") && node->prev->token->type == TOKEN_OPERATOR
-		&& node->prev && (node->prev->left == node 
+		!ft_strcmp(node->cmd_ready[0], "cat") && node->prev && node->prev->token->type == TOKEN_OPERATOR
+		&& (node->prev->left == node 
 		|| (node->prev->prev && node->prev->prev->token->type == TOKEN_OPERATOR && node->prev->right == node)))
 			exit(13);
 		execve(ms->env.full_path, node->cmd_ready, ms->env.envp); // Executa o executável encontrado

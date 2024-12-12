@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/10 09:03:46 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/11 05:24:15 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ typedef struct s_token
 {
 	t_type	type;
 	char	*value;
+	char	*old_value;
 
 }	t_token;
 
@@ -88,7 +89,7 @@ typedef struct s_minishell
 	int					save_stdout;
 	int 				n_args;
 	// int					n_tokens;
-	int					pid;
+	pid_t				pid;
 	struct	sigaction	sa;
 	int					pipefd[2];
 	int					exit_code;
@@ -101,6 +102,10 @@ typedef struct s_minishell
 }				t_minishell;
 
 /**__HANDLE_and_LEXING_INPUT__**/
+void ft_init_ms(t_minishell *ms);
+int ft_save_stdin_stdout(t_minishell *ms);
+int	ft_readline(t_minishell *ms);
+void ft_close_stdin_stdout(t_minishell *ms);
 int	ft_process_input_and_execute(t_minishell *ms);
 int	ft_handle_and_tokenize_input(t_minishell *ms);
 void ft_clean_stuck_cats(t_minishell *ms);
@@ -108,9 +113,10 @@ void ft_find_stuck_cats(t_minishell *ms, t_node *node);
 
 /**__HANDLE_INPUT__**/
 int		ft_count_args(char *str);
+int		ft_skip_operator(const char *str, int i);
 int		ft_check_quotes(char *str);
-/* void	ft_get_additional_input(char **str); */
 int		ft_handle_quotes(char *str, int i, int *start, int *end);
+// static int	ft_skip_and_process(char *str, int i, char quote_type);
 int		ft_handle_argument(char *str, int i);
 
 /**__LEXING_INPUT__**/
@@ -187,4 +193,9 @@ char	*ft_get_env_value(const char *str, char **envp, char **key);
 int	ft_revalue_heredock_input(char **input, t_minishell *ms);
 /* int		ft_remove_str(char **value, char *key, char *ptr);
  */
+
+/**__UTILS__ **/
+int ft_perror(char *error, int return_value);
+int ft_putstr_and_return(char *msg, int return_value);
+
 #endif
