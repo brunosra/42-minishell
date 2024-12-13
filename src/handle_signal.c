@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/09 01:15:48 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/12 04:28:19 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,8 +79,13 @@ t_minishell	*ft_ms_struct(t_minishell *ms, int flag)
 
 void	ft_set_main_signals(void)
 {
-	signal(SIGINT, ft_signal_handler);
-	signal(SIGQUIT, SIG_IGN); // Se for para executar alterar para SIG_DFL
+	struct sigaction sa;
+
+	sa.sa_handler = ft_signal_handler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;  // Reinicia chamadas interrompidas
+	sigaction(SIGINT, &sa, NULL);
+	signal(SIGQUIT, SIG_IGN);
 }
 
 void	ft_set_fork_signals(void)
@@ -88,12 +93,6 @@ void	ft_set_fork_signals(void)
 	signal(SIGINT, SIG_IGN); 
 	signal(SIGQUIT, SIG_IGN); // Se for para executar alterar para SIG_DFL
 } 
-
-/* void	ft_set_fork_signals(void)
-{
-	signal(SIGINT, SIG_IGN); 
-	signal(SIGQUIT, SIG_IGN); // Se for para executar alterar para SIG_DFL
-}  */
 
 void	ft_set_heredoc_signals(void)
 {

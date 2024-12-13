@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/10 08:23:02 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/12 02:19:49 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
     	prev_type = tokens[*j - 1].type;
 	else
     	prev_type = TOKEN_NULL;
+	tokens[*j].old_value = NULL;
 	if (str[*i] == '"' || str[*i] == '\'')
 	{
 		*i = ft_handle_quotes(str, *i, &start, &end);
@@ -64,6 +65,7 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 		else
 			tokens[*j].value = ft_revalue_quoted_value(tokens[*j].value);
 		tokens[*j].type = ft_get_token_type(tokens[*j].value, prev_type);
+		// printf("%s\n", tokens[*j].value);
 		(*j)++;
 		return (++(*i));
 	}
@@ -84,6 +86,7 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 	}
 	tokens[*j].value = ft_strndup(str + start, *i - start);
 	tokens[*j].type = ft_get_token_type(tokens[*j].value, prev_type);
+	// printf("%s\n", tokens[*j].value);
 	(*j)++;
 	return (*i);
 }

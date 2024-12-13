@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/08 07:55:27 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/11 19:34:15 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ int	ft_revalue_token_variable(t_minishell *ms)
 		return (1);
 	while (ms->tokens[++i].value)
 	{
+		// ft_putstr_fd(ms->tokens[i].value, 1);
 		if (ms->tokens[i].type == TOKEN_VARIABLE || ms->tokens[i].type == TOKEN_COMMAND || ms->tokens[i].type == TOKEN_FILENAME || ms->tokens[i].type == TOKEN_ARGUMENT)
 		{
 			ptr = ft_strchr(ms->tokens[i].value, '$');

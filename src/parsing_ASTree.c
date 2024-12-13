@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/09 03:22:41 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/12 02:56:08 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,31 +48,36 @@ t_node *ft_parse_ast(t_token *tokens)
 /* 			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
 			return (NULL); // Código de erro para "command not found" */
 		}
-		if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND || tokens[i].type == TOKEN_FILENAME /* || (tokens[i].type == TOKEN_VARIABLE && current->token->type != TOKEN_FILENAME && current->token->type != TOKEN_VARIABLE && current->token->type != TOKEN_ARGUMENT) */)
+		if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND || tokens[i].type == TOKEN_FILENAME  || tokens[i].type == TOKEN_ARGUMENT /*&& current->token->type != TOKEN_FILENAME && current->token->type != TOKEN_VARIABLE && current->token->type != TOKEN_ARGUMENT) */)
 		{
 			if (tokens[i].type == TOKEN_FILENAME)
 			{
+				if (current && current->token->type == TOKEN_HEREDOC)
+					tokens[i].old_value = ft_strdup(tokens[i].value);
 				tokens[i].value = ft_remove_quotes(tokens[i].value);
 			}
+			if (tokens[i].type == TOKEN_ARGUMENT && current && current->token->type == TOKEN_FILENAME && current->prev->token->type == TOKEN_HEREDOC)
+				tokens[i].type = TOKEN_COMMAND;
 			if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND)
 			{
 				cmd_node = ft_group_command_tokens(tokens, &i);
-				if (cmd_node == NULL)
+/* 				if (cmd_node == NULL)
 				{												//ALTERAR// INPUT - "$CASA" | "$ CAMA" | "$USER" | '$HOME' $USER $ "$ HOME" << HOME
 					cmd_node = ft_create_cmd_node(&tokens[i]); // verificar se tem heredocs e se tiver cpnecta o ramos esquerdo a este no, se nao tiver executa o comando!
 					return (cmd_node);
-				} 
+				}  */
 			}
 			else
 			{
 				cmd_node = ft_create_cmd_node(&tokens[i]);
 				i++;
 			}
+			// ft_putnbr_fd(tokens[i].type, 1);
             if (!root)
                 root = cmd_node;
 			else if (current && (current->token->type == TOKEN_OPERATOR || current->token->type == TOKEN_OUTPUT_REDIRECT || current->token->type == TOKEN_INPUT_REDIRECT || current->token->type == TOKEN_HEREDOC || current->token->type == TOKEN_EXCEPT))
                 current->right = cmd_node;
-			else /* if (current && current->prev->token->type == TOKEN_INPUT_REDIRECT && tokens[i].type == TOKEN_COMMAND && current->token->type == TOKEN_FILENAME && !current->prev->left) */
+			else if (tokens[i].type != TOKEN_ARGUMENT && cmd_node->token->type != TOKEN_ARGUMENT)/* if (current && current->prev->token->type == TOKEN_INPUT_REDIRECT && tokens[i].type == TOKEN_COMMAND && current->token->type == TOKEN_FILENAME && !current->prev->left) */
 			{
 				current->prev->left = cmd_node;
 			}
@@ -237,7 +242,8 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 		else if ((tokens[*index].type == TOKEN_INPUT_REDIRECT || tokens[*index].type == TOKEN_OUTPUT_REDIRECT || tokens[*index].type == TOKEN_HEREDOC || tokens[*index].type == TOKEN_FILENAME))
 			(*index)++;
 		else
-			return (NULL);
+			break ;
+		// 	return (NULL);
 	}
 	if (c_except)
 		*index = stop;

@@ -6,17 +6,73 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/10 09:03:48 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/12 02:27:06 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
 int	main(int argc, char **argv, char **envp);
+void ft_init_ms(t_minishell *ms);
+int ft_save_stdin_stdout(t_minishell *ms);
+int	ft_readline(t_minishell *ms);
+void ft_close_stdin_stdout(t_minishell *ms);
 int	ft_handle_and_tokenize_input(t_minishell *ms);
 int	ft_process_input_and_execute(t_minishell *ms);
 void ft_clean_stuck_cats(t_minishell *ms);
 void ft_find_stuck_cats(t_minishell *ms, t_node *node);
+
+void ft_init_ms(t_minishell *ms)
+{
+	ms->input = NULL;
+	ms->tokens = NULL;
+	ms->temp = NULL;
+	ms->status = -1;
+	ms->save_stdin = -1;
+	ms->save_stdout = -1;
+	ms->n_args = -1;
+	ms->pid = -1;
+	ms->exit_code = 0;
+	ms->c_multi_heredocs = 0;
+	ms->c_stuck_cats = 0;
+	ms->pipefd[0] = -1;
+	ms->pipefd[1] = -1;
+	ms->swap_input_redirects = false;
+	ms->swap_output_redirects = false;
+	ms->in_pipe = false;
+	ms->env.env_paths = NULL;
+	ms->env.envp = NULL;
+	ms->env.full_path = NULL;
+	ms->env.paths = NULL;
+}
+
+int ft_save_stdin_stdout(t_minishell *ms)
+{
+	ms->save_stdin = dup(STDIN_FILENO);
+	ms->save_stdout = dup(STDOUT_FILENO);
+	if (ms->save_stdin == -1 || ms->save_stdout == -1)
+		return (ft_perror("dup", 1));
+	return (0);
+}
+
+void ft_close_stdin_stdout(t_minishell *ms)
+{
+	close(ms->save_stdin);
+	close(ms->save_stdout);
+}
+
+int	ft_readline(t_minishell *ms)
+{
+	ms->input = readline(RD"minishell"RST"$ ");
+	if (ms->input == NULL)
+	{
+		write(STDOUT_FILENO, "exit\n", 5);
+		return (1) ;
+	}
+	if (ms->input)
+		add_history(ms->input);
+	return (0);
+}
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -24,37 +80,20 @@ int	main(int argc, char **argv, char **envp)
 
 	(void)argv;
 	(void)argc;
-	ms.exit_code = 0;
-	ft_ms_struct(&ms, 0);
-	ms.sa.sa_handler = ft_signal_handler;
-	sigemptyset(&ms.sa.sa_mask);
-	ms.sa.sa_flags = SA_RESTART;
-	sigaction(SIGINT, &ms.sa, NULL);  // Ctrl-C
-	sigaction(SIGQUIT, &ms.sa, NULL); // Ctrl-'\'
+	ft_init_ms(&ms);
 	ms.env.envp = ft_duplicate_envp(envp);
 	if (!ms.env.envp)
-		return (perror("malloc"), 1);
+		return (ft_perror("malloc", 1));
 	while (1)
 	{
 		ft_set_main_signals();
-		ms.save_stdin = dup(STDIN_FILENO);
-		ms.save_stdout = dup(STDOUT_FILENO);
-		ms.swap_input_redirects = false;
-		ms.swap_output_redirects = false;
-		ms.in_pipe = false;
-		ms.c_stuck_cats = 0;
-		if (ms.save_stdin == -1 || ms.save_stdout == -1)
-			return(perror("dup"), 1);
-		ms.input = readline(RD"minishell"RST"$ ");
-		if (ms.input == NULL) // Ctrl-D ou EOF
-		{
-			write(STDOUT_FILENO, "exit\n", 5);
+		ft_ms_struct(&ms, 0);
+		if (ft_save_stdin_stdout(&ms))
+			return (1);
+		if (ft_readline(&ms))
 			break ;
-		}
-		if (*ms.input)
-			add_history(ms.input);
 		if (ft_process_input_and_execute(&ms))
-			continue;
+			continue ;
 		ft_free_tokens(ms.tokens);
 		ft_free_ast(ms.ast_root);
 		free(ms.input);
@@ -64,9 +103,13 @@ int	main(int argc, char **argv, char **envp)
 	return (0);
 }
 
+
 int	ft_handle_and_tokenize_input(t_minishell *ms)
 {
-	ms->n_args = ft_count_args(ms->input); // Atualiza n_args diretamente em ms
+	
+	if (ft_check_quotes(ms->input))
+		return (1); // erro por falta de fechar aspas!
+	ms->n_args = ft_count_args(ms->input);
 	if (ms->n_args == -1)
 		return (1);
 	ms->tokens = ft_tokenize_input(ms->input, ms->n_args, 0, 0);
@@ -76,36 +119,29 @@ int	ft_handle_and_tokenize_input(t_minishell *ms)
 
 int	ft_process_input_and_execute(t_minishell *ms)
 {
-	if (ft_handle_and_tokenize_input(ms)) // Lidar com entrada e tokenização
+	if (ft_handle_and_tokenize_input(ms))
 	{
 		if (ms->exit_code == 2)
 			return (1);
 		else
-		{
-			ft_putstr_fd("minishell: unclosed quotes\n", STDERR_FILENO);
-			return (1);
-		}
+			return (ft_putstr_and_return("minishell: unclosed quotes\n", 1));
 	}
  	ms->ast_root = ft_parse_ast(ms->tokens);
 	ft_find_stuck_cats(ms, ms->ast_root);
-//	print_ast(ms->ast_root, 5); // Para testar a estrutura da AST, se necessário
+	// print_ast(ms->ast_root, 5); // Para testar a estrutura da AST, se necessário
 	if (ms->ast_root)
 	{
 		ms->status = ft_execute_ast(ms->ast_root, ms);
-		if (dup2(ms->save_stdin, STDIN_FILENO) == -1 || dup2(ms->save_stdout, STDOUT_FILENO) == -1)
+		if (dup2(ms->save_stdin, STDIN_FILENO) == -1
+			|| dup2(ms->save_stdout, STDOUT_FILENO) == -1)
 		{
-			perror("dup2");
-			close(ms->save_stdin);
-			close(ms->save_stdout);
-			return (1);
+			ft_close_stdin_stdout(ms);
+			return(ft_perror("dup2", 1));
 		}
 		if (ms->in_pipe == true)
 			ms->in_pipe = false;
 		else
-		{
-			close(ms->save_stdin);
-			close(ms->save_stdout);
-		}
+			ft_close_stdin_stdout(ms);
 		ft_clean_stuck_cats(ms);
 	}
 	return (0);
@@ -140,9 +176,13 @@ void ft_find_stuck_cats(t_minishell *ms, t_node *node)
 		return;
 	if (current->token->type == TOKEN_COMMAND)
 	{
-		if (current->cmd_ready[1] == NULL && (!ft_strcmp(current->cmd_ready[0], "cat") || !ft_strcmp(current->cmd_ready[0], "/bin/cat"))
-		&& current->prev->token->type == TOKEN_OPERATOR && current->prev
-		&& (current->prev->left == current || (current->prev->prev && current->prev->prev->token->type == TOKEN_OPERATOR && current->prev->right == current)))
+		if (current->cmd_ready[1] == NULL
+		&& (!ft_strcmp(current->cmd_ready[0], "cat")
+		|| !ft_strcmp(current->cmd_ready[0], "/bin/cat"))
+		&& current->prev && current->prev->token->type == TOKEN_OPERATOR 
+		&& (current->prev->left == current || (current->prev->prev
+		&& current->prev->prev->token->type == TOKEN_OPERATOR
+		&& current->prev->right == current)))
 			ms->c_stuck_cats++;
 	}
 	if (!current->left && !current->right)
