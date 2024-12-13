@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/11 05:24:15 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/13 04:38:31 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,9 +88,7 @@ typedef struct s_minishell
 	int					save_stdin;
 	int					save_stdout;
 	int 				n_args;
-	// int					n_tokens;
 	pid_t				pid;
-	struct	sigaction	sa;
 	int					pipefd[2];
 	int					exit_code;
 	bool				swap_input_redirects;

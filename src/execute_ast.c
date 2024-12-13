@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/12 03:02:07 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/13 04:33:32 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ void	ft_remove_created_files(t_node *node);
 void	ft_create_files(t_node *node);
 int	ft_collect_heredocs(t_node *node, t_minishell *ms);
 int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
+static int ft_has_cat(t_node *node);
+
 
 int	ft_execute_ast(t_node *node, t_minishell *ms)
 {
@@ -330,6 +332,25 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms)
 	return (ft_execute_ast(node->left, ms));
 }
 
+static int ft_has_cat(t_node *node)
+{
+	t_node *current;
+
+	current = node;
+	if (!current)
+		return (0);
+	if (current->token->type == TOKEN_COMMAND)
+	{
+		if (!ft_strcmp(current->cmd_ready[0], "cat")
+		|| !ft_strcmp(current->cmd_ready[0], "/bin/cat"))
+			return (1);
+	}
+ 	if (!current->left && !current->right)
+		return (0);
+	return (ft_has_cat(current->left));
+	// ft_has_cat(current->right);
+}
+
 int	ft_handle_pipe(t_node *node, t_minishell *ms)
 {
 	char *input;
@@ -387,8 +408,9 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 		exit(ft_execute_ast(node->left, ms));
 	}
 	close(ms->pipefd[1]);
-	waitpid(ms->pid, &ms->status, 0); // VER IMPLICACOES! funciona paea os stuck_cats e para "$CASA" | '$HOME' | $USER $ | "$ HOME" << o!!!
-	if (dup2(ms->pipefd[0], STDIN_FILENO) == -1) // Mas nao para broken pipes! ver como resolver!
+	if (!ft_has_cat(node))
+		waitpid(ms->pid, &ms->status, 0); //  "$CASA" | '$HOME' | $USER $ | "$ HOME" << o     //  cat < test_files/infile_big | grep oi // [asa nso dois agora!]
+	if (dup2(ms->pipefd[0], STDIN_FILENO) == -1)
 	{
 		perror("dup2");
 		ms->exit_code = 1;
@@ -423,12 +445,12 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 
 	valid = -1;
 	sig = 0;
-	if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
+/* 	if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
 	{
 		ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
 		ms->exit_code = 127;
 		return (127); // Código de erro para "command not found"
-	}
+	} */
 	ms->pid = fork();
 	if (ms->pid == -1)
 	{
@@ -439,6 +461,12 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	if (ms->pid == 0)
 	{
 		//ft_set_fork_signals();
+		if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
+		{
+/* 			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
+			ms->exit_code = 127;
+ */			return (42); // Código de erro para "command not found"
+		}
 		if (node->token->type == TOKEN_BUILTIN)
 			exit(ft_exec_builtins(node, ms));
 		if (node->cmd_ready[0][0] == '/' || 									// Caminho absoluto ou relativo
@@ -449,16 +477,16 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 			if (valid != 0)
 				exit(valid); // Retorna o erro correspondente (127 ou 126)
 			execve(node->cmd_ready[0], node->cmd_ready, ms->env.envp); // Executa diretamente se for válido
-			ft_putstr_fd("minishell: ", STDERR_FILENO);
-			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
-			ft_putstr_fd(": command not found\n", STDERR_FILENO);
-			exit(127);
+			// ft_putstr_fd("minishell: ", STDERR_FILENO);
+			// ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
+			// ft_putstr_fd(": command not found\n", STDERR_FILENO);
+			exit(42);
 		}
 		if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
 		{
-			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
-			ft_putstr_fd(": command not found\n", STDERR_FILENO);
-			exit(127);
+/* 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
+			ft_putstr_fd(": command not found\n", STDERR_FILENO); */
+			exit(42);
 		}
 		if (node->cmd_ready[1] == NULL && 
 		!ft_strcmp(node->cmd_ready[0], "cat") && node->prev && node->prev->token->type == TOKEN_OPERATOR
@@ -472,7 +500,15 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	ft_set_fork_signals();
 	waitpid(ms->pid, &ms->status, 0);
 	if (WIFEXITED(ms->status)) // Processo terminou normalmente
+	{
 		ms->exit_code = WEXITSTATUS(ms->status);
+ 		if (ms->exit_code == 42)
+		{
+			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
+			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
+			ms->exit_code = 127;
+		}
+	}
 	else if (WIFSIGNALED(ms->status)) // Processo foi terminado por um sinal
 	{
 		sig = WTERMSIG(ms->status);
