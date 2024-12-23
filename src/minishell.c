@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 19:40:56 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/23 19:49:42 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void ft_init_ms(t_minishell *ms)
 	ms->env.envp = NULL;
 	ms->env.full_path = NULL;
 	ms->env.paths = NULL;
-	ms->prompt = ""RD"minishell"RST"$ ";
+	ms->prompt = ft_strjoin_all(4, RD"["RST, ft_itoa(exit_code(ms)), RD"] minishell"RST, "$ ");
 }
 
 int ft_save_stdin_stdout(t_minishell *ms)
@@ -63,6 +63,7 @@ void ft_close_stdin_stdout(t_minishell *ms)
 	close(ms->save_stdout);
 }
 
+// TODO: FIX SEGFAULT IN THIS FUNCTION
 void ft_create_prompt(t_minishell *ms)
 {
 	char *old_prompt;
@@ -76,6 +77,7 @@ void ft_create_prompt(t_minishell *ms)
 
 int	ft_readline(t_minishell *ms)
 {
+	ft_create_prompt(ms);
 	ms->input = readline(ms->prompt);
 	if (ms->input == NULL)
 	{
