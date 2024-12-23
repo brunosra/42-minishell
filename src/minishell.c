@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/12 02:27:06 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/23 16:45:00 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,7 @@ int	ft_process_input_and_execute(t_minishell *ms)
 {
 	if (ft_handle_and_tokenize_input(ms))
 	{
-		if (ms->exit_code == 2)
+		if (exit_code() == 2)
 			return (1);
 		else
 			return (ft_putstr_and_return("minishell: unclosed quotes\n", 1));
@@ -163,7 +163,7 @@ void ft_clean_stuck_cats(t_minishell *ms)
 				break ;
 		}
 	}
-	ms->exit_code = 0;
+	set_exit_code(ms,0);
 	return ;
 }
 

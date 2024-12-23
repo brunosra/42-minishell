@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/03 02:54:31 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/23 16:32:47 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ int ft_builtin_exit(char **args, t_minishell *ms)
 	while (args[i])	
 		i++;
 	if (i == 1)
-		ms->exit_code = 0;
+		set_exit_code(ms, 0);
 	else if (i > 2 && ft_atoll(args[1], 0, 0))
 	{
 		ft_putstr_fd("exit\nminishell: exit: too many arguments\n", STDERR_FILENO);
@@ -104,8 +104,8 @@ int ft_builtin_exit(char **args, t_minishell *ms)
 	else if (ft_value_is_numeric(args[1]))
 	{
 		mod = ft_atoll(args[1], 0, 0) % 256;
-		ms->exit_code = mod;
-		exit(ms->exit_code);
+		set_exit_code(ms, mod);
+		exit(exit_code(ms));
 	}
 	else if (!ft_value_is_numeric(args[1]))
 	{
@@ -115,8 +115,8 @@ int ft_builtin_exit(char **args, t_minishell *ms)
 		exit(2);
 	}
 	else
-		ms->exit_code = 0;
-	exit(ms->exit_code);
+		set_exit_code(ms, 0);
+	exit(exit_code(ms));
 }
 
 long long ft_atoll(char *str, int i, long long res)
@@ -188,17 +188,16 @@ int ft_value_is_numeric(char *str)
  * TODO:		Check if malloc() is needed on cwd var.
  */
 
-/* int	ft_builtin_pwd() // Tem de retornar um int
+int	ft_builtin_pwd() // Tem de retornar um int
 {	
-	char cwd[1024]; // VER!! malloc!?
+	char cwd[4095];
 	if (getcwd(cwd, sizeof(cwd)) != NULL)
-		printf("CWD IS: %s\n", cwd);
+		printf("%s\n", cwd);
 	else
-		perror("pwd");
+		perror("pwd: ");
 	return (EX_OK);
-	// }
 }
- */
+
 void 	ft_builtin_env(char **args, t_minishell *ms)
 {
 	char **env;

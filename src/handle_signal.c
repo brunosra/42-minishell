@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_signal.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/12 04:28:19 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/23 16:41:44 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	ft_signal_handler(int sig)
 		rl_replace_line("", 0);
 		rl_on_new_line();
 		rl_redisplay();
-		ms->exit_code = 130; // Código típico para interrupções via Ctrl-C
+		set_exit_code(ms, 130); // Código típico para interrupções via Ctrl-C
 	}
 /* 	else if (sig == SIGQUIT) // Ctrl-'\'
 	{
