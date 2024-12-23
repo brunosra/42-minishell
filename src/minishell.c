@@ -6,11 +6,12 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 18:16:08 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/23 19:40:56 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+volatile sig_atomic_t g_interrupt;
 
 int	main(int argc, char **argv, char **envp);
 void ft_init_ms(t_minishell *ms);
@@ -62,21 +63,20 @@ void ft_close_stdin_stdout(t_minishell *ms)
 	close(ms->save_stdout);
 }
 
-/* void *ft_create_prompt(t_minishell *ms)
+void ft_create_prompt(t_minishell *ms)
 {
 	char *old_prompt;
 	char *new_prompt;
 
 	old_prompt = ms->prompt;
-	new_prompt = ft_strjoin("[", ft_itoa(ms->error_code));
-} */
+	new_prompt = ft_strjoin_all(4, RD"["RST, ft_itoa(exit_code(ms)), RD"] minishell"RST, "$ ");
+	free(old_prompt);
+	ms->prompt = new_prompt;
+}
 
 int	ft_readline(t_minishell *ms)
 {
-	int	ec;
-
-	ec = exit_code(ms);
-	ms->input = readline(RD"minishell"RST"$ ");
+	ms->input = readline(ms->prompt);
 	if (ms->input == NULL)
 	{
 		write(STDOUT_FILENO, "exit\n", 5);

@@ -6,11 +6,12 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 02:09:28 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 18:13:07 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/23 19:42:45 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+extern volatile sig_atomic_t g_interrupt;
 
 int ft_perror(char *error, int return_value);
 int ft_putstr_and_return(char *msg, int return_value);

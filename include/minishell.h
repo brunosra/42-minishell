@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 18:16:22 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/23 19:40:44 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,6 @@
 # include <errno.h>
 # include <limits.h>
 # include <stdbool.h>
-
-volatile sig_atomic_t g_interrupt;
 
 typedef struct s_ast_node t_node;
 

@@ -6,11 +6,12 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 18:11:28 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/23 19:42:25 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+extern volatile sig_atomic_t g_interrupt;
 
 int		ft_builtin_echo(char **args);
 void	ft_builtin_pwd(t_minishell *ms);

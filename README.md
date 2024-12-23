@@ -27,3 +27,6 @@
 ## Minishell_tester:
 
 [Minishell_tester --> Git hub](https://github.com/LucasKuhn/minishell_tester)
+
+## DOC about global vars
+https://www.cs.emory.edu/~cheung/Courses/255/Syllabus/1-C-intro/cprep3.html
