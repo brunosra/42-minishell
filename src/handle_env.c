@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   hendle_env.c                                       :+:      :+:    :+:   */
+/*   handle_env.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 16:45:07 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/23 18:15:16 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,8 +91,8 @@ int	ft_revalue_token_variable(t_minishell *ms)
 				else if (ft_check_if_expand(ms->tokens[i].value, ptr, 0) == 2)
 				{
 					key = ft_strdup("?");
-					// printf("%lu\n", ft_strlen(ft_itoa(exit_code())));
-					ft_replace_str(&ms->tokens[i].value, key, ptr, ft_itoa(exit_code()));
+					// printf("%lu\n", ft_strlen(ft_itoa(exit_code(ms))));
+					ft_replace_str(&ms->tokens[i].value, key, ptr, ft_itoa(exit_code(ms)));
 					free(key);
 					ptr = ft_strchr(ms->tokens[i].value, '$');
 					if (!ptr)
@@ -300,8 +300,8 @@ int	ft_revalue_heredock_input(char **input, t_minishell *ms)
 			else if (ft_check_if_expand(*input, ptr, 1) == 2)
 			{
 				key = ft_strdup("?");
-				// printf("%lu\n", ft_strlen(ft_itoa(exit_code())));
-				ft_replace_str(input, key, ptr, ft_itoa(exit_code()));
+				// printf("%lu\n", ft_strlen(ft_itoa(exit_code(ms))));
+				ft_replace_str(input, key, ptr, ft_itoa(exit_code(ms)));
 				free(key);
 				ptr = ft_strchr(*input, '$');
 				if (!ptr)

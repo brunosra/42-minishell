@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 16:45:00 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/23 18:16:08 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ void ft_init_ms(t_minishell *ms)
 	ms->env.envp = NULL;
 	ms->env.full_path = NULL;
 	ms->env.paths = NULL;
+	ms->prompt = ""RD"minishell"RST"$ ";
 }
 
 int ft_save_stdin_stdout(t_minishell *ms)
@@ -61,8 +62,20 @@ void ft_close_stdin_stdout(t_minishell *ms)
 	close(ms->save_stdout);
 }
 
+/* void *ft_create_prompt(t_minishell *ms)
+{
+	char *old_prompt;
+	char *new_prompt;
+
+	old_prompt = ms->prompt;
+	new_prompt = ft_strjoin("[", ft_itoa(ms->error_code));
+} */
+
 int	ft_readline(t_minishell *ms)
 {
+	int	ec;
+
+	ec = exit_code(ms);
 	ms->input = readline(RD"minishell"RST"$ ");
 	if (ms->input == NULL)
 	{
@@ -121,7 +134,7 @@ int	ft_process_input_and_execute(t_minishell *ms)
 {
 	if (ft_handle_and_tokenize_input(ms))
 	{
-		if (exit_code() == 2)
+		if (exit_code(ms) == 2)
 			return (1);
 		else
 			return (ft_putstr_and_return("minishell: unclosed quotes\n", 1));

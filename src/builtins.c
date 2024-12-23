@@ -6,15 +6,15 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 16:32:47 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/23 18:11:28 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
 int		ft_builtin_echo(char **args);
-void	ft_builtin_pwd(); // deve retornar int
-int		ft_builtin_exit(char **args, t_minishell *ms);
+void	ft_builtin_pwd(t_minishell *ms);
+void	ft_builtin_exit(char **args, t_minishell *ms);
 int		ft_value_is_numeric(char *str);
 long long ft_atoll(char *str, int i, long long res);
 
@@ -85,7 +85,7 @@ int ft_builtin_echo(char **args)
 	exit(0);
 }
 
-int ft_builtin_exit(char **args, t_minishell *ms)
+void	ft_builtin_exit(char **args, t_minishell *ms)
 {
 	int mod;
 	int i;
@@ -188,14 +188,15 @@ int ft_value_is_numeric(char *str)
  * TODO:		Check if malloc() is needed on cwd var.
  */
 
-int	ft_builtin_pwd() // Tem de retornar um int
+void	ft_builtin_pwd(t_minishell *ms) // Tem de retornar um int
 {	
 	char cwd[4095];
 	if (getcwd(cwd, sizeof(cwd)) != NULL)
 		printf("%s\n", cwd);
 	else
 		perror("pwd: ");
-	return (EX_OK);
+	set_exit_code(ms, EX_OK);
+	exit(exit_code(ms));
 }
 
 void 	ft_builtin_env(char **args, t_minishell *ms)

@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 16:41:14 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/23 18:15:17 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -438,7 +438,7 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 	// 	/* set_exit_code(ms,  */ft_builtin_pwd(ms));
 /* 	if (!ft_strcmp(node->token->value, "cd"))
 		ft_builtin_cd(ms); */
-	return (exit_code());
+	return (exit_code(ms));
 }
 
 int	ft_execute_command(t_node *node, t_minishell *ms)
@@ -505,7 +505,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	if (WIFEXITED(ms->status)) // Processo terminou normalmente
 	{
 		set_exit_code(ms, WEXITSTATUS(ms->status));
- 		if (exit_code() == 42)
+ 		if (exit_code(ms) == 42)
 		{
 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
 			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
@@ -522,18 +522,18 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	else
 		set_exit_code(ms, 1);
 	ft_set_main_signals();
-	if (exit_code() != 0 && node->prev && node->prev->token->type == TOKEN_INPUT_REDIRECT) // Remoção de arquivos criados caso o comando falhe
+	if (exit_code(ms) != 0 && node->prev && node->prev->token->type == TOKEN_INPUT_REDIRECT) // Remoção de arquivos criados caso o comando falhe
 	{
 		ft_remove_created_files(node->prev);
 	}
-	if (node->token->type == TOKEN_BUILTIN && !ft_strcmp(node->cmd_ready[0], "exit") && exit_code() != 1) // Finaliza o shell se for exit
+	if (node->token->type == TOKEN_BUILTIN && !ft_strcmp(node->cmd_ready[0], "exit") && exit_code(ms) != 1) // Finaliza o shell se for exit
 	{
 		ft_free_tokens(ms->tokens);
 		ft_free_ast(ms->ast_root);
 		free(ms->input);
-		exit(exit_code());
+		exit(exit_code(ms));
 	}
-	return (exit_code());
+	return (exit_code(ms));
 }
 
 void	ft_remove_created_files(t_node *node)

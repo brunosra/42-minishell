@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 16:31:23 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/23 18:16:22 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,7 @@ typedef struct s_minishell
 	bool					in_pipe;
 	char				*temp;
 	int					c_stuck_cats;
+	char				*prompt;
 }				t_minishell;
 
 /**__HANDLE_and_LEXING_INPUT__**/
@@ -156,7 +157,7 @@ int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
 
 /**__BUILTINS__**/
 int		ft_check_builtins(char *str);
-int		ft_builtin_exit(char **args, t_minishell *ms);
+void	ft_builtin_exit(char **args, t_minishell *ms);
 void	ft_builtin_pwd(t_minishell *ms);
 int 	ft_builtin_echo(char **args);
 int		ft_value_is_numeric(char *str);
@@ -179,7 +180,6 @@ void	ft_free_ast(t_node *root);
 void	ft_free_split(char **str);
 char	*ft_strjoin_free(char *s1, char *s2, int free_s1, int free_s2);
 
-
 /**__HANDLE_ENV__ **/
 int		ft_revalue_token_variable(t_minishell *ms);
 int		ft_check_balanced_quotes(char *str, int idx);
@@ -195,7 +195,7 @@ int		ft_revalue_heredock_input(char **input, t_minishell *ms);
 /**__UTILS__ **/
 int 	ft_perror(char *error, int return_value);
 int 	ft_putstr_and_return(char *msg, int return_value);
-void	set_exit_code(t_minishell ms, int exit_code);
-int		exit_code(t_minishell ms);
+void	set_exit_code(t_minishell *ms, int exit_code);
+int		exit_code(t_minishell *ms);
 
 #endif

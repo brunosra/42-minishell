@@ -1,54 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   mini_utils.c                                       :+:      :+:    :+:   */
+/*   ft_strjoin_all.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/11 02:09:28 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 18:13:07 by bschwell         ###   ########.fr       */
+/*   Created: 2024/12/23 18:01:27 by bschwell          #+#    #+#             */
+/*   Updated: 2024/12/23 18:06:54 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "libft.h"
 
-int ft_perror(char *error, int return_value);
-int ft_putstr_and_return(char *msg, int return_value);
-
-int ft_perror(char *error, int return_value)
-{
-	perror(error);
-	return (return_value);
-}
-
-int ft_putstr_and_return(char *msg, int return_value)
-{
-	ft_putstr_fd(msg, STDERR_FILENO);
-	return (return_value);
-}
-
-/**
- * @brief Getter and Setter for Exit Codes
- * 
- * @param ms 
- * @param exit_code 
- */
-
-void	set_exit_code(t_minishell *ms, int exit_code)
-{
-	ms->exit_code = exit_code;
-}
-
-int		exit_code(t_minishell *ms)
-{
-	return (ms->exit_code);
-}
-
-char *ft_str_join_all(int argcount, ...)
+char	*ft_strjoin_all(int argcount, ...)
 {
 	va_list	ap;
 	char *tmp;
 	char *to_free;
+	char *res;
 	char *curr_str;
 	int curr_arg;
 
