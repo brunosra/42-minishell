@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 19:58:01 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/23 19:58:41 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,6 @@ void ft_create_prompt(t_minishell *ms)
 
 int	ft_readline(t_minishell *ms)
 {
-	free(ms->prompt);
 	ft_create_prompt(ms);
 	ms->input = readline(ms->prompt);
 	if (ms->input == NULL)
