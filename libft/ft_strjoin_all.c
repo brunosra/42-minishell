@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/23 18:01:27 by bschwell          #+#    #+#             */
-/*   Updated: 2024/12/23 18:06:54 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/23 18:47:09 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ char	*ft_strjoin_all(int argcount, ...)
 	va_list	ap;
 	char *tmp;
 	char *to_free;
-	char *res;
 	char *curr_str;
 	int curr_arg;
 
