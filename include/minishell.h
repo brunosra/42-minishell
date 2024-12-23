@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/13 04:38:31 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/23 16:31:23 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,15 +185,17 @@ int		ft_revalue_token_variable(t_minishell *ms);
 int		ft_check_balanced_quotes(char *str, int idx);
 char	*ft_get_env(const char *key, char **envp);
 char	**ft_duplicate_envp(char **envp);
-int	ft_check_if_expand(char *str, char *ptr, int heredoc);
+int		ft_check_if_expand(char *str, char *ptr, int heredoc);
 int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
 char	*ft_get_env_value(const char *str, char **envp, char **key);
-int	ft_revalue_heredock_input(char **input, t_minishell *ms);
+int		ft_revalue_heredock_input(char **input, t_minishell *ms);
 /* int		ft_remove_str(char **value, char *key, char *ptr);
  */
 
 /**__UTILS__ **/
-int ft_perror(char *error, int return_value);
-int ft_putstr_and_return(char *msg, int return_value);
+int 	ft_perror(char *error, int return_value);
+int 	ft_putstr_and_return(char *msg, int return_value);
+void	set_exit_code(t_minishell ms, int exit_code);
+int		exit_code(t_minishell ms);
 
 #endif
