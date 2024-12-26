@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 19:58:41 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/26 11:07:44 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ void ft_close_stdin_stdout(t_minishell *ms)
 	close(ms->save_stdout);
 }
 
-// TODO: FIX SEGFAULT IN THIS FUNCTION
 void ft_create_prompt(t_minishell *ms)
 {
 	char *old_prompt;
