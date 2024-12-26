@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/26 12:13:27 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/26 15:17:44 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,40 @@ void 	ft_builtin_env(char **args, t_minishell *ms); // deve retornar int
  */
 
 /* JUST FOR TEST */
-static void print_str_arr(char **args)
-{
-	int i;
+// static void print_str_arr(char **args)
+// {
+// 	int i;
 
-	i = -1;
-	while (args[++i])
-		printf("[%d]: %s\n", i, args[i]);
+// 	i = -1;
+// 	while (args[++i])
+// 		printf("[%d]: %s\n", i, args[i]);
+// }
+
+/**
+ * @brief 		Check if arg from echo is a valid variation of -n
+ * 
+ * @param opt	Option that needs to be checked
+ * @return int	1: is a valid variation of -n
+ * 				0: is not
+ */
+
+static int		ft_check_valid_echo_opt(char *opt)
+{
+	int	i;
+
+	i = 1;
+	if (ft_strncmp(opt, "-n", 2) == 0)
+	{
+		while (opt[i])
+		{
+			if (opt[i] != 'n')
+				return (0);
+			i++;
+		}
+	}
+	else
+		return (0);
+	return (1);
 }
 
 /**
@@ -47,8 +74,10 @@ void	ft_builtin_echo(char **args, t_minishell *ms)
 
 	i = 1;
 	newline = 1;
-	while (ft_strncmp(args[i], "-n", 2) == 0)
+	while (args[i])
 	{
+		if (ft_check_valid_echo_opt(args[i]) == 0)
+			break;
 		newline = 0;
 		i++;
 	}
@@ -63,13 +92,6 @@ void	ft_builtin_echo(char **args, t_minishell *ms)
 		printf("\n");
 	set_exit_code(ms, 0);
 }
-
-/**
- * TODO: Tiago, Review esse echo que voce fez e compara se ha algo faltando no meu por favor.
- * 
- * 
- */
-
 
 /* void	ft_builtin_echo(char **args, t_minishell *ms)
 {
