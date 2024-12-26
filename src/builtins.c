@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/26 12:09:36 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/26 12:13:27 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,10 @@ static void print_str_arr(char **args)
 }
 
 /**
- * @brief 		Builtin Echo
+ * @brief 		Builtin echo
  * 
- * @param args	what should be written in the command line
- * @return int	exit_code
+ * @param args 	What should be writter on the command line
+ * @param ms 	minishell struct pointer
  */
 
 void	ft_builtin_echo(char **args, t_minishell *ms)
