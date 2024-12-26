@@ -6,19 +6,19 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 19:42:40 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/26 15:50:52 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
 
-void	ft_signal_handler(int sig);
+void		ft_signal_handler(int sig);
 t_minishell	*ft_ms_struct(t_minishell *ms, int flag);
-void	ft_set_main_signals(void);
-void	ft_set_fork_signals(void);
-void	ft_set_heredoc_signals(void);
-void	ft_signal_heredoc_handler(int sig);
+void		ft_set_main_signals(void);
+void		ft_set_fork_signals(void);
+void		ft_set_heredoc_signals(void);
+void		ft_signal_heredoc_handler(int sig);
 
 // void	ft_check_signals();
 

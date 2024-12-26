@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/26 11:22:30 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/26 17:54:14 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,8 +161,8 @@ void	ft_builtin_echo(char **args, t_minishell *ms);
 int		ft_value_is_numeric(char *str);
 long long ft_atoll(char *str, int i, long long res);
 void 	ft_builtin_env(char **args, t_minishell *ms); // deve retornar int
-/* int		ft_builtin_cd(t_minishell *ms);
- */
+void	ft_builtin_cd(char **args, t_minishell *ms);
+
 /**__SIGNAL__**/
 void	ft_signal_handler(int sig);
 t_minishell	*ft_ms_struct(t_minishell *ms, int flag);

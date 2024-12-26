@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/26 11:07:44 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/26 15:48:57 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,6 @@ int	main(int argc, char **argv, char **envp)
 	return (0);
 }
 
-
 int	ft_handle_and_tokenize_input(t_minishell *ms)
 {
 	
@@ -177,7 +176,7 @@ void ft_clean_stuck_cats(t_minishell *ms)
 				break ;
 		}
 	}
-	set_exit_code(ms,0);
+	set_exit_code(ms, 0);
 	return ;
 }
 

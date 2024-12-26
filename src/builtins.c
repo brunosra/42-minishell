@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/26 15:42:40 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/26 18:48:13 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,8 @@ void	ft_builtin_exit(char **args, t_minishell *ms);
 int		ft_value_is_numeric(char *str);
 long long ft_atoll(char *str, int i, long long res);
 
-void 	ft_builtin_env(char **args, t_minishell *ms); // deve retornar int
-/* int		ft_builtin_cd(t_minishell *ms);
- */
+void 	ft_builtin_env(char **args, t_minishell *ms);
+void	ft_builtin_cd(char **args, t_minishell *ms);
 
 /* JUST FOR TEST */
 // static void print_str_arr(char **args)
@@ -32,6 +31,34 @@ void 	ft_builtin_env(char **args, t_minishell *ms); // deve retornar int
 // 	while (args[++i])
 // 		printf("[%d]: %s\n", i, args[i]);
 // }
+
+void	ft_builtin_cd(char **args, t_minishell *ms)
+{
+	int	result;
+
+	//TEST
+	char s[1000];
+
+	printf("pwd: %s\n", getcwd(s, 100));
+	if (args[2])
+	{
+		set_exit_code(ms, 1);
+		printf("cd: too many arguments\n");
+		exit(ms->exit_code);
+	}
+	if (!args[1])
+	{
+		set_exit_code(ms, 0);
+		chdir("~");
+		exit(ms->exit_code);
+	}
+	result = chdir(args[1]);
+	if (result != 0)
+		perror("cd error");
+	set_exit_code(ms, result);
+	printf("pwd: %s\n", getcwd(s, 100));
+	exit(ms->exit_code);
+}
 
 /**
  * @brief 		Check if arg from echo is a valid variation of -n
@@ -140,6 +167,7 @@ void	ft_builtin_echo(char **args, t_minishell *ms)
 	set_exit_code(ms, 0);
 } */
 
+// TODO: Criar funcao de limpeza de memoria (valgrind) e chamar ela antes de todo exit
 void	ft_builtin_exit(char **args, t_minishell *ms)
 {
 	int mod;
@@ -254,6 +282,7 @@ void	ft_builtin_pwd(t_minishell *ms)
 	exit(exit_code(ms));
 }
 
+// TODO: conversar sobre o sair do programa aqui
 void 	ft_builtin_env(char **args, t_minishell *ms)
 {
 	char **env;
@@ -271,15 +300,6 @@ void 	ft_builtin_env(char **args, t_minishell *ms)
 			env++;
 		}
 	}
-	exit(0);
+	set_exit_code(ms, EX_OK);
+	exit(exit_code(ms));
 }
-
-/* int ft_builtin_cd(t_minishell *ms)
-{
-	if (cd ..)
-		exit(printf("[cd error]: too many arguments\n"));
-	if (!ms->ast_root->cmd_ready[1])
-		return (chdir("~"));
-	else
-		return (chdir(ms->ast_root->cmd_ready[1]));
-} */
