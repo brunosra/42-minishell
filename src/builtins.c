@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/26 15:17:44 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/26 15:18:40 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,8 @@ void	ft_builtin_echo(char **args, t_minishell *ms)
 		printf("\n");
 	set_exit_code(ms, 0);
 }
+
+// TODO: verificar se este echo acima esta ok, se estiver, apagar o de baixo
 
 /* void	ft_builtin_echo(char **args, t_minishell *ms)
 {
