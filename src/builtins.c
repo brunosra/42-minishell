@@ -6,14 +6,14 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 19:42:25 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/26 12:09:36 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
 
-int		ft_builtin_echo(char **args);
+void	ft_builtin_echo(char **args, t_minishell *ms);
 void	ft_builtin_pwd(t_minishell *ms);
 void	ft_builtin_exit(char **args, t_minishell *ms);
 int		ft_value_is_numeric(char *str);
@@ -24,7 +24,7 @@ void 	ft_builtin_env(char **args, t_minishell *ms); // deve retornar int
  */
 
 /* JUST FOR TEST */
-/* static void print_str_arr(char **args)
+static void print_str_arr(char **args)
 {
 	int i;
 
@@ -33,14 +33,45 @@ void 	ft_builtin_env(char **args, t_minishell *ms); // deve retornar int
 		printf("[%d]: %s\n", i, args[i]);
 }
 
- *//**
+/**
  * @brief 		Builtin Echo
  * 
  * @param args	what should be written in the command line
  * @return int	exit_code
  */
 
-int ft_builtin_echo(char **args)
+void	ft_builtin_echo(char **args, t_minishell *ms)
+{
+	int i;
+	int newline;
+
+	i = 1;
+	newline = 1;
+	while (ft_strncmp(args[i], "-n", 2) == 0)
+	{
+		newline = 0;
+		i++;
+	}
+	while (args[i])
+	{
+		printf("%s", args[i]);
+		if (args[i + 1])
+			printf(" ");
+		i++;
+	}
+	if (newline)
+		printf("\n");
+	set_exit_code(ms, 0);
+}
+
+/**
+ * TODO: Tiago, Review esse echo que voce fez e compara se ha algo faltando no meu por favor.
+ * 
+ * 
+ */
+
+
+/* void	ft_builtin_echo(char **args, t_minishell *ms)
 {
 	int i;
 	int j;
@@ -49,7 +80,6 @@ int ft_builtin_echo(char **args)
 	i = 1;
 	j = 2;
 	newline = 1;
-	// print_str_arr(args);
 	while (args[i] && !ft_strncmp(args[i], "-n", 2))
 	{
 		while (args[i][j] == 'n')
@@ -59,7 +89,7 @@ int ft_builtin_echo(char **args)
 			i++;
 			newline = 0;
 		}
-		else 
+		else
 			break ;	
 	}
 	while (args[i] && !ft_strncmp(args[i], "-n", 2))
@@ -82,9 +112,9 @@ int ft_builtin_echo(char **args)
 		}
 	}
 	if (newline)
-		printf("\n");	
-	exit(0);
-}
+		printf("\n");
+	set_exit_code(ms, 0);
+} */
 
 void	ft_builtin_exit(char **args, t_minishell *ms)
 {
@@ -189,7 +219,7 @@ int ft_value_is_numeric(char *str)
  * TODO:		Check if malloc() is needed on cwd var.
  */
 
-void	ft_builtin_pwd(t_minishell *ms) // Tem de retornar um int
+void	ft_builtin_pwd(t_minishell *ms)
 {	
 	char cwd[4095];
 	if (getcwd(cwd, sizeof(cwd)) != NULL)

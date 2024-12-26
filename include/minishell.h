@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 19:40:44 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/26 11:22:30 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,7 +157,7 @@ int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
 int		ft_check_builtins(char *str);
 void	ft_builtin_exit(char **args, t_minishell *ms);
 void	ft_builtin_pwd(t_minishell *ms);
-int 	ft_builtin_echo(char **args);
+void	ft_builtin_echo(char **args, t_minishell *ms);
 int		ft_value_is_numeric(char *str);
 long long ft_atoll(char *str, int i, long long res);
 void 	ft_builtin_env(char **args, t_minishell *ms); // deve retornar int
