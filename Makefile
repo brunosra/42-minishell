@@ -16,7 +16,7 @@ CFLAGS = -g -Wall -Wextra -Werror -I $(INC_DIR)
 LDFLAGS = -L$(LIBFT_DIR) -lft -L. -lreadline
 
 # Arquivos fonte e objetos
-SRCS = $(wildcard $(SRC_DIR)/*.c)
+SRCS = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/builtins/*.c)
 
 # Regras principais
 all: $(LIBFT) $(NAME)

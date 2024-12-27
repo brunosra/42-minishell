@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/26 18:48:13 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/27 11:31:54 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,7 @@ long long ft_atoll(char *str, int i, long long res);
 void 	ft_builtin_env(char **args, t_minishell *ms);
 void	ft_builtin_cd(char **args, t_minishell *ms);
 
-/* JUST FOR TEST */
-// static void print_str_arr(char **args)
-// {
-// 	int i;
-
-// 	i = -1;
-// 	while (args[++i])
-// 		printf("[%d]: %s\n", i, args[i]);
-// }
-
+// TODO: precisa terminar o CD depois que resolver o export
 void	ft_builtin_cd(char **args, t_minishell *ms)
 {
 	int	result;
