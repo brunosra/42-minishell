@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_ASTree.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/12 02:56:08 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/23 19:42:49 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+extern volatile sig_atomic_t g_interrupt;
 
 t_node	*ft_parse_ast(t_token *tokens);
 t_node	*ft_create_cmd_node(t_token *token);

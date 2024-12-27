@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/13 04:38:31 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/27 14:38:03 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,6 @@
 # include <errno.h>
 # include <limits.h>
 # include <stdbool.h>
-
-volatile sig_atomic_t g_interrupt;
 
 typedef struct s_ast_node t_node;
 
@@ -94,9 +92,10 @@ typedef struct s_minishell
 	bool				swap_input_redirects;
 	bool				swap_output_redirects;
 	int					c_multi_heredocs;
-	bool					in_pipe;
+	bool				in_pipe;
 	char				*temp;
 	int					c_stuck_cats;
+	char				*prompt;
 }				t_minishell;
 
 /**__HANDLE_and_LEXING_INPUT__**/
@@ -156,14 +155,15 @@ int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
 
 /**__BUILTINS__**/
 int		ft_check_builtins(char *str);
-int		ft_builtin_exit(char **args, t_minishell *ms);
+void	ft_builtin_exit(char **args, t_minishell *ms);
 void	ft_builtin_pwd(t_minishell *ms);
-int 	ft_builtin_echo(char **args);
+void	ft_builtin_echo(char **args, t_minishell *ms);
 int		ft_value_is_numeric(char *str);
 long long ft_atoll(char *str, int i, long long res);
 void 	ft_builtin_env(char **args, t_minishell *ms); // deve retornar int
-/* int		ft_builtin_cd(t_minishell *ms);
- */
+void	ft_builtin_cd(char **args, t_minishell *ms);
+void	ft_builtin_export(t_minishell *ms);
+
 /**__SIGNAL__**/
 void	ft_signal_handler(int sig);
 t_minishell	*ft_ms_struct(t_minishell *ms, int flag);
@@ -179,21 +179,25 @@ void	ft_free_ast(t_node *root);
 void	ft_free_split(char **str);
 char	*ft_strjoin_free(char *s1, char *s2, int free_s1, int free_s2);
 
-
 /**__HANDLE_ENV__ **/
 int		ft_revalue_token_variable(t_minishell *ms);
 int		ft_check_balanced_quotes(char *str, int idx);
 char	*ft_get_env(const char *key, char **envp);
 char	**ft_duplicate_envp(char **envp);
-int	ft_check_if_expand(char *str, char *ptr, int heredoc);
+int		ft_check_if_expand(char *str, char *ptr, int heredoc);
 int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
 char	*ft_get_env_value(const char *str, char **envp, char **key);
-int	ft_revalue_heredock_input(char **input, t_minishell *ms);
+int		ft_revalue_heredock_input(char **input, t_minishell *ms);
 /* int		ft_remove_str(char **value, char *key, char *ptr);
  */
 
 /**__UTILS__ **/
-int ft_perror(char *error, int return_value);
-int ft_putstr_and_return(char *msg, int return_value);
+int 	ft_perror(char *error, int return_value);
+int 	ft_putstr_and_return(char *msg, int return_value);
+void	set_exit_code(t_minishell *ms, int exit_code);
+int		exit_code(t_minishell *ms);
+
+/**__MISC_UTILS__**/
+void	ft_print_str_arr(char **arr);
 
 #endif

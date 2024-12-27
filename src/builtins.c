@@ -3,43 +3,117 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/03 02:54:31 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/27 11:31:54 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+extern volatile sig_atomic_t g_interrupt;
 
-int		ft_builtin_echo(char **args);
-void	ft_builtin_pwd(); // deve retornar int
-int		ft_builtin_exit(char **args, t_minishell *ms);
+void	ft_builtin_echo(char **args, t_minishell *ms);
+void	ft_builtin_pwd(t_minishell *ms);
+void	ft_builtin_exit(char **args, t_minishell *ms);
 int		ft_value_is_numeric(char *str);
 long long ft_atoll(char *str, int i, long long res);
 
-void 	ft_builtin_env(char **args, t_minishell *ms); // deve retornar int
-/* int		ft_builtin_cd(t_minishell *ms);
- */
+void 	ft_builtin_env(char **args, t_minishell *ms);
+void	ft_builtin_cd(char **args, t_minishell *ms);
 
-/* JUST FOR TEST */
-/* static void print_str_arr(char **args)
+// TODO: precisa terminar o CD depois que resolver o export
+void	ft_builtin_cd(char **args, t_minishell *ms)
 {
-	int i;
+	int	result;
 
-	i = -1;
-	while (args[++i])
-		printf("[%d]: %s\n", i, args[i]);
+	//TEST
+	char s[1000];
+
+	printf("pwd: %s\n", getcwd(s, 100));
+	if (args[2])
+	{
+		set_exit_code(ms, 1);
+		printf("cd: too many arguments\n");
+		exit(ms->exit_code);
+	}
+	if (!args[1])
+	{
+		set_exit_code(ms, 0);
+		chdir("~");
+		exit(ms->exit_code);
+	}
+	result = chdir(args[1]);
+	if (result != 0)
+		perror("cd error");
+	set_exit_code(ms, result);
+	printf("pwd: %s\n", getcwd(s, 100));
+	exit(ms->exit_code);
 }
 
- *//**
- * @brief 		Builtin Echo
+/**
+ * @brief 		Check if arg from echo is a valid variation of -n
  * 
- * @param args	what should be written in the command line
- * @return int	exit_code
+ * @param opt	Option that needs to be checked
+ * @return int	1: is a valid variation of -n
+ * 				0: is not
  */
 
-int ft_builtin_echo(char **args)
+static int		ft_check_valid_echo_opt(char *opt)
+{
+	int	i;
+
+	i = 1;
+	if (ft_strncmp(opt, "-n", 2) == 0)
+	{
+		while (opt[i])
+		{
+			if (opt[i] != 'n')
+				return (0);
+			i++;
+		}
+	}
+	else
+		return (0);
+	return (1);
+}
+
+/**
+ * @brief 		Builtin echo
+ * 
+ * @param args 	What should be writter on the command line
+ * @param ms 	minishell struct pointer
+ */
+
+void	ft_builtin_echo(char **args, t_minishell *ms)
+{
+	int i;
+	int newline;
+
+	i = 1;
+	newline = 1;
+	while (args[i])
+	{
+		if (ft_check_valid_echo_opt(args[i]) == 0)
+			break;
+		newline = 0;
+		i++;
+	}
+	while (args[i])
+	{
+		printf("%s", args[i]);
+		if (args[i + 1])
+			printf(" ");
+		i++;
+	}
+	if (newline)
+		printf("\n");
+	set_exit_code(ms, 0);
+}
+
+// TODO: verificar se este echo acima esta ok, se estiver, apagar o de baixo
+
+/* void	ft_builtin_echo(char **args, t_minishell *ms)
 {
 	int i;
 	int j;
@@ -48,7 +122,6 @@ int ft_builtin_echo(char **args)
 	i = 1;
 	j = 2;
 	newline = 1;
-	// print_str_arr(args);
 	while (args[i] && !ft_strncmp(args[i], "-n", 2))
 	{
 		while (args[i][j] == 'n')
@@ -58,7 +131,7 @@ int ft_builtin_echo(char **args)
 			i++;
 			newline = 0;
 		}
-		else 
+		else
 			break ;	
 	}
 	while (args[i] && !ft_strncmp(args[i], "-n", 2))
@@ -81,11 +154,12 @@ int ft_builtin_echo(char **args)
 		}
 	}
 	if (newline)
-		printf("\n");	
-	exit(0);
-}
+		printf("\n");
+	set_exit_code(ms, 0);
+} */
 
-int ft_builtin_exit(char **args, t_minishell *ms)
+// TODO: Criar funcao de limpeza de memoria (valgrind) e chamar ela antes de todo exit
+void	ft_builtin_exit(char **args, t_minishell *ms)
 {
 	int mod;
 	int i;
@@ -95,7 +169,7 @@ int ft_builtin_exit(char **args, t_minishell *ms)
 	while (args[i])	
 		i++;
 	if (i == 1)
-		ms->exit_code = 0;
+		set_exit_code(ms, 0);
 	else if (i > 2 && ft_atoll(args[1], 0, 0))
 	{
 		ft_putstr_fd("exit\nminishell: exit: too many arguments\n", STDERR_FILENO);
@@ -104,8 +178,8 @@ int ft_builtin_exit(char **args, t_minishell *ms)
 	else if (ft_value_is_numeric(args[1]))
 	{
 		mod = ft_atoll(args[1], 0, 0) % 256;
-		ms->exit_code = mod;
-		exit(ms->exit_code);
+		set_exit_code(ms, mod);
+		exit(exit_code(ms));
 	}
 	else if (!ft_value_is_numeric(args[1]))
 	{
@@ -115,8 +189,8 @@ int ft_builtin_exit(char **args, t_minishell *ms)
 		exit(2);
 	}
 	else
-		ms->exit_code = 0;
-	exit(ms->exit_code);
+		set_exit_code(ms, 0);
+	exit(exit_code(ms));
 }
 
 long long ft_atoll(char *str, int i, long long res)
@@ -188,17 +262,18 @@ int ft_value_is_numeric(char *str)
  * TODO:		Check if malloc() is needed on cwd var.
  */
 
-/* int	ft_builtin_pwd() // Tem de retornar um int
+void	ft_builtin_pwd(t_minishell *ms)
 {	
-	char cwd[1024]; // VER!! malloc!?
+	char cwd[4095];
 	if (getcwd(cwd, sizeof(cwd)) != NULL)
-		printf("CWD IS: %s\n", cwd);
+		printf("%s\n", cwd);
 	else
-		perror("pwd");
-	return (EX_OK);
-	// }
+		perror("pwd: ");
+	set_exit_code(ms, EX_OK);
+	exit(exit_code(ms));
 }
- */
+
+// TODO: conversar sobre o sair do programa aqui
 void 	ft_builtin_env(char **args, t_minishell *ms)
 {
 	char **env;
@@ -216,15 +291,6 @@ void 	ft_builtin_env(char **args, t_minishell *ms)
 			env++;
 		}
 	}
-	exit(0);
+	set_exit_code(ms, EX_OK);
+	exit(exit_code(ms));
 }
-
-/* int ft_builtin_cd(t_minishell *ms)
-{
-	if (cd ..)
-		exit(printf("[cd error]: too many arguments\n"));
-	if (!ms->ast_root->cmd_ready[1])
-		return (chdir("~"));
-	else
-		return (chdir(ms->ast_root->cmd_ready[1]));
-} */

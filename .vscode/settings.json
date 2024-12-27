@@ -3,7 +3,9 @@
 		"minishell.h": "c",
 		"type_traits": "c",
 		"readline.h": "c",
-		"sysexits.h": "c"
+		"sysexits.h": "c",
+		"history.h": "c",
+		"libft.h": "c"
 	},
 	"editor.insertSpaces": false,
 	"editor.detectIndentation": false,

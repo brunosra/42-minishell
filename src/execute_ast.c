@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   execute_ast.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/13 04:33:32 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2024/12/27 11:54:30 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+extern volatile sig_atomic_t g_interrupt;
 
 int	ft_execute_ast(t_node *node, t_minishell *ms);
 int	ft_handle_heredoc(t_node *node, t_minishell *ms);
@@ -38,7 +39,8 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
 		ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
 		ft_putstr_fd(node->token->value, STDERR_FILENO);
 		ft_putstr_fd("'\n", STDERR_FILENO);
-		ms->exit_code = 2;
+		set_exit_code(ms, 2);
+		
 		return (1);
 	}
 	if (node->token->type == TOKEN_OUTPUT_REDIRECT)
@@ -110,13 +112,13 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 	if (!node->right)
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", STDERR_FILENO);
-		ms->exit_code = 2;
+		set_exit_code(ms, 2);
 		return (1);
 	}
 	if (pipe(ms->pipefd) == -1)
 	{
 		perror("pipe");
-		ms->exit_code = 1;
+		set_exit_code(ms, 1);
 		return (1);
 	}
 	if (!isatty(STDOUT_FILENO))
@@ -127,7 +129,7 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 			perror("dup");
 			close(ms->pipefd[0]);
 			close(ms->pipefd[1]);
-			ms->exit_code = 1;
+			set_exit_code(ms, 1);
 			return (1);
 		}
 		tty_fd = open("/dev/tty", O_WRONLY);
@@ -137,7 +139,7 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 			close(ms->pipefd[0]);
 			close(ms->pipefd[1]);
 			close(save_stdout);
-			ms->exit_code = 1;
+			set_exit_code(ms, 1);
 			return (1);
 		}
 		if (dup2(ms->save_stdout, STDOUT_FILENO) == -1)
@@ -148,7 +150,7 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 			close(ms->pipefd[1]);
 			close(ms->save_stdout);
 			close(save_stdout);
-			ms->exit_code = 1;
+			set_exit_code(ms, 1);
 			return (1);
 		}
 		close(tty_fd);
@@ -159,7 +161,7 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 		perror("fork");
 		close(ms->pipefd[0]);
 		close(ms->pipefd[1]);
-		ms->exit_code = 1;
+		set_exit_code(ms, 1);
 		return (1);
 	}
 	ft_set_fork_signals();
@@ -175,7 +177,7 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 				ft_putstr_fd("minishell: warning: here-document delimited by end-of-file (wanted `", STDERR_FILENO);
 				ft_putstr_fd(node->right->token->value, STDERR_FILENO);
 				write(STDERR_FILENO, "')\n", 3); 
-				ms->exit_code = 0;
+				set_exit_code(ms, 0);
 				break; // Contar heredocs, criar variavel para saber qdo tem de fechar exit 130
 			} 
 			if (!input || ft_strcmp(input, node->right->token->value) == 0)
@@ -206,7 +208,7 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 	{
 		perror("dup2");
 		close(ms->pipefd[0]);
-		ms->exit_code = 1;
+		set_exit_code(ms, 1);
 		return (1);
 	}
 	close(ms->pipefd[0]);
@@ -218,15 +220,15 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 		{
 			perror("dup2");
 			close(save_stdout);
-			ms->exit_code = 1;
+			set_exit_code(ms, 1);
 			return (1);
 		}
 		close(save_stdout);
 	}
 	if (WIFEXITED(ms->status))
-		ms->exit_code = WEXITSTATUS(ms->status);
+		set_exit_code(ms, WEXITSTATUS(ms->status));
 	else
-		ms->exit_code = 1;
+		set_exit_code(ms, 1);
 	return (ft_execute_ast(node->left, ms));
 }
 
@@ -237,7 +239,7 @@ int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 	if (!node->right) // Verifica se o token à direita é inválido
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", STDERR_FILENO);
-		ms->exit_code = 2;
+		set_exit_code(ms, 2);
 		return (1);
 	}
 	else if (ft_invalid_right_token_value(node->right->token->value))
@@ -248,12 +250,12 @@ int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 		else
 			ft_putstr_fd("newline", STDERR_FILENO);
 		ft_putstr_fd("'\n", STDERR_FILENO);
-		ms->exit_code = 2;
+		set_exit_code(ms, 2);
 		return (1);
 	}
 /* 	if (ft_is_valid_file(node->right->token->value, O_WRONLY)) // Verifica se o arquivo é inválido// verificar se e um diretorio!!
 	{
-		ms->exit_code = 1;
+		set_exit_code(ms, 1);
 		return (1);
 	} */
 	if (ft_strcmp(node->token->value, ">>") == 0) // Abre o arquivo para escrita ou append
@@ -263,7 +265,7 @@ int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 	if (fd == -1) // Trata erros ao abrir o arquivo
 	{
 		perror("open");
-		ms->exit_code = 1;
+		set_exit_code(ms, 1);
 		return (1);
 	}
 	else
@@ -272,7 +274,7 @@ int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 	{
 		perror("dup2");
 		close(fd);
-		ms->exit_code = 1;
+		set_exit_code(ms, 1);
 		return (1);
 	}
 	close(fd);
@@ -280,7 +282,7 @@ int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 		return (ft_execute_ast(node->left, ms));
 	else
 	{
-		ms->exit_code = 0;
+		set_exit_code(ms, 0);
 		return (0);
 	}
 }
@@ -292,7 +294,7 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms)
 	if (!node->right) // Verifica se o token à direita é inválido
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", STDERR_FILENO);
-		ms->exit_code = 2;
+		set_exit_code(ms, 2);
 		return (1);
 	}
 	if (ft_invalid_right_token_value(node->right->token->value)) 	// Verifica se o token à direita é inválido
@@ -303,32 +305,32 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms)
 		else
 			ft_putstr_fd("newline", STDERR_FILENO);
 		ft_putstr_fd("'\n", STDERR_FILENO);
-		ms->exit_code = 2;
+		set_exit_code(ms, 2);
 		return (1);
 	}	
 	if (ft_is_valid_file(node->right->token->value, O_RDONLY)) 	// Verifica se o arquivo é inválido
 	{
 		ft_remove_created_files(node->prev);
 		ft_create_files(node->left);
-		ms->exit_code = 1; // Checar se existem outputs_redirects para a frente em que os ficheiros precisem de ser criados!!
+		set_exit_code(ms, 1); // Checar se existem outputs_redirects para a frente em que os ficheiros precisem de ser criados!!
 		return (1);
 	}
 	fd = open(node->right->token->value, O_RDONLY); // Abre o arquivo para leitura
 	if (fd == -1)
 	{
 		perror("open");
-		ms->exit_code = 1;
+		set_exit_code(ms, 1);
 		return (1);
 	}
 	if (dup2(fd, STDIN_FILENO) == -1) // Redireciona STDIN para o arquivo
 	{
 		perror("dup2");
 		close(fd);
-		ms->exit_code = 1;
+		set_exit_code(ms, 1);
 		return (1);
 	}
 	close(fd);
-	ms->exit_code = 0; // Redirecionamento bem-sucedido
+	set_exit_code(ms, 0); // Redirecionamento bem-sucedido
 	return (ft_execute_ast(node->left, ms));
 }
 
@@ -360,7 +362,7 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 	if (!node->left)
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", STDERR_FILENO);
-		ms->exit_code = 2; // Código de erro para erro de sintaxe
+		set_exit_code(ms, 2); // Código de erro para erro de sintaxe
 		return (2);
 	}
 	else if (!node->right) // Caso de pipe sem lado direito
@@ -369,7 +371,7 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 		if (!input) // Ctrl-D
 		{
 			ft_putstr_fd("minishell: syntax error: unexpected end of file\n", STDERR_FILENO);
-			ms->exit_code = 258; // Código típico de erro de sintaxe
+			set_exit_code(ms, 258); // Código típico de erro de sintaxe
 			return (258);
 		}
 		temp = ft_strjoin(ms->input, " ");
@@ -386,14 +388,14 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 	if (pipe(ms->pipefd) == -1)
 	{
 		perror("pipe");
-		ms->exit_code = 1;
+		set_exit_code(ms, 1);
 		return (1);
 	}
 	ms->pid = fork();
 	if (ms->pid == -1)
 	{
 		perror("fork");
-		ms->exit_code = 1;
+		set_exit_code(ms, 1);
 		return (1);
 	}
 	if (ms->pid == 0)
@@ -413,12 +415,12 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 	if (dup2(ms->pipefd[0], STDIN_FILENO) == -1)
 	{
 		perror("dup2");
-		ms->exit_code = 1;
+		set_exit_code(ms, 1);
 		close(ms->pipefd[0]);
 		return (1);
 	}
 	close(ms->pipefd[0]);
-	ms->exit_code = 0;
+	set_exit_code(ms, 0);
 	return (ft_execute_ast(node->right, ms));
 }
 
@@ -426,16 +428,21 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 {
 	// printf("node token: %s\n", node->token->value);
 	if (!ft_strcmp(node->token->value, "echo"))
-		ms->exit_code = ft_builtin_echo(node->cmd_ready);
-	if (!ft_strcmp(node->token->value, "exit"))
+	// TODO: Fix this to add the exit codes directly in the builtin
+		ft_builtin_echo(node->cmd_ready, ms);
+		// set_exit_code(ms, ft_builtin_echo(node->cmd_ready, ms));
+	else if (!ft_strcmp(node->token->value, "exit"))
 	 	ft_builtin_exit(node->cmd_ready, ms);
-	if (!ft_strcmp(node->token->value, "env"))
-		/* ms->exit_code = */ ft_builtin_env(node->cmd_ready, ms);
-	// if (!ft_strcmp(node->token->value, "pwd"))
-	// 	/* ms->exit_code =  */ft_builtin_pwd(ms);
-/* 	if (!ft_strcmp(node->token->value, "cd"))
-		ft_builtin_cd(ms); */
-	return (ms->exit_code);
+	else if (!ft_strcmp(node->token->value, "env"))
+		ft_builtin_env(node->cmd_ready, ms);
+	else if (!ft_strcmp(node->token->value, "pwd"))
+	 	ft_builtin_pwd(ms);
+	else if (!ft_strcmp(node->token->value, "cd"))
+		ft_builtin_cd(node->cmd_ready, ms);
+	else if (!ft_strcmp(node->token->value, "export"))
+			ft_builtin_export(ms);
+	exit(exit_code(ms));
+	return (exit_code(ms));
 }
 
 int	ft_execute_command(t_node *node, t_minishell *ms)
@@ -448,14 +455,14 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 /* 	if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
 	{
 		ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
-		ms->exit_code = 127;
+		set_exit_code(ms, 127);
 		return (127); // Código de erro para "command not found"
 	} */
 	ms->pid = fork();
 	if (ms->pid == -1)
 	{
 		perror("fork");
-		ms->exit_code = 1; // Código genérico para erro de fork
+		set_exit_code(ms, 1); // Código genérico para erro de fork
 		return (1);
 	}
 	if (ms->pid == 0)
@@ -464,7 +471,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 		if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
 		{
 /* 			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
-			ms->exit_code = 127;
+			set_exit_code(ms, 127);
  */			return (42); // Código de erro para "command not found"
 		}
 		if (node->token->type == TOKEN_BUILTIN)
@@ -501,36 +508,36 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	waitpid(ms->pid, &ms->status, 0);
 	if (WIFEXITED(ms->status)) // Processo terminou normalmente
 	{
-		ms->exit_code = WEXITSTATUS(ms->status);
- 		if (ms->exit_code == 42)
+		set_exit_code(ms, WEXITSTATUS(ms->status));
+ 		if (exit_code(ms) == 42)
 		{
 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
 			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
-			ms->exit_code = 127;
+			set_exit_code(ms, 127);
 		}
 	}
 	else if (WIFSIGNALED(ms->status)) // Processo foi terminado por um sinal
 	{
 		sig = WTERMSIG(ms->status);
-		ms->exit_code = 128 + sig;
+		set_exit_code(ms, 128 + sig);
 		if (sig == SIGINT)
 			write(STDERR_FILENO, "\n", 1);
 	}
 	else
-		ms->exit_code = 1;
+		set_exit_code(ms, 1);
 	ft_set_main_signals();
-	if (ms->exit_code != 0 && node->prev && node->prev->token->type == TOKEN_INPUT_REDIRECT) // Remoção de arquivos criados caso o comando falhe
+	if (exit_code(ms) != 0 && node->prev && node->prev->token->type == TOKEN_INPUT_REDIRECT) // Remoção de arquivos criados caso o comando falhe
 	{
 		ft_remove_created_files(node->prev);
 	}
-	if (node->token->type == TOKEN_BUILTIN && !ft_strcmp(node->cmd_ready[0], "exit") && ms->exit_code != 1) // Finaliza o shell se for exit
+	if (node->token->type == TOKEN_BUILTIN && !ft_strcmp(node->cmd_ready[0], "exit") && exit_code(ms) != 1) // Finaliza o shell se for exit
 	{
 		ft_free_tokens(ms->tokens);
 		ft_free_ast(ms->ast_root);
 		free(ms->input);
-		exit(ms->exit_code);
+		exit(exit_code(ms));
 	}
-	return (ms->exit_code);
+	return (exit_code(ms));
 }
 
 void	ft_remove_created_files(t_node *node)
@@ -709,7 +716,7 @@ int ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
     {
         if (g_interrupt)
         {
-            ms->exit_code = 130;
+            set_exit_code(ms, 130);
             break;
         }
         if (pipe(ms->pipefd) == -1) // Criar o pipe para o heredoc
@@ -769,13 +776,13 @@ int ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
         if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
         {
             g_interrupt = 1;
-            ms->exit_code = 130;
+            set_exit_code(ms, 130);
             close(ms->pipefd[0]);
             break;
         }
         if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
         {
-            ms->exit_code = 130;
+            set_exit_code(ms, 130);
             close(ms->pipefd[0]);
             break;
         }
@@ -787,7 +794,7 @@ int ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
         {
             perror("dup2 aqui");
             close(ms->pipefd[0]);
-            ms->exit_code = 1;
+            set_exit_code(ms, 1);
             return (1);
         }
     }
@@ -799,7 +806,7 @@ int ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
         {
             perror("dup2 este");
             close(save_stdout);
-            ms->exit_code = 1;
+            set_exit_code(ms, 1);
             return (1);
         }
         close(save_stdout);
@@ -851,7 +858,7 @@ int	ft_collect_heredocs(t_node *node, t_minishell *ms)
 			//ft_putstr_fd(current->left->token->value, STDERR_FILENO);
 			ft_putchar_fd(current->left->token->value[0], STDERR_FILENO);
 			ft_putstr_fd("'\n", STDERR_FILENO);
-			ms->exit_code = 2;
+			set_exit_code(ms, 2);
 			return (1);
 		}
 		node->heredoc_stops[i] = current->right->token->value;
