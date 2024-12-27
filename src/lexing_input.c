@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 19:42:43 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/27 11:50:19 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,10 @@ int ft_check_builtins(char *str)
 		return (/* printf("builtin: cd -->"), */ 1);
 	if (!ft_strcmp(str, "env"))
 		return (/* printf("builtin: env -->"), */ 1);
+	if (!ft_strcmp(str, "export"))
+		return (/* printf("builtin: export -->"), */ 1);
+	if (!ft_strcmp(str, "unset"))
+		return (/* printf("builtin: export -->"), */ 1);
 	return (0);
 }
 

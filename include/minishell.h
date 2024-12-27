@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/26 17:54:14 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/27 14:38:03 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ typedef struct s_minishell
 	bool				swap_input_redirects;
 	bool				swap_output_redirects;
 	int					c_multi_heredocs;
-	bool					in_pipe;
+	bool				in_pipe;
 	char				*temp;
 	int					c_stuck_cats;
 	char				*prompt;
@@ -162,6 +162,7 @@ int		ft_value_is_numeric(char *str);
 long long ft_atoll(char *str, int i, long long res);
 void 	ft_builtin_env(char **args, t_minishell *ms); // deve retornar int
 void	ft_builtin_cd(char **args, t_minishell *ms);
+void	ft_builtin_export(t_minishell *ms);
 
 /**__SIGNAL__**/
 void	ft_signal_handler(int sig);
@@ -195,5 +196,8 @@ int 	ft_perror(char *error, int return_value);
 int 	ft_putstr_and_return(char *msg, int return_value);
 void	set_exit_code(t_minishell *ms, int exit_code);
 int		exit_code(t_minishell *ms);
+
+/**__MISC_UTILS__**/
+void	ft_print_str_arr(char **arr);
 
 #endif

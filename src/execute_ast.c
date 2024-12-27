@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/26 17:53:40 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/27 11:54:30 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -431,14 +431,16 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 	// TODO: Fix this to add the exit codes directly in the builtin
 		ft_builtin_echo(node->cmd_ready, ms);
 		// set_exit_code(ms, ft_builtin_echo(node->cmd_ready, ms));
-	if (!ft_strcmp(node->token->value, "exit"))
+	else if (!ft_strcmp(node->token->value, "exit"))
 	 	ft_builtin_exit(node->cmd_ready, ms);
-	if (!ft_strcmp(node->token->value, "env"))
+	else if (!ft_strcmp(node->token->value, "env"))
 		ft_builtin_env(node->cmd_ready, ms);
-	if (!ft_strcmp(node->token->value, "pwd"))
+	else if (!ft_strcmp(node->token->value, "pwd"))
 	 	ft_builtin_pwd(ms);
-	if (!ft_strcmp(node->token->value, "cd"))
+	else if (!ft_strcmp(node->token->value, "cd"))
 		ft_builtin_cd(node->cmd_ready, ms);
+	else if (!ft_strcmp(node->token->value, "export"))
+			ft_builtin_export(ms);
 	exit(exit_code(ms));
 	return (exit_code(ms));
 }

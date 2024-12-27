@@ -1,24 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   misc_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/27 11:32:18 by bschwell          #+#    #+#             */
-/*   Updated: 2024/12/27 11:32:57 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/27 12:23:15 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+// TODO: Decide if we want to delete or not this file afterwards
 
 #include "../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
 
-/* JUST FOR TEST */
-static void ft_print_str_arr(char **args)
+/**
+ * @brief 		Prints an array of Strings
+ * 
+ * @param args 	the array to be printed
+ */
+void	ft_print_str_arr(char **arr)
 {
 	int i;
 
 	i = -1;
-	while (args[++i])
-		printf("[%d]: %s\n", i, args[i]);
+	if (arr == NULL)
+	{
+		printf("[print_str_arr]: NULL / Empty array");
+		return;
+	}
+	else
+		while (arr[++i])
+			printf("[%d]: %s\n", i, arr[i]);
 }
