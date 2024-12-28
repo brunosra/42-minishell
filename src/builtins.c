@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/27 11:31:54 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/28 09:13:39 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,36 +20,6 @@ int		ft_value_is_numeric(char *str);
 long long ft_atoll(char *str, int i, long long res);
 
 void 	ft_builtin_env(char **args, t_minishell *ms);
-void	ft_builtin_cd(char **args, t_minishell *ms);
-
-// TODO: precisa terminar o CD depois que resolver o export
-void	ft_builtin_cd(char **args, t_minishell *ms)
-{
-	int	result;
-
-	//TEST
-	char s[1000];
-
-	printf("pwd: %s\n", getcwd(s, 100));
-	if (args[2])
-	{
-		set_exit_code(ms, 1);
-		printf("cd: too many arguments\n");
-		exit(ms->exit_code);
-	}
-	if (!args[1])
-	{
-		set_exit_code(ms, 0);
-		chdir("~");
-		exit(ms->exit_code);
-	}
-	result = chdir(args[1]);
-	if (result != 0)
-		perror("cd error");
-	set_exit_code(ms, result);
-	printf("pwd: %s\n", getcwd(s, 100));
-	exit(ms->exit_code);
-}
 
 /**
  * @brief 		Check if arg from echo is a valid variation of -n
@@ -250,27 +220,6 @@ int ft_value_is_numeric(char *str)
 		i++;
 	}
 	return (0);
-}
-
-// void ft_builtin_pwd(t_minishell *ms) // Tem de retornar um int
-/**
- * @brief	pwd - print name of current/working directory
- * 
- * @return int	exit_code
- * *			0	success
- * *			1	error
- * TODO:		Check if malloc() is needed on cwd var.
- */
-
-void	ft_builtin_pwd(t_minishell *ms)
-{	
-	char cwd[4095];
-	if (getcwd(cwd, sizeof(cwd)) != NULL)
-		printf("%s\n", cwd);
-	else
-		perror("pwd: ");
-	set_exit_code(ms, EX_OK);
-	exit(exit_code(ms));
 }
 
 // TODO: conversar sobre o sair do programa aqui

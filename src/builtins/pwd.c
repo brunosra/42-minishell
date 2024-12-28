@@ -1,28 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   export.c                                           :+:      :+:    :+:   */
+/*   pwd.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/27 11:28:18 by bschwell          #+#    #+#             */
-/*   Updated: 2024/12/28 09:21:56 by bschwell         ###   ########.fr       */
+/*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
+/*   Updated: 2024/12/28 09:14:27 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
 
-void	ft_builtin_export(t_minishell *ms)
-{
-	printf("ms: %s", ms->env.env_paths);
-	/* printf("########## envp: #########\n");
-	ft_print_str_arr(ms->env.envp); */
-	/* printf("####### env_paths: #######\n");
-	printf("%s\n", ms->env.env_paths); */
-	/* printf("######### paths: #########\n");
-	ft_print_str_arr(ms->env.paths);
-	printf("####### full_path: #######\n");
-	printf("%s\n", ms->env.full_path);*/
-}
+// void ft_builtin_pwd(t_minishell *ms) // Tem de retornar um int
+/**
+ * @brief	pwd - print name of current/working directory
+ * 
+ * @return	void
+ * TODO:		Check if malloc() is needed on cwd var.
+ */
 
+void	ft_builtin_pwd(t_minishell *ms)
+{	
+	char cwd[4095];
+	if (getcwd(cwd, sizeof(cwd)) != NULL)
+		printf("%s\n", cwd);
+	else
+		perror("pwd: ");
+	set_exit_code(ms, EX_OK);
+	exit(exit_code(ms));
+}

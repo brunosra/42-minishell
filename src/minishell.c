@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/27 15:43:36 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/28 10:24:46 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,10 @@ void ft_init_ms(t_minishell *ms)
 	ms->swap_output_redirects = false;
 	ms->in_pipe = false;
 	ms->env.envp = NULL;
-	ms->env.env_paths = ft_calloc(sizeof(char *));
-	ms->env.paths = ft_calloc(sizeof(char **));
-	ms->env.full_path = ft_calloc(sizeof(char *));
-	ms->prompt = ft_strjoin_all(4, RD"["RST, ft_itoa(exit_code(ms)), RD"] minishell"RST, "$ ");
+	ms->env.env_paths = ft_calloc(1, sizeof(char *));
+	ms->env.paths = ft_calloc(1, sizeof(char **));
+	ms->env.full_path = ft_calloc(1, sizeof(char *));
+	ms->prompt = ft_strjoin_all(4, RD"["RST, ft_itoa(exit_code(ms)), RD"] minishell:"BL, ft_get_env("PWD", ms),RST"$ ");
 }
 
 int ft_save_stdin_stdout(t_minishell *ms)
