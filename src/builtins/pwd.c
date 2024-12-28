@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2024/12/28 09:14:27 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/28 11:06:21 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ extern volatile sig_atomic_t g_interrupt;
 
 void	ft_builtin_pwd(t_minishell *ms)
 {	
-	char cwd[4095];
+	char cwd[PATH_MAX];
 	if (getcwd(cwd, sizeof(cwd)) != NULL)
 		printf("%s\n", cwd);
 	else

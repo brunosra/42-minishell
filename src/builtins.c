@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/28 09:13:39 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/28 14:44:46 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,17 +229,13 @@ void 	ft_builtin_env(char **args, t_minishell *ms)
 	
 	env = ms->env.envp;
 	if (args[1])
-	{
 		exit(printf("[env error]: doesn't support arguments\n")); // Talvez fosse melhor ignorar os restabtes argumentos! Ou enviar uma mensagem de erro mas nao sair do programa!
-	}
 	else
-	{
 		while (*env != 0)
 		{
 			printf("%s\n", *env);
 			env++;
 		}
-	}
 	set_exit_code(ms, EX_OK);
 	exit(exit_code(ms));
 }

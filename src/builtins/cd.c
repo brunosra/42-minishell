@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:08:03 by bschwell          #+#    #+#             */
-/*   Updated: 2024/12/28 10:24:59 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/28 15:12:31 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,15 +21,15 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 	char	*newpwd;
 
 	// TEST
-	char s[1000];
-	printf("##############\n");
+	/* printf("##############\n");
 	ft_print_str_arr(args);
 	printf("##############\n");
-	printf("arg[1]: %s\n", args[1]);
-	printf("arg[2]: %s\n", args[2]);
-
+	printf("arg[1]: %s\n", args[1]); */
+	// printf("arg[2]: %s\n", args[2]);
+	printf("oldpwd: %s\n", ft_get_env("PWD", ms));
+	ft_print_str_arr(ms->env.envp);
 	oldpwd = ft_get_env("PWD", ms);
-	printf("cwd: %s\n", getcwd(s, 100));
+	printf("oldpwd_var: %s\n", oldpwd);
 	if (args[1] == NULL)
 	{
 		// no argument
@@ -38,7 +38,10 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 		if (newpwd == NULL)
 			printf("cd: HOME not set");
 		else
-			ft_set_env("HOME", newpwd, ms);
+		{
+			ft_set_env("PWD", newpwd, ms);
+			ft_set_env("OLDPWD", oldpwd, ms);
+		}
 	}
 	else if (args[2] == NULL)
 	{
@@ -52,12 +55,13 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 		exit(ms->exit_code);
 	}
 
-	result = chdir(args[1]);
+	result = chdir(newpwd);
 	if (result != 0)
 		perror("cd error");
 	set_exit_code(ms, result);
-	printf("new cwd: %s\n", getcwd(s, 100));
-	exit(ms->exit_code);
+	printf("newpwd: %s\n", ft_get_env("PWD", ms));
+	ms->exit_code = 0;
+	ft_print_str_arr(ms->env.envp);
 }
 
 

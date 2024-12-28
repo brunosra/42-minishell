@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/28 10:30:00 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/28 15:12:14 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -328,9 +328,9 @@ char	*ft_get_env(const char *key, t_minishell *ms)
 
 int	ft_set_env(const char *key, const char *value, t_minishell *ms)
 {
-	int i;
-	size_t len;
-	char *new_var;
+	int		i;
+	size_t	len;
+	char	*new_var;
 
 	i = 0;
 	len = ft_strlen(key);
@@ -347,7 +347,7 @@ int	ft_set_env(const char *key, const char *value, t_minishell *ms)
 		if (!ft_strncmp(ms->env.envp[i], key, len) && ms->env.envp[i][len] == '=')
 		{
 			free(ms->env.envp[i]);
-			ms->env.envp[i] = new_var;
+			ms->env.envp[i] = &new_var;
 			return (0);
 		}
 		i++;
