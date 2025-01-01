@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/01 12:19:05 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/01 12:51:03 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int	ft_exec_builtins_check(t_node *node, t_minishell *ms)
 	else if (!ft_strcmp(node->token->value, "pwd"))
 	 	return (0);
 	else if (!ft_strcmp(node->token->value, "cd"))
-		ft_builtin_cd(node->cmd_ready, ms);
+		return (ft_builtin_cd_check(node->cmd_ready, ms));
 	else if (!ft_strcmp(node->token->value, "env"))
 		ft_builtin_env(node->cmd_ready, ms);
 	else if (!ft_strcmp(node->token->value, "export"))
