@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/28 10:28:14 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/01 12:21:27 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,6 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms);
 int	ft_handle_pipe(t_node *node, t_minishell *ms);
 int	ft_execute_command(t_node *node, t_minishell *ms);
 int	ft_handle_heredoc(t_node *node, t_minishell *ms);
-//int	ft_handle_builtins(t_node *node, t_minishell *ms); //nao existe pois nao?
 int	ft_find_executable(t_minishell *ms, char *cmd);
 int	ft_invalid_right_token_value(char *value);
 int	ft_is_valid_file(char *filepath, int mode);
@@ -153,12 +152,12 @@ int	ft_collect_heredocs(t_node *node, t_minishell *ms);
 int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
 
 /**__BUILTINS__**/
+int		ft_exec_builtins_check(t_node *node, t_minishell *ms);
+int		ft_exec_builtins(t_node *node, t_minishell *ms);
 int		ft_check_builtins(char *str);
-void	ft_builtin_exit(char **args, t_minishell *ms);
-void	ft_builtin_pwd(t_minishell *ms);
-void	ft_builtin_echo(char **args, t_minishell *ms);
-int		ft_value_is_numeric(char *str);
-long long ft_atoll(char *str, int i, long long res);
+int		ft_builtin_exit(char **args);
+int		ft_builtin_pwd();
+int		ft_builtin_echo(char **args);
 void 	ft_builtin_env(char **args, t_minishell *ms); // deve retornar int
 void	ft_builtin_cd(char **args, t_minishell *ms);
 void	ft_builtin_export(t_minishell *ms);

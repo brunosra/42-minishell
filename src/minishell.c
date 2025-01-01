@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/28 10:37:50 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/01 12:28:13 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,9 +68,13 @@ void ft_create_prompt(t_minishell *ms)
 {
 	char *old_prompt;
 	char *new_prompt;
+	char *e;
+	char *p;
 
+	e = ft_itoa(exit_code(ms));
+	p = ft_get_env("PWD", ms);
 	old_prompt = ms->prompt;
-	new_prompt = ft_strjoin_all(4, RD"["RST, ft_itoa(exit_code(ms)), RD"] minishell"RST, "$ ");
+	new_prompt = ft_strjoin_all(6, RD"["RST, e, RD"] ["RST, p, RD"] minishell"RST, "$ ");
 	free(old_prompt);
 	ms->prompt = new_prompt;
 }

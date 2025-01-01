@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/28 15:12:14 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/31 14:18:52 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -347,7 +347,7 @@ int	ft_set_env(const char *key, const char *value, t_minishell *ms)
 		if (!ft_strncmp(ms->env.envp[i], key, len) && ms->env.envp[i][len] == '=')
 		{
 			free(ms->env.envp[i]);
-			ms->env.envp[i] = &new_var;
+			ms->env.envp[i] = new_var;
 			return (0);
 		}
 		i++;

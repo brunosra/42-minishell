@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:08:03 by bschwell          #+#    #+#             */
-/*   Updated: 2024/12/28 15:12:31 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/31 14:20:56 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 	printf("arg[1]: %s\n", args[1]); */
 	// printf("arg[2]: %s\n", args[2]);
 	printf("oldpwd: %s\n", ft_get_env("PWD", ms));
-	ft_print_str_arr(ms->env.envp);
+	// ft_print_str_arr(ms->env.envp);
 	oldpwd = ft_get_env("PWD", ms);
 	printf("oldpwd_var: %s\n", oldpwd);
 	if (args[1] == NULL)
@@ -61,7 +61,7 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 	set_exit_code(ms, result);
 	printf("newpwd: %s\n", ft_get_env("PWD", ms));
 	ms->exit_code = 0;
-	ft_print_str_arr(ms->env.envp);
+	// ft_print_str_arr(ms->env.envp);
 }
 
 

@@ -1,37 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pwd.c                                              :+:      :+:    :+:   */
+/*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/01 12:19:18 by bschwell         ###   ########.fr       */
+/*   Created: 2024/12/31 17:28:29 by bschwell          #+#    #+#             */
+/*   Updated: 2024/12/31 17:28:35 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
 
-/**
- * @brief	pwd - print name of current/working directory
- * 
- * @param ms minishell pointer
- * @return int 
- */
-
-int	ft_builtin_pwd()
-{	
-	char cwd[PATH_MAX];
-
-	if (getcwd(cwd, sizeof(cwd)) != NULL)
-	{
-		printf("%s\n", cwd);
-		return (0);
-	}
+// TODO: conversar sobre o sair do programa aqui
+void 	ft_builtin_env(char **args, t_minishell *ms)
+{
+	char **env;
+	
+	env = ms->env.envp;
+	if (args[1])
+		exit(printf("[env error]: doesn't support arguments\n")); // Talvez fosse melhor ignorar os restabtes argumentos! Ou enviar uma mensagem de erro mas nao sair do programa!
 	else
-	{
-		perror("pwd: ");
-		return (errno);
-	}
+		while (*env != 0)
+		{
+			printf("%s\n", *env);
+			env++;
+		}
+	set_exit_code(ms, EX_OK);
+	exit(exit_code(ms));
 }
