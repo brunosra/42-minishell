@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/01 12:52:20 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/02 09:26:45 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,6 +152,7 @@ int	ft_collect_heredocs(t_node *node, t_minishell *ms);
 int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
 
 /**__BUILTINS__**/
+int		ft_builtin_error(char *msg, int err);
 int		ft_exec_builtins_check(t_node *node, t_minishell *ms);
 int		ft_exec_builtins(t_node *node, t_minishell *ms);
 int		ft_check_builtins(char *str);

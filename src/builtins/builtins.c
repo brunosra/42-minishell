@@ -6,12 +6,18 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/01 12:51:03 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/02 10:08:42 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
+
+int		ft_builtin_error(char *msg, int err)
+{
+	perror(msg);
+	return (err);
+}
 
 /**
  * @brief 	Check if builtin executed correctly
