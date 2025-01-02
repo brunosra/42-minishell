@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:08:03 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/02 12:02:43 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/02 12:06:45 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,11 @@
 extern volatile sig_atomic_t g_interrupt;
 
 /**
- * @brief 			Tokenize a string and returns them in order
+ * @brief 	Tokenize a string and returns them in order
  * 
- * @param str 		String to be tokenized
- * @param delim 	Token delimiter
- * @return char* 	Pointer to the first char of the first pointer.
+ * @param 	str 	String to be tokenized
+ * @param 	delim 	Token delimiter
+ * @return 	char* 	Pointer to the first char of the first pointer.
  */
 static char *ft_strtok(char *str, const char *delim) {
 	static char *last = NULL;
@@ -47,11 +47,11 @@ static char *ft_strtok(char *str, const char *delim) {
 }
 
 /**
- * @brief resolve relative paths for cd
+ * @brief	resolve relative paths for cd
  * 
- * @param base_path 	the current working directory
- * @param relative_path the path to solve to
- * @param resolved_path pointer to where to store the resolved path
+ * @param	base_path 		the current working directory
+ * @param	relative_path 	the path to solve to
+ * @param	resolved_path 	pointer to where to store the resolved path
  */
 static void ft_resolve_relative_path(const char *base_path, const char *relative_path, char *resolved_path) {
     char temp_path[PATH_MAX];
@@ -113,12 +113,12 @@ static void ft_resolve_relative_path(const char *base_path, const char *relative
 /**
  * @brief 	checks if arguments are valid for cd 
  * 
- * @param args 	arguments received in the function
- * @param ms 	minishell pointer
- * @return 		int
- * *		 	0: OK!
- * * 			N: not ok, cd should not be run.
- * TODO: 		remove comments
+ * @param 	args 	arguments received in the function
+ * @param 	ms 		minishell pointer
+ * @return 	int
+ * *		0: OK!
+ * * 		N: not ok, cd should not be run.
+ * TODO: 	remove comments
  */
 int		ft_builtin_cd_check(char **args, t_minishell *ms)
 {
@@ -161,11 +161,11 @@ int		ft_builtin_cd_check(char **args, t_minishell *ms)
 
 /**
  * @brief	execute cd command. 3 cases needed:
- * *		 0 arg: check if $HOME exists, change to HOME value
- * *		 1 arg: calculate path and change ENV vars to it
+ * *		0 arg: check if $HOME exists, change to HOME value
+ * *		1 arg: calculate path and change ENV vars to it
  * 
- * @param args	directory to change to
- * @param ms 	minishell pointer
+ * @param 	args	directory to change to
+ * @param 	ms 		minishell pointer
  */
 void	ft_builtin_cd(char **args, t_minishell *ms)
 {
@@ -235,54 +235,3 @@ cd: cd [-L|[-P [-e]] [-@]] [dir]
     Returns 0 if the directory is changed, and if $PWD is set successfully when
     -P is used; non-zero otherwise.
 */
-
-
-
-
-
-
-
-
-
-void resolve_relative_path(const char *base_path, const char *relative_path, char *resolved_path) {
-    char temp_path[PATH_MAX];
-
-    // Copy the base path to a temporary buffer
-    strncpy(temp_path, base_path, PATH_MAX - 1);
-    temp_path[PATH_MAX - 1] = '\0';
-
-    // Ensure the base path ends with a '/'
-    if (temp_path[strlen(temp_path) - 1] != '/')
-        strncat(temp_path, "/", PATH_MAX - strlen(temp_path) - 1);
-
-    // Tokenize the relative path
-    char *token = strtok((char *)relative_path, "/");
-    while (token != NULL) {
-        if (strcmp(token, ".") == 0) {
-            // Current directory: do nothing
-        } else if (strcmp(token, "..") == 0) {
-            // Parent directory: remove the last segment from temp_path
-            char *last_slash = strrchr(temp_path, '/');
-            if (last_slash != NULL && last_slash != temp_path) {
-                *last_slash = '\0'; // Remove the last segment
-            } else {
-                // Edge case: prevent going beyond root
-                temp_path[1] = '\0';
-            }
-        } else {
-            // Normal directory: append it to the path
-            strncat(temp_path, token, PATH_MAX - strlen(temp_path) - 1);
-            strncat(temp_path, "/", PATH_MAX - strlen(temp_path) - 1);
-        }
-        token = strtok(NULL, "/");
-    }
-
-    // Remove trailing slash if not root
-    size_t len = strlen(temp_path);
-    if (len > 1 && temp_path[len - 1] == '/')
-        temp_path[len - 1] = '\0';
-
-    // Copy the result to the resolved_path buffer
-    strncpy(resolved_path, temp_path, PATH_MAX - 1);
-    resolved_path[PATH_MAX - 1] = '\0';
-}

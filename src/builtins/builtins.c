@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/02 10:08:42 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/02 12:05:12 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,13 @@ int	ft_exec_builtins_check(t_node *node, t_minishell *ms)
 	return (0);
 }
 
-
+/**
+ * @brief 	Executes builtin if check allows
+ * 
+ * @param 	node 	tree node
+ * @param 	ms 		minishell ptr
+ * @return 	int 	exit code that was in the ms struct
+ */
 int	ft_exec_builtins(t_node *node, t_minishell *ms)
 {
 	if (!ft_strcmp(node->token->value, "echo"))
