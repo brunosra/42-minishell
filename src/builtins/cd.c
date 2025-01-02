@@ -6,19 +6,20 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:08:03 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/02 11:45:47 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/02 12:02:43 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
 
-// static void ft_ensure_trailing_slash(char *path) {
-// 	size_t len = strlen(path);
-// 	if (len > 0 && path[len - 1] != '/')
-// 		ft_strncat(path, "/", PATH_MAX - len - 1);
-// }
-
+/**
+ * @brief 			Tokenize a string and returns them in order
+ * 
+ * @param str 		String to be tokenized
+ * @param delim 	Token delimiter
+ * @return char* 	Pointer to the first char of the first pointer.
+ */
 static char *ft_strtok(char *str, const char *delim) {
 	static char *last = NULL;
 	char *start = NULL;
@@ -45,76 +46,14 @@ static char *ft_strtok(char *str, const char *delim) {
 	return start;
 }
 
-/* void ft_resolve_relative_path(const char *base_path, const char *relative_path, char *resolved_path) {
-    char temp_path[PATH_MAX] = "";
-
-    // Handle cases where the relative_path starts with '~' or '/'
-    if (relative_path[0] == '~') {
-        const char *home_dir = getenv("HOME");
-        if (!home_dir) {
-            perror("Error: HOME environment variable not set.\n");
-            exit(EXIT_FAILURE);
-        }
-
-        // If relative_path is "~", resolve to the home directory
-        if (relative_path[1] == '\0') {
-            ft_strncpy(temp_path, home_dir, PATH_MAX - 1);
-        } else {
-            // Replace '~' with the home directory and append the rest
-            ft_strncpy(temp_path, home_dir, PATH_MAX - 1);
-            temp_path[PATH_MAX - 1] = '\0';
-            ft_strncat(temp_path, relative_path + 1, PATH_MAX - ft_strlen(temp_path) - 1);
-        }
-    } else if (relative_path[0] == '/') {
-        // If the path is absolute, copy it as is
-        ft_strncpy(temp_path, relative_path, PATH_MAX - 1);
-    } else {
-        // Otherwise, treat it as a relative path starting from base_path
-        ft_strncpy(temp_path, base_path, PATH_MAX - 1);
-        temp_path[PATH_MAX - 1] = '\0';
-
-        // Ensure the base path ends with '/'
-        if (temp_path[strlen(temp_path) - 1] != '/')
-            ft_strncat(temp_path, "/", PATH_MAX - ft_strlen(temp_path) - 1);
-
-        // Append the relative path
-        ft_strncat(temp_path, relative_path, PATH_MAX - ft_strlen(temp_path) - 1);
-    }
-
-    // Normalize the path (resolve . and ..)
-    char normalized_path[PATH_MAX] = "/";
-    char *token = ft_strtok(temp_path, "/");
-    while (token != NULL) {
-        if (ft_strcmp(token, ".") == 0) {
-            // Current directory: do nothing
-        } else if (ft_strcmp(token, "..") == 0) {
-            // Parent directory: remove the last segment from normalized_path
-            char *last_slash = ft_strrchr(normalized_path, '/');
-            if (last_slash != NULL && last_slash != normalized_path) {
-                *last_slash = '\0'; // Remove the last segment
-            } else {
-                // Edge case: prevent going beyond root
-                normalized_path[0] = '\0';
-            }
-        } else {
-            // Normal directory: append it to the normalized_path
-            if (ft_strlen(normalized_path) > 1)
-                ft_strncat(normalized_path, "/", PATH_MAX - ft_strlen(normalized_path) - 1);
-            ft_strncat(normalized_path, token, PATH_MAX - ft_strlen(normalized_path) - 1);
-        }
-        token = ft_strtok(NULL, "/");
-    }
-
-    // Ensure the resolved path starts with a slash
-    if (normalized_path[0] == '\0') {
-        ft_strncpy(resolved_path, "/", PATH_MAX - 1);
-    } else {
-        ft_strncpy(resolved_path, normalized_path, PATH_MAX - 1);
-    }
-    resolved_path[PATH_MAX - 1] = '\0';
-} */
-
-void ft_resolve_relative_path(const char *base_path, const char *relative_path, char *resolved_path) {
+/**
+ * @brief resolve relative paths for cd
+ * 
+ * @param base_path 	the current working directory
+ * @param relative_path the path to solve to
+ * @param resolved_path pointer to where to store the resolved path
+ */
+static void ft_resolve_relative_path(const char *base_path, const char *relative_path, char *resolved_path) {
     char temp_path[PATH_MAX];
 	char normalized_path[PATH_MAX];
 	char *token;
@@ -171,7 +110,16 @@ void ft_resolve_relative_path(const char *base_path, const char *relative_path, 
     resolved_path[PATH_MAX - 1] = '\0';
 }
 
-
+/**
+ * @brief 	checks if arguments are valid for cd 
+ * 
+ * @param args 	arguments received in the function
+ * @param ms 	minishell pointer
+ * @return 		int
+ * *		 	0: OK!
+ * * 			N: not ok, cd should not be run.
+ * TODO: 		remove comments
+ */
 int		ft_builtin_cd_check(char **args, t_minishell *ms)
 {
 	char	*curpwd;
@@ -185,7 +133,7 @@ int		ft_builtin_cd_check(char **args, t_minishell *ms)
 		if (ft_get_env("HOME", ms) == NULL)
 			return (ft_builtin_error("cd: HOME not set", 1));
 		ft_strncpy(resolved_path, ft_get_env("HOME", ms), PATH_MAX - 1);
-		printf("resolved path %s: %s\n", "HOME", resolved_path);
+		// printf("resolved path %s: %s\n", "HOME", resolved_path);
 	}
 	else if (args[2] == NULL)
 	{
@@ -194,7 +142,7 @@ int		ft_builtin_cd_check(char **args, t_minishell *ms)
 			if (ft_get_env("OLDPWD", ms) == NULL)
 				return(ft_builtin_error("cd: OLDPWD not set", 2));
 			ft_strncpy(resolved_path, ft_get_env("OLDPWD", ms), PATH_MAX - 1);
-			printf("resolved path %s: %s\n", "OLDPWD", resolved_path);
+			// printf("resolved path %s: %s\n", "OLDPWD", resolved_path);
 		}
 		else
 		{
@@ -202,7 +150,7 @@ int		ft_builtin_cd_check(char **args, t_minishell *ms)
 			printf("args[1]: %s\n", args[1]);
 			ft_resolve_relative_path(curpwd, args[1], resolved_path);
 		}
-		printf("resolved path %s: %s\n", "1 ARG", resolved_path);
+		// printf("resolved path %s: %s\n", "1 ARG", resolved_path);
 	}
 	else
 		return (printf("cd: too many arguments\n"));
@@ -232,7 +180,6 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 		set_exit_code(ms, errno);
 		return ;
 	}
-	//ft_strncpy(curpwd, ft_get_env("PWD", ms), ft_strlen(ft_get_env("PWD", ms)) + 1);
 	if (ft_get_env("OLDPWD", ms) != NULL)
 		ft_strncpy(oldpwd, ft_get_env("OLDPWD", ms), PATH_MAX - 1);
 	if (args[1] == NULL)
