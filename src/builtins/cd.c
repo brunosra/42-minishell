@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/28 09:08:03 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/02 12:06:45 by bschwell         ###   ########.fr       */
+/*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
+/*   Updated: 2025/01/03 11:47:04 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,21 +53,21 @@ static char *ft_strtok(char *str, const char *delim) {
  * @param	relative_path 	the path to solve to
  * @param	resolved_path 	pointer to where to store the resolved path
  */
-static void ft_resolve_relative_path(const char *base_path, const char *relative_path, char *resolved_path) {
+
+void ft_resolve_relative_path(const char *base_path, const char *relative_path, char *resolved_path) {
     char temp_path[PATH_MAX];
+	const char *home_dir;
 	char normalized_path[PATH_MAX];
 	char *token;
+	size_t len;
+	char *last_slash;
 
-	temp_path[0] = '\0';
     if (relative_path[0] == '~') {
-        const char *home_dir = getenv("HOME");
-        if (!home_dir) {
-            perror("Error: HOME environment variable not set.\n");
-            exit(EXIT_FAILURE);
-        }
+        home_dir = getenv("HOME");
         if (relative_path[1] == '\0')
             ft_strncpy(temp_path, home_dir, PATH_MAX - 1);
-        else {
+        else
+		{
             ft_strncpy(temp_path, home_dir, PATH_MAX - 1);
             temp_path[PATH_MAX - 1] = '\0';
             ft_strncat(temp_path, relative_path + 1, PATH_MAX - ft_strlen(temp_path) - 1);
@@ -83,30 +83,31 @@ static void ft_resolve_relative_path(const char *base_path, const char *relative
             ft_strncat(temp_path, "/", PATH_MAX - ft_strlen(temp_path) - 1);
         ft_strncat(temp_path, relative_path, PATH_MAX - ft_strlen(temp_path) - 1);
     }
-    normalized_path[0] = '/';
-    token = ft_strtok(temp_path, "/");
+    ft_strncpy(normalized_path, "/", PATH_MAX - 1);
+    
+	// TODO: get all this while into a separate function
+	token = ft_strtok(temp_path, "/");
     while (token != NULL) {
         if (ft_strcmp(token, ".") == 0)
 			;
-        else if (ft_strcmp(token, "..") == 0) {
-            char *last_slash = ft_strrchr(normalized_path, '/');
+		else if (ft_strcmp(token, "..") == 0)
+		{
+            last_slash = ft_strrchr(normalized_path, '/');
             if (last_slash != NULL && last_slash != normalized_path)
                 *last_slash = '\0';
             else
-                normalized_path[0] = '\0';
+                normalized_path[1] = '\0';
         }
 		else
 		{
-            if (ft_strlen(normalized_path) > 1)
-                ft_strncat(normalized_path, "/", PATH_MAX - ft_strlen(normalized_path) - 1);
+            len = ft_strlen(normalized_path);
+            if (len > 1 && normalized_path[len - 1] != '/')
+                ft_strncat(normalized_path, "/", PATH_MAX - len - 1);
             ft_strncat(normalized_path, token, PATH_MAX - ft_strlen(normalized_path) - 1);
         }
         token = ft_strtok(NULL, "/");
     }
-    if (normalized_path[0] == '\0')
-        ft_strncpy(resolved_path, "/", PATH_MAX - 1);
-    else
-        ft_strncpy(resolved_path, normalized_path, PATH_MAX - 1);
+    ft_strncpy(resolved_path, normalized_path, PATH_MAX - 1);
     resolved_path[PATH_MAX - 1] = '\0';
 }
 
@@ -146,8 +147,8 @@ int		ft_builtin_cd_check(char **args, t_minishell *ms)
 		}
 		else
 		{
-			printf("curpwd : %s\n", curpwd);
-			printf("args[1]: %s\n", args[1]);
+			// printf("curpwd : %s\n", curpwd);
+			// printf("args[1]: %s\n", args[1]);
 			ft_resolve_relative_path(curpwd, args[1], resolved_path);
 		}
 		// printf("resolved path %s: %s\n", "1 ARG", resolved_path);
@@ -173,7 +174,7 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 	char	oldpwd[PATH_MAX];
 	char	resolved_path[PATH_MAX];
 
-	printf("execute cd \n");
+	// printf("execute cd \n");
 	curpwd = ft_get_env("PWD", ms);
 	if (curpwd == NULL)
 	{
@@ -193,6 +194,7 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 		else
 			ft_resolve_relative_path(curpwd, args[1], resolved_path);
 	}
+	printf("resolved path: %s\n", resolved_path);
 	ft_set_env("PWD", resolved_path, ms);
 	ft_set_env("OLDPWD", curpwd, ms);
 	set_exit_code(ms, 0);
@@ -201,37 +203,37 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 /* HELP FROM BASH CD
 
 cd: cd [-L|[-P [-e]] [-@]] [dir]
-    Change the shell working directory.
-    
-    Change the current directory to DIR.  The default DIR is the value of the
-    HOME shell variable. If DIR is "-", it is converted to $OLDPWD.
-    
-    The variable CDPATH defines the search path for the directory containing
-    DIR.  Alternative directory names in CDPATH are separated by a colon (:).
-    A null directory name is the same as the current directory.  If DIR begins
-    with a slash (/), then CDPATH is not used.
-    
-    If the directory is not found, and the shell option `cdable_vars' is set,
-    the word is assumed to be  a variable name.  If that variable has a value,
-    its value is used for DIR.
-    
-    Options:
-      -L	force symbolic links to be followed: resolve symbolic
-    		links in DIR after processing instances of `..'
-      -P	use the physical directory structure without following
-    		symbolic links: resolve symbolic links in DIR before
-    		processing instances of `..'
-      -e	if the -P option is supplied, and the current working
-    		directory cannot be determined successfully, exit with
-    		a non-zero status
-      -@	on systems that support it, present a file with extended
-    		attributes as a directory containing the file attributes
-    
-    The default is to follow symbolic links, as if `-L' were specified.
-    `..' is processed by removing the immediately previous pathname component
-    back to a slash or the beginning of DIR.
-    
-    Exit Status:
-    Returns 0 if the directory is changed, and if $PWD is set successfully when
-    -P is used; non-zero otherwise.
+	Change the shell working directory.
+	
+	Change the current directory to DIR.  The default DIR is the value of the
+	HOME shell variable. If DIR is "-", it is converted to $OLDPWD.
+	
+	The variable CDPATH defines the search path for the directory containing
+	DIR.  Alternative directory names in CDPATH are separated by a colon (:).
+	A null directory name is the same as the current directory.  If DIR begins
+	with a slash (/), then CDPATH is not used.
+	
+	If the directory is not found, and the shell option `cdable_vars' is set,
+	the word is assumed to be  a variable name.  If that variable has a value,
+	its value is used for DIR.
+	
+	Options:
+	  -L	force symbolic links to be followed: resolve symbolic
+			links in DIR after processing instances of `..'
+	  -P	use the physical directory structure without following
+			symbolic links: resolve symbolic links in DIR before
+			processing instances of `..'
+	  -e	if the -P option is supplied, and the current working
+			directory cannot be determined successfully, exit with
+			a non-zero status
+	  -@	on systems that support it, present a file with extended
+			attributes as a directory containing the file attributes
+	
+	The default is to follow symbolic links, as if `-L' were specified.
+	`..' is processed by removing the immediately previous pathname component
+	back to a slash or the beginning of DIR.
+	
+	Exit Status:
+	Returns 0 if the directory is changed, and if $PWD is set successfully when
+	-P is used; non-zero otherwise.
 */
