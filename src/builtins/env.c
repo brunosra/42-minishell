@@ -6,20 +6,24 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/31 17:28:29 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/03 10:31:46 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/03 10:49:50 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
 
-void 	ft_builtin_env(char **args, t_minishell *ms)
+void	ft_builtin_env(char **args, t_minishell *ms)
 {
 	char **env;
 	
 	env = ms->env.envp;
 	if (args[1])
-		exit(printf("[env error]: doesn't support arguments\n")); // Talvez fosse melhor ignorar os restabtes argumentos! Ou enviar uma mensagem de erro mas nao sair do programa!
+	{
+		printf("[env error]: doesn't support arguments\n");
+		set_exit_code(ms, EX_EXITARGERR);
+		return ;
+	}
 	else
 		while (*env != 0)
 		{
@@ -27,5 +31,4 @@ void 	ft_builtin_env(char **args, t_minishell *ms)
 			env++;
 		}
 	set_exit_code(ms, EX_OK);
-	exit(exit_code(ms));
 }
