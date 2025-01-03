@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/02 09:26:45 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/03 10:58:48 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,7 +158,7 @@ int		ft_exec_builtins(t_node *node, t_minishell *ms);
 int		ft_check_builtins(char *str);
 int		ft_builtin_exit(char **args);
 int		ft_builtin_pwd();
-int		ft_builtin_echo(char **args);
+void	ft_builtin_echo(char **args, t_minishell *ms);
 void 	ft_builtin_env(char **args, t_minishell *ms);
 int		ft_builtin_cd_check(char **args, t_minishell *ms);
 void	ft_builtin_cd(char **args, t_minishell *ms);

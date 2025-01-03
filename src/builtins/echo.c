@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/31 17:18:39 by bschwell          #+#    #+#             */
-/*   Updated: 2024/12/31 17:32:45 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/03 10:58:30 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,13 +41,13 @@ static int		ft_check_valid_echo_opt(char *opt)
 }
 
 /**
- * @brief 		Builtin echo
+ * @brief 	Builtin echo
  * 
- * @param args 	What should be writter on the command line
- * @param ms 	minishell struct pointer
+ * @param 	args 	What should be written on the command line
+ * @param 	ms	 	minishell struct pointer
  */
 
-int	ft_builtin_echo(char **args)
+void	ft_builtin_echo(char **args, t_minishell *ms)
 {
 	int i;
 	int newline;
@@ -70,7 +70,7 @@ int	ft_builtin_echo(char **args)
 	}
 	if (newline)
 		printf("\n");
-	return (0);
+	set_exit_code(ms, EX_OK);
 }
 
 // TODO: verificar se este echo acima esta ok, se estiver, apagar o de baixo

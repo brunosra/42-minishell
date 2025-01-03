@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/03 10:47:56 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/03 10:57:51 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int	ft_exec_builtins_check(t_node *node, t_minishell *ms)
 		return (ft_builtin_cd_check(node->cmd_ready, ms));
 	else if (!ft_strcmp(node->token->value, "export"))
 		ft_builtin_export(ms);
-	return (0);
+	return (EX_OK);
 }
 
 /**
@@ -52,7 +52,7 @@ int	ft_exec_builtins_check(t_node *node, t_minishell *ms)
 int	ft_exec_builtins(t_node *node, t_minishell *ms)
 {
 	if (!ft_strcmp(node->token->value, "echo"))
-		ft_builtin_echo(node->cmd_ready);
+		ft_builtin_echo(node->cmd_ready, ms);
 	else if (!ft_strcmp(node->token->value, "exit"))
 	 	ft_builtin_exit(node->cmd_ready);
 	else if (!ft_strcmp(node->token->value, "env"))
