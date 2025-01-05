@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/05 15:05:00 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/05 15:05:53 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,7 +194,6 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 		else
 			ft_resolve_relative_path(curpwd, args[1], resolved_path);
 	}
-	printf("resolved path: %s\n", resolved_path);
 	ft_set_env("OLDPWD", curpwd, ms);
 	ft_set_env("PWD", resolved_path, ms);
 	set_exit_code(ms, 0);
