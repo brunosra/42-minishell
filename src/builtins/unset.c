@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/05 21:05:00 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/05 21:15:45 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,9 @@ static int ft_check_valid_varname(char *arg)
 {
 	if (!arg[0])
 		return (1);
-	if (!ft_isalpha(arg[0]) && arg[0] != '_')
+	if (!ft_isalpha(arg[0]))
+		return (1);
+	if (arg[0] == '_')
 		return (1);
 	return (0);
 }
