@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/05 20:22:01 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/05 20:26:56 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,18 +22,14 @@ static int ft_check_valid_varname(char *arg)
 	return (0);
 }
 
-int	ft_builtin_unset_check(char **args)
-{
-	if (!args || !args[1])
-		return (-1);
-	return (0);
-}
-
 void	ft_builtin_unset(char **args, t_minishell *ms)
 {
 	size_t	i;
 
 	i = 0;
+	ft_print_str_arr(args);
+	if (!args[1])
+		return ;
 	while (args[++i])
 		if (ft_check_valid_varname(args[i]))
 			ft_unset_env(args[i], ms);
