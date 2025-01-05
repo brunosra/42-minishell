@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/05 18:10:41 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/05 20:17:07 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int	ft_exec_builtins_check(t_node *node, t_minishell *ms)
 	else if (!ft_strcmp(node->token->value, "export"))
 		ft_builtin_export(ms);
 	else if (!ft_strcmp(node->token->value, "unset"))
-		return (ft_builtin_unset_check(node->cmd_ready, ms));
+		return (ft_builtin_unset_check(node->cmd_ready));
 	return (EX_OK);
 }
 

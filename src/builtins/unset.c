@@ -6,37 +6,38 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/05 18:53:07 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/05 20:20:39 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
 
-static int ft_check_if_valid_var(char *arg)
+static int ft_check_valid_varname(char *arg)
 {
-
+	if (!arg[0])
+		return (1);
+	if (!ft_isalpha(arg[0]) && arg[0] != '_')
+		return (1);
+	return (0);
 }
 
-int	ft_builtin_unset_check(char **args, t_minishell *ms)
+int	ft_builtin_unset_check(char **args)
 {
 	if (!args || !args[1])
 		return (-1);
-	
-	printf("##### unset check #####\n");
-	ft_print_str_arr(args);
-	printf("#######################\n");
-	printf("%s\n", ms->prompt);
 	return (0);
 }
 
-int	ft_builtin_unset(char **args, t_minishell *ms)
-{	
-	printf("##### unset #####\n");
-	ft_print_str_arr(args);
-	printf("#################\n");
-	printf("%s\n", ms->prompt);
-	return (0);
+void	ft_builtin_unset(char **args, t_minishell *ms)
+{
+	size_t	i;
+
+	i = -1;
+	while (args[++i])
+		if (ft_check_valid_varname(args[i]))
+			ft_unset_env(args[i], ms);
+	set_exit_code(ms, 0);
 }
 
 /* 
