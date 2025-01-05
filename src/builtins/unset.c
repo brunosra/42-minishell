@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/05 20:26:56 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/05 20:44:58 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,19 @@ void	ft_builtin_unset(char **args, t_minishell *ms)
 {
 	size_t	i;
 
-	i = 0;
+	i = 1;
 	ft_print_str_arr(args);
 	if (!args[1])
 		return ;
-	while (args[++i])
-		if (ft_check_valid_varname(args[i]))
+	while (args[i])
+	{
+		printf("args[%ld]: %s", i, args[i]);
+		if (ft_check_valid_varname(args[i]) == 0)
+		{
 			ft_unset_env(args[i], ms);
+		}
+		i++;
+	}
 	set_exit_code(ms, 0);
 }
 
