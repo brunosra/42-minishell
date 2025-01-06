@@ -6,11 +6,13 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/05 21:03:26 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/06 12:08:55 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+// TODO: nao podemos usar esta variavel global para ter os sinais.
+// TODO: Somente podemos usar um int para receber. nao podemos usar sig_atomic_t
 volatile sig_atomic_t g_interrupt;
 
 int	main(int argc, char **argv, char **envp);
