@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/06 11:36:22 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/06 11:59:49 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,18 @@ static int ft_check_valid_varname(char *arg)
 {
 	if (!arg[0] || !ft_isalpha(arg[0]) || arg[0] == '_')
 		return (1);
+	printf("arg[0]: %c\n", arg[0]);
+	return (0);
+}
+
+
+static int ft_check_option(char *arg)
+{
+	if (arg[0] == '-')
+	{
+		printf("unset: options not implemented\n");
+		return (1);
+	}
 	return (0);
 }
 
@@ -43,6 +55,8 @@ void	ft_builtin_unset(char **args, t_minishell *ms)
 		return ;
 	while (args[i])
 	{
+		if (i == 1 && ft_check_option(args[i]) != 0)
+			break ;
 		if (ft_check_valid_varname(args[i]) == 0)
 			ft_unset_env(args[i], ms);
 		i++;
