@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/06 11:59:49 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/06 12:15:49 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ extern volatile sig_atomic_t g_interrupt;
  * 
  * @param	arg		string with varname
  * @return	int 
- * *		0: ok!
+ * *		0: ok
  * *		1: error
  */
 static int ft_check_valid_varname(char *arg)
@@ -29,12 +29,19 @@ static int ft_check_valid_varname(char *arg)
 	return (0);
 }
 
-
+/**
+ * @brief 	Check if argument is an option (starts with -)
+ * 
+ * @param 	arg arg to be checked
+ * @return 	int
+ * *		0: ok
+ * *		1: error
+ */
 static int ft_check_option(char *arg)
 {
 	if (arg[0] == '-')
 	{
-		printf("unset: options not implemented\n");
+		printf("export: options not implemented\n");
 		return (1);
 	}
 	return (0);
