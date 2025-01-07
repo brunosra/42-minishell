@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/27 11:28:18 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/06 16:34:31 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/07 07:15:03 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void ft_sort_envp(char **arr, int count)
 		j = 0;
 		while (j < count - i - 1) {
 			if (ft_strcmp(arr[j], arr[j + 1]) > 0)
-				swap(&arr[j], &arr[j + 1]);
+				ft_swap_env(&arr[j], &arr[j + 1]);
 			j++;
 		}
 		i++;
@@ -80,13 +80,13 @@ void ft_sort_envp(char **arr, int count)
  * *		0: ok
  * *		1: error
  */
-static int ft_check_valid_varname(char *arg)
+/* static int ft_check_valid_varname(char *arg)
 {
 	if (!arg[0] || !ft_isalpha(arg[0]) || arg[0] == '_')
 		return (1);
 	printf("arg[0]: %c\n", arg[0]);
 	return (0);
-}
+} */
 
 /**
  * @brief 	Check if argument is an option (starts with -)
@@ -96,7 +96,7 @@ static int ft_check_valid_varname(char *arg)
  * *		0: ok
  * *		1: error
  */
-static int ft_check_option(char *arg)
+/* static int	ft_check_option(char *arg)
 {
 	if (arg[0] == '-')
 	{
@@ -104,37 +104,45 @@ static int ft_check_option(char *arg)
 		return (1);
 	}
 	return (0);
-}
+} */
 
-/**
- * @brief	Check if arguments are valid for export
- * 
- * @param	arg		string with varname
- * @return	int 
- * *		0: ok!
- * *		1: error
- */
-static int ft_check_valid_varname(char *arg)
+int			ft_builtin_export_check(char **args, t_minishell *ms)
 {
-	if (!arg[0] || !ft_isalpha(arg[0]) || arg[0] == '_')
-		return (1);
+	// TODO: implement
+	int		count;
+
+	count = 0;
+	while (args[count] != NULL) {
+        count++;
+    }
+	printf("export check: %s\n", ms->env.envp[0]);
 	return (0);
 }
 
-void	ft_builtin_export(t_minishell *ms)
+void		ft_builtin_export(char **args, t_minishell *ms)
 {
 	char	**dupenv;
 	int		count;
 
-	while (src[count] != NULL) {
+	count = 0;
+	while (args[count] != NULL) {
         count++;
     }
 	if (args[1] == NULL)
 	{
 		// only 1 arg
+		dupenv = malloc(sizeof(char *) * count);
+		if (dupenv == NULL)
+		{
+			perror("malloc error");
+			return ;
+		}
 
+		ft_print_str_arr(dupenv);
+		ft_dup_envp(ms->env.envp, dupenv, count);
+		ft_sort_envp(dupenv, count);
+		printf("ms: %s", ms->env.env_paths);
 	}
-	printf("ms: %s", ms->env.env_paths);
 	/* printf("########## envp: #########\n");
 	ft_print_str_arr(ms->env.envp); */
 	/* printf("####### env_paths: #######\n");
