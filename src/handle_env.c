@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 19:42:31 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/31 14:18:52 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,12 @@ extern volatile sig_atomic_t g_interrupt;
 
 int		ft_revalue_token_variable(t_minishell *ms);
 int		ft_check_balanced_quotes(char *str, int idx);
-char	*ft_get_env(const char *key, char **envp);
 char	**ft_duplicate_envp(char **envp);
-int	ft_check_if_expand(char *str, char *ptr, int heredoc);
+int		ft_check_if_expand(char *str, char *ptr, int heredoc);
 int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
-char	*ft_get_env_value(const char *str, char **envp, char **key);
-int	ft_revalue_heredock_input(char **input, t_minishell *ms);
+int		ft_revalue_heredock_input(char **input, t_minishell *ms);
+char	*ft_get_env_value(const char *str, t_minishell *ms, char **key);
+char	*ft_get_env(const char *key, t_minishell *ms);
 
 
 char	**ft_duplicate_envp(char **envp)
@@ -72,7 +72,7 @@ int	ft_revalue_token_variable(t_minishell *ms)
 			{
 				if (ft_check_if_expand(ms->tokens[i].value, ptr, 0) == 1)
 				{
-					env_value = ft_get_env_value(ptr, ms->env.envp, &key);
+					env_value = ft_get_env_value(ptr, ms, &key);
 					if (!env_value) 
  						env_value = ft_strdup("");
 					ft_replace_str(&ms->tokens[i].value, key, ptr, env_value);
@@ -112,12 +112,14 @@ int	ft_revalue_token_variable(t_minishell *ms)
 	return (0);
 }
 
-char	*ft_get_env_value(const char *str, char **envp, char **key)
+char	*ft_get_env_value(const char *str, t_minishell *ms, char **key)
 {
 	int		i;
 	char	*value;
 	int		start;
+	char **envp;
 
+	envp = ms->env.envp;
 	if (!str || !envp)
 		return (NULL);
 	i = 1;
@@ -127,7 +129,7 @@ char	*ft_get_env_value(const char *str, char **envp, char **key)
 	*key = ft_substr(str, start, i - start);
 	if (!*key)
 		return (NULL);
-	value = ft_get_env(*key, envp);
+	value = ft_get_env(*key, ms);
 	return (value);
 }
 
@@ -176,24 +178,6 @@ int	ft_replace_str(char **value, char *key, char *ptr, char *env_value)
 	free(*value);
 	*value = new_value;
 	return (0);
-}
-
-char	*ft_get_env(const char *key, char **envp)
-{
-	int		i;
-	size_t	len;
-
-	len = ft_strlen(key);
-	i = 0;
-	if (!key || !envp)
-		return (NULL);
-	while (envp[i])
-	{
-		if (!ft_strncmp(envp[i], key, len) && envp[i][len] == '=')
-			return (&envp[i][len + 1]);
-		i++;
-	}
-	return (NULL);
 }
 
 int	ft_check_balanced_quotes(char *str, int idx)
@@ -283,7 +267,7 @@ int	ft_revalue_heredock_input(char **input, t_minishell *ms)
 		{
 			if (ft_check_if_expand(*input, ptr, 1) == 1)
 			{
-				env_value = ft_get_env_value(ptr, ms->env.envp, &key);
+				env_value = ft_get_env_value(ptr, ms, &key);
 				if (!env_value) 
  					env_value = ft_strdup("");
 				ft_replace_str(input, key, ptr, env_value);
@@ -322,3 +306,82 @@ int	ft_revalue_heredock_input(char **input, t_minishell *ms)
 	return (0);
 }
 
+char	*ft_get_env(const char *key, t_minishell *ms)
+{
+	int		i;
+	size_t	len;
+	char	**envp;
+
+	envp = ms->env.envp;
+	len = ft_strlen(key);
+	i = 0;
+	if (!key || !envp)
+		return (NULL);
+	while (envp[i])
+	{
+		if (!ft_strncmp(envp[i], key, len) && envp[i][len] == '=')
+			return (&envp[i][len + 1]);
+		i++;
+	}
+	return (NULL);
+}
+
+int	ft_set_env(const char *key, const char *value, t_minishell *ms)
+{
+	int		i;
+	size_t	len;
+	char	*new_var;
+
+	i = 0;
+	len = ft_strlen(key);
+	new_var = ft_strjoin(ft_strjoin(key, "="), value);
+	if (!key || !value || !ms || !ms->env.envp)
+		return (1);
+	if (!new_var)
+	{
+		perror("ft_set_env: ft_strjoin");
+		return (1);
+	}
+	while (ms->env.envp[i])
+	{
+		if (!ft_strncmp(ms->env.envp[i], key, len) && ms->env.envp[i][len] == '=')
+		{
+			free(ms->env.envp[i]);
+			ms->env.envp[i] = new_var;
+			return (0);
+		}
+		i++;
+	}
+	ms->env.envp[i] = new_var;
+	ms->env.envp[i + 1] = NULL;
+	return (0);
+}
+
+int ft_unset_env(const char *key, t_minishell *ms)
+{
+	int i;
+	int j;
+	size_t len;
+
+	len = ft_strlen(key);
+	i = 0;
+	j = 0;
+	if (!key || !ms || !ms->env.envp)
+		return (1);
+	while (ms->env.envp[i])
+	{
+		if (!ft_strncmp(ms->env.envp[i], key, len) && ms->env.envp[i][len] == '=')
+		{
+			free(ms->env.envp[i]);
+			j = i;
+			while (ms->env.envp[j])
+			{
+				ms->env.envp[j] = ms->env.envp[j + 1];
+				j++;
+			}
+			return (0);
+		}
+		i++;
+	}
+	return (1);
+}

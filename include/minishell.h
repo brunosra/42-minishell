@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/27 14:38:03 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/05 20:27:43 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,6 @@ t_type	ft_get_token_type(char *str, t_type prev_type);
 char	*ft_revalue_quoted_value(char *value);
 int		ft_verify_variable_value(char *str);
 
-
 /**__PARSING_AST_(Abstract Syntax Tree)__**/
 t_node	*ft_parse_ast(t_token *tokens); // muito grande!
 t_node	*ft_create_cmd_node(t_token *token);
@@ -142,7 +141,6 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms);
 int	ft_handle_pipe(t_node *node, t_minishell *ms);
 int	ft_execute_command(t_node *node, t_minishell *ms);
 int	ft_handle_heredoc(t_node *node, t_minishell *ms);
-//int	ft_handle_builtins(t_node *node, t_minishell *ms); //nao existe pois nao?
 int	ft_find_executable(t_minishell *ms, char *cmd);
 int	ft_invalid_right_token_value(char *value);
 int	ft_is_valid_file(char *filepath, int mode);
@@ -154,15 +152,18 @@ int	ft_collect_heredocs(t_node *node, t_minishell *ms);
 int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
 
 /**__BUILTINS__**/
+int		ft_builtin_error(char *msg, int err);
+int		ft_exec_builtins_check(t_node *node, t_minishell *ms);
+int		ft_exec_builtins(t_node *node, t_minishell *ms);
 int		ft_check_builtins(char *str);
-void	ft_builtin_exit(char **args, t_minishell *ms);
-void	ft_builtin_pwd(t_minishell *ms);
+int		ft_builtin_exit(char **args);
+int		ft_builtin_pwd();
 void	ft_builtin_echo(char **args, t_minishell *ms);
-int		ft_value_is_numeric(char *str);
-long long ft_atoll(char *str, int i, long long res);
-void 	ft_builtin_env(char **args, t_minishell *ms); // deve retornar int
+void 	ft_builtin_env(char **args, t_minishell *ms);
+int		ft_builtin_cd_check(char **args, t_minishell *ms);
 void	ft_builtin_cd(char **args, t_minishell *ms);
 void	ft_builtin_export(t_minishell *ms);
+void	ft_builtin_unset(char **args, t_minishell *ms);
 
 /**__SIGNAL__**/
 void	ft_signal_handler(int sig);
@@ -182,12 +183,15 @@ char	*ft_strjoin_free(char *s1, char *s2, int free_s1, int free_s2);
 /**__HANDLE_ENV__ **/
 int		ft_revalue_token_variable(t_minishell *ms);
 int		ft_check_balanced_quotes(char *str, int idx);
-char	*ft_get_env(const char *key, char **envp);
 char	**ft_duplicate_envp(char **envp);
 int		ft_check_if_expand(char *str, char *ptr, int heredoc);
 int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
-char	*ft_get_env_value(const char *str, char **envp, char **key);
+char	*ft_get_env_value(const char *str, t_minishell *ms, char **key);
 int		ft_revalue_heredock_input(char **input, t_minishell *ms);
+char	*ft_get_env(const char *key, t_minishell *ms);
+int		ft_set_env(const char *key, const char *value, t_minishell *ms);
+int		ft_unset_env(const char *key, t_minishell *ms);
+
 /* int		ft_remove_str(char **value, char *key, char *ptr);
  */
 

@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 22:18:23 by bschwell          #+#    #+#             */
-/*   Updated: 2024/12/01 22:26:45 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/03 10:56:32 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # define ERRORS_MS_H
 
 // Bash Standard Errors
+# define EX_OK				0
 # define EX_GENERICERR		1
 # define EX_BUILTINERR		2
 # define EX_EXECERR			126

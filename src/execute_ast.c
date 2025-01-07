@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/27 11:54:30 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/12/31 17:30:49 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -424,27 +424,6 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 	return (ft_execute_ast(node->right, ms));
 }
 
-int	ft_exec_builtins(t_node *node, t_minishell *ms)
-{
-	// printf("node token: %s\n", node->token->value);
-	if (!ft_strcmp(node->token->value, "echo"))
-	// TODO: Fix this to add the exit codes directly in the builtin
-		ft_builtin_echo(node->cmd_ready, ms);
-		// set_exit_code(ms, ft_builtin_echo(node->cmd_ready, ms));
-	else if (!ft_strcmp(node->token->value, "exit"))
-	 	ft_builtin_exit(node->cmd_ready, ms);
-	else if (!ft_strcmp(node->token->value, "env"))
-		ft_builtin_env(node->cmd_ready, ms);
-	else if (!ft_strcmp(node->token->value, "pwd"))
-	 	ft_builtin_pwd(ms);
-	else if (!ft_strcmp(node->token->value, "cd"))
-		ft_builtin_cd(node->cmd_ready, ms);
-	else if (!ft_strcmp(node->token->value, "export"))
-			ft_builtin_export(ms);
-	exit(exit_code(ms));
-	return (exit_code(ms));
-}
-
 int	ft_execute_command(t_node *node, t_minishell *ms)
 {
 	int	valid;
@@ -475,7 +454,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
  */			return (42); // Código de erro para "command not found"
 		}
 		if (node->token->type == TOKEN_BUILTIN)
-			exit(ft_exec_builtins(node, ms));
+			exit(ft_exec_builtins_check(node, ms));
 		if (node->cmd_ready[0][0] == '/' || 									// Caminho absoluto ou relativo
 			(node->cmd_ready[0][0] == '.' && node->cmd_ready[0][1] == '/') || 
 			!ft_strncmp(node->cmd_ready[0], "../", 3)) 
@@ -514,6 +493,11 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
 			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
 			set_exit_code(ms, 127);
+		}
+		else if (exit_code(ms) == 0)
+		{
+			if (node->token->type == TOKEN_BUILTIN)
+				ft_exec_builtins(node, ms);
 		}
 	}
 	else if (WIFSIGNALED(ms->status)) // Processo foi terminado por um sinal

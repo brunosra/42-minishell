@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/27 11:50:19 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/05 15:23:35 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,17 +97,17 @@ int ft_check_builtins(char *str)
 	if (!ft_strcmp(str, "echo"))
 		return (1);
 	if (!ft_strcmp(str, "pwd"))
-		return (/* printf("builtin: pwd -->"), */ 1);
+		return (1);
 	if (!ft_strcmp(str, "exit"))
-		return (/* printf("builtin: exit -->"), */ 1);
+		return (1);
 	if (!ft_strcmp(str, "cd"))
-		return (/* printf("builtin: cd -->"), */ 1);
+		return (1);
 	if (!ft_strcmp(str, "env"))
-		return (/* printf("builtin: env -->"), */ 1);
+		return (1);
 	if (!ft_strcmp(str, "export"))
-		return (/* printf("builtin: export -->"), */ 1);
+		return (1);
 	if (!ft_strcmp(str, "unset"))
-		return (/* printf("builtin: export -->"), */ 1);
+		return (1);
 	return (0);
 }
 

@@ -6,11 +6,13 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/27 14:41:06 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/06 12:08:55 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+// TODO: nao podemos usar esta variavel global para ter os sinais.
+// TODO: Somente podemos usar um int para receber. nao podemos usar sig_atomic_t
 volatile sig_atomic_t g_interrupt;
 
 int	main(int argc, char **argv, char **envp);
@@ -41,11 +43,12 @@ void ft_init_ms(t_minishell *ms)
 	ms->swap_input_redirects = false;
 	ms->swap_output_redirects = false;
 	ms->in_pipe = false;
-	ms->env.env_paths = NULL;
 	ms->env.envp = NULL;
-	ms->env.full_path = NULL;
-	ms->env.paths = NULL;
+	ms->env.env_paths = ft_calloc(1, sizeof(char *));
+	ms->env.paths = ft_calloc(1, sizeof(char **));
+	ms->env.full_path = ft_calloc(1, sizeof(char *));
 	ms->prompt = ft_strjoin_all(4, RD"["RST, ft_itoa(exit_code(ms)), RD"] minishell"RST, "$ ");
+	// ms->prompt = RD"minishell:"RST"$";
 }
 
 int ft_save_stdin_stdout(t_minishell *ms)
@@ -67,9 +70,13 @@ void ft_create_prompt(t_minishell *ms)
 {
 	char *old_prompt;
 	char *new_prompt;
+	char *e;
+	char p[PATH_MAX];
 
+	e = ft_itoa(exit_code(ms));
+	getcwd(p, PATH_MAX);
 	old_prompt = ms->prompt;
-	new_prompt = ft_strjoin_all(4, RD"["RST, ft_itoa(exit_code(ms)), RD"] minishell"RST, "$ ");
+	new_prompt = ft_strjoin_all(6, RD"["RST, e, RD"] ["RST, p, RD"] minishell"RST, "$ ");
 	free(old_prompt);
 	ms->prompt = new_prompt;
 }
