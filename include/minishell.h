@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/07 07:12:36 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/08 18:03:13 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,7 @@ typedef struct s_minishell
 	char				*temp;
 	int					c_stuck_cats;
 	char				*prompt;
+	char				currpath[PATH_MAX];
 }				t_minishell;
 
 /**__HANDLE_and_LEXING_INPUT__**/
