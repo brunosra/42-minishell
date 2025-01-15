@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_malloc.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 22:18:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 19:42:37 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/15 02:51:18 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,11 @@ void	ft_free_split(char **str);
 char	*ft_strjoin_free(char *s1, char *s2, int free_s1, int free_s2); // mover para utils ou libft
 /* void	ft_free_env(t_env *env); */
 
+/**
+ * @brief  Frees the memory allocated for the token array.
+ * 
+ * @param  tokens  Pointer to the array of tokens to free.
+ */
 void	ft_free_tokens(t_token *tokens)
 {
 	int	i;
@@ -36,6 +41,11 @@ void	ft_free_tokens(t_token *tokens)
 	return ;
 }
 
+/**
+ * @brief  Frees the memory allocated for the abstract syntax tree (AST).
+ * 
+ * @param  root  Pointer to the root of the AST to free.
+ */
 void	ft_free_ast(t_node *root)
 {
 	if (!root)
@@ -55,6 +65,11 @@ void	ft_free_ast(t_node *root)
 		free(env->full_path);
 } */
 
+/**
+ * @brief  Frees the memory allocated for a split string array.
+ * 
+ * @param  str  Pointer to the array of strings to free.
+ */
 void ft_free_split(char **str)
 {
 	int i;
@@ -74,6 +89,16 @@ void ft_free_split(char **str)
 	return ;
 }
 
+/**
+ * @brief  Joins two strings and optionally frees one or both of the input strings.
+ * 
+ * @param  s1        First string to join.
+ * @param  s2        Second string to join.
+ * @param  free_s1   Flag indicating whether to free the first string.
+ * @param  free_s2   Flag indicating whether to free the second string.
+ * @return char*     Pointer to the newly allocated joined string.
+ **         NULL if memory allocation fails.
+ */
 char	*ft_strjoin_free(char *s1, char *s2, int free_s1, int free_s2) // mover para utils ou libft
 {
 	char	*joined;

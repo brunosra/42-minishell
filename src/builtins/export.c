@@ -3,17 +3,36 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/27 11:28:18 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/07 07:15:03 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/15 03:55:57 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
 
-void	ft_dup_envp(char **src, char **dest, int count) {
+void	ft_dup_envp(char **src, char **dest, int count);
+void	free_dup_envp(char **arr);
+void	ft_swap_env(char **a, char **b);
+void	ft_sort_envp(char **arr, int count);
+
+/**
+ * @brief	Duplicates a given array of environment variables.
+ * 
+ * @param	src		Source array of strings to be duplicated.
+ * @param	dest	Destination array to store the duplicated strings.
+ * @param	count	Number of strings in the source array to duplicate.
+ * 
+ * @details
+ * - Allocates memory for each string in the destination array.
+ * - Copies the content of each string from the source array to the destination array.
+ * - Adds a NULL terminator at the end of the destination array.
+ * - Exits the program if memory allocation fails.
+ */
+void	ft_dup_envp(char **src, char **dest, int count)
+{
     int i;
 
 	i = 0;
@@ -30,7 +49,18 @@ void	ft_dup_envp(char **src, char **dest, int count) {
     dest[i] = NULL;
 }
 
-void	free_dup_envp(char **arr) {
+/**
+ * @brief	Frees the memory allocated for a duplicated environment variable array.
+ * 
+ * @param	arr	Array of strings to be freed.
+ * 
+ * @details
+ * - Frees each string in the array.
+ * - Frees the array pointer itself.
+ * - Does nothing if the array is NULL.
+ */
+void	free_dup_envp(char **arr)
+{
 	int i;
 
 	i = 0;
@@ -44,6 +74,15 @@ void	free_dup_envp(char **arr) {
 	free(arr);
 }
 
+/**
+ * @brief	Swaps the values of two environment variable pointers.
+ * 
+ * @param	a	Pointer to the first string to be swapped.
+ * @param	b	Pointer to the second string to be swapped.
+ * 
+ * @details
+ * - Swaps the values of the two pointers using a temporary variable.
+ */
 void ft_swap_env(char **a, char **b)
 {
 	char *temp = *a;
@@ -51,6 +90,17 @@ void ft_swap_env(char **a, char **b)
 	*b = temp;
 }
 
+/**
+ * @brief	Sorts an array of environment variable strings in alphabetical order.
+ * 
+ * @param	arr		Array of strings to be sorted.
+ * @param	count	Number of strings in the array.
+ * 
+ * @details
+ * - Implements a bubble sort algorithm to sort the strings lexicographically.
+ * - Swaps adjacent strings if they are out of order.
+ * - Uses `ft_strcmp` to compare the strings.
+ */
 void ft_sort_envp(char **arr, int count)
 {
 	int i;

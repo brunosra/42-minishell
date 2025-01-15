@@ -3,15 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/31 17:18:39 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/03 10:58:30 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/15 03:49:04 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
+
+static int	ft_check_valid_echo_opt(char *opt);
+void		ft_builtin_echo(char **args, t_minishell *ms);
+
 
 /**
  * @brief 		Check if arg from echo is a valid variation of -n
@@ -20,7 +24,6 @@ extern volatile sig_atomic_t g_interrupt;
  * @return int	1: is a valid variation of -n
  * 				0: is not
  */
-
 static int		ft_check_valid_echo_opt(char *opt)
 {
 	int	i;
@@ -46,7 +49,6 @@ static int		ft_check_valid_echo_opt(char *opt)
  * @param 	args 	What should be written on the command line
  * @param 	ms	 	minishell struct pointer
  */
-
 void	ft_builtin_echo(char **args, t_minishell *ms)
 {
 	int i;
@@ -70,7 +72,7 @@ void	ft_builtin_echo(char **args, t_minishell *ms)
 	}
 	if (newline)
 		printf("\n");
-	set_exit_code(ms, EX_OK);
+	ft_set_exit_code(ms, EX_OK);
 }
 
 // TODO: verificar se este echo acima esta ok, se estiver, apagar o de baixo
@@ -117,5 +119,5 @@ void	ft_builtin_echo(char **args, t_minishell *ms)
 	}
 	if (newline)
 		printf("\n");
-	set_exit_code(ms, 0);
+	ft_set_exit_code(ms, 0);
 } */

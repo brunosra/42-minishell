@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexing_input.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/05 15:23:35 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/14 03:59:25 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,15 @@ t_type			ft_get_token_type(char *str, t_type prev_type);
 char			*ft_revalue_quoted_value(char *value);
 int				ft_verify_variable_value(char *str);
 
+/**
+ * @brief  Tokenizes the input string into an array of tokens.
+ * 
+ * @param  str      Input string to tokenize.
+ * @param  n_args   Number of arguments in the input.
+ * @param  i        Current index in the input string.
+ * @param  j        Index to store tokens in the array.
+ * @return t_token* Pointer to the array of tokens.
+ */
 t_token	*ft_tokenize_input(char *str, int n_args, int i, int j)
 {
 	t_token	*tokens;
@@ -44,6 +53,15 @@ t_token	*ft_tokenize_input(char *str, int n_args, int i, int j)
 	return (tokens);
 }
 
+/**
+ * @brief  Tokenizes a segment of the input string into a token.
+ * 
+ * @param  str     Input string.
+ * @param  i       Pointer to the current index in the string.
+ * @param  tokens  Array of tokens.
+ * @param  j       Pointer to the index in the token array.
+ * @return int     Updated index after tokenization.
+ */
 int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 {
 	int		start;
@@ -92,6 +110,14 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 	return (*i);
 }
 
+/**
+ * @brief  Checks if a string corresponds to a supported builtin command.
+ * 
+ * @param  str  Command string to check.
+ * @return int
+ **        1 if the command is a builtin.
+ **        0 otherwise.
+ */
 int ft_check_builtins(char *str)
 {
 	if (!ft_strcmp(str, "echo"))
@@ -111,6 +137,13 @@ int ft_check_builtins(char *str)
 	return (0);
 }
 
+/**
+ * @brief  Determines the type of a token based on its value and the previous token's type.
+ * 
+ * @param  str         Token value.
+ * @param  prev_type   Type of the previous token.
+ * @return t_type      Type of the current token.
+ */
 t_type	ft_get_token_type(char *str, t_type prev_type)
 {
 	if (!ft_strcmp(str, "<"))
@@ -147,6 +180,14 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 	return (TOKEN_COMMAND);
 }
 
+/**
+ * @brief  Verifies whether a variable within a string should be expanded.
+ * 
+ * @param  str  Input string.
+ * @return int
+ **        1 if the variable should be expanded.
+ **        0 otherwise.
+ */
 int	ft_verify_variable_value(char *str)
 {
 	int		i;
@@ -179,8 +220,12 @@ int	ft_verify_variable_value(char *str)
 	return (expand);
 }
 
-
-
+/**
+ * @brief  Processes and removes quotes from a quoted value, reconstructing the final string.
+ * 
+ * @param  value  Input string containing quoted sections.
+ * @return char*  Processed string with quotes removed.
+ */
 char	*ft_revalue_quoted_value(char *value)
 {
 	int		i;
