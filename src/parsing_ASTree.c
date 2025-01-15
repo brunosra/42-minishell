@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_ASTree.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/23 19:42:49 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/15 04:19:35 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,12 @@ char 	**ft_remove_null_values(char **cmd_ready, int arg_count);
 /* Temporaria para testar */
 void	print_ast(t_node *node, int depth);
 
+/**
+ * @brief  Parses tokens into an Abstract Syntax Tree (AST).
+ * 
+ * @param  tokens  Array of tokens to parse.
+ * @return t_node* Pointer to the root node of the AST.
+ */
 t_node *ft_parse_ast(t_token *tokens)
 {
     int     i;
@@ -139,6 +145,13 @@ t_node *ft_parse_ast(t_token *tokens)
     return (root);
 }
 
+/**
+ * @brief  Groups command-related tokens into a single command node.
+ * 
+ * @param  tokens  Array of tokens.
+ * @param  index   Pointer to the current token index.
+ * @return t_node* Pointer to the created command node.
+ */
 t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 {
 	t_node	*cmd_node;
@@ -253,6 +266,13 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 	return (cmd_node);
 }
 
+/**
+ * @brief  Removes null or empty values from a command's arguments array.
+ * 
+ * @param  cmd_ready  Array of command arguments.
+ * @param  arg_count  Total number of arguments.
+ * @return char**     Updated array without null or empty values.
+ */
 char **ft_remove_null_values(char **cmd_ready, int arg_count)
 {
 	int i;
@@ -314,6 +334,12 @@ char **ft_remove_null_values(char **cmd_ready, int arg_count)
 }
  */
 
+/**
+ * @brief  Removes quotes from a given string and returns the updated value.
+ * 
+ * @param  value  String to process and remove quotes from.
+ * @return char*  Processed string with quotes removed.
+ */
 char	*ft_remove_quotes(char *value)
 {
 	int		i;
@@ -368,6 +394,12 @@ char	*ft_remove_quotes(char *value)
 	return (new_value);
 }
 
+/**
+ * @brief  Verifies the number of arguments within a command node value.
+ * 
+ * @param  cmd_node  Command node to evaluate.
+ * @return int       Number of arguments found within the command node value.
+ */
 int ft_verify_cmd_node_value(t_node *cmd_node)
 {
 	int i;
@@ -391,6 +423,12 @@ int ft_verify_cmd_node_value(t_node *cmd_node)
 	return (count);
 }
 
+/**
+ * @brief  Creates a new command node in the AST.
+ * 
+ * @param  token  Token associated with the command node.
+ * @return t_node* Pointer to the created command node.
+ */
 t_node	*ft_create_cmd_node(t_token *token)
 {
 	t_node *node;
@@ -408,6 +446,14 @@ t_node	*ft_create_cmd_node(t_token *token)
 	return (node);
 }
 
+/**
+ * @brief  Creates a new operator node in the AST.
+ * 
+ * @param  token  Token associated with the operator node.
+ * @param  left   Pointer to the left child node.
+ * @param  right  Pointer to the right child node.
+ * @return t_node* Pointer to the created operator node.
+ */
 t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right)
 {
     t_node *node;
@@ -426,6 +472,12 @@ t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right)
 }
 
 /* Temporaria para testar */
+/**
+ * @brief  Recursively prints the Abstract Syntax Tree (AST) structure for debugging.
+ * 
+ * @param  node   Pointer to the current node in the AST.
+ * @param  depth  Current depth level for indentation.
+ */
 void	print_ast(t_node *node, int depth)
 {
     int i;

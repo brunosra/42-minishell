@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/08 18:04:50 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/15 04:45:29 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,12 @@ int	ft_process_input_and_execute(t_minishell *ms);
 void ft_clean_stuck_cats(t_minishell *ms);
 void ft_find_stuck_cats(t_minishell *ms, t_node *node);
 
+/**
+ * @brief  Initialize the minishell structure with default values.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return void
+ */
 void ft_init_ms(t_minishell *ms)
 {
 	ms->input = NULL;
@@ -48,10 +54,18 @@ void ft_init_ms(t_minishell *ms)
 	ms->env.paths = ft_calloc(1, sizeof(char **));
 	ms->env.full_path = ft_calloc(1, sizeof(char *));
 	getcwd(ms->currpath, PATH_MAX);
-	ms->prompt = ft_strjoin_all(4, RD"["RST, ft_itoa(exit_code(ms)), RD"] minishell"RST, "$ ");
+	ms->prompt = ft_strjoin_all(4, RD"["RST, ft_itoa(ft_exit_code(ms)), RD"] minishell"RST, "$ ");
 	// ms->prompt = RD"minishell:"RST"$";
 }
 
+/**
+ * @brief  Save the current stdin and stdout file descriptors.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return int
+ **        0 on success
+ **        1 if an error occurs during duplication
+ */
 int ft_save_stdin_stdout(t_minishell *ms)
 {
 	ms->save_stdin = dup(STDIN_FILENO);
@@ -61,12 +75,24 @@ int ft_save_stdin_stdout(t_minishell *ms)
 	return (0);
 }
 
+/**
+ * @brief  Close saved stdin and stdout file descriptors.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return void
+ */
 void ft_close_stdin_stdout(t_minishell *ms)
 {
 	close(ms->save_stdin);
 	close(ms->save_stdout);
 }
 
+/**
+ * @brief  Create a new prompt string based on the current path and exit code.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return void
+ */
 void ft_create_prompt(t_minishell *ms)
 {
 	char *old_prompt;
@@ -74,7 +100,7 @@ void ft_create_prompt(t_minishell *ms)
 	char *e;
 	char p[PATH_MAX];
 
-	e = ft_itoa(exit_code(ms));
+	e = ft_itoa(ft_exit_code(ms));
 	getcwd(p, PATH_MAX);
 	old_prompt = ms->prompt;
 	new_prompt = ft_strjoin_all(6, RD"["RST, e, RD"] ["RST, p, RD"] minishell"RST, "$ ");
@@ -82,6 +108,14 @@ void ft_create_prompt(t_minishell *ms)
 	ms->prompt = new_prompt;
 }
 
+/**
+ * @brief  Read a line of input using readline and handle the prompt display.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return int
+ **        0 on successful input
+ **        1 if the input is NULL (EOF or Ctrl-D)
+ */
 int	ft_readline(t_minishell *ms)
 {
 	ft_create_prompt(ms);
@@ -96,6 +130,15 @@ int	ft_readline(t_minishell *ms)
 	return (0);
 }
 
+/**
+ * @brief  Main entry point of the program.
+ * 
+ * @param  argc  Argument count (unused).
+ * @param  argv  Argument vector (unused).
+ * @param  envp  Environment variables.
+ * @return int
+ **        Exit code of the shell
+ */
 int	main(int argc, char **argv, char **envp)
 {
 	t_minishell	ms;
@@ -125,6 +168,14 @@ int	main(int argc, char **argv, char **envp)
 	return (0);
 }
 
+/**
+ * @brief  Tokenize the user input and check for unclosed quotes.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return int
+ **        0 on success
+ **        1 if there are unclosed quotes or other errors
+ */
 int	ft_handle_and_tokenize_input(t_minishell *ms)
 {
 	
@@ -138,11 +189,19 @@ int	ft_handle_and_tokenize_input(t_minishell *ms)
 	return (0);
 }
 
+/**
+ * @brief  Process the user input and execute commands.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return int
+ **        0 on successful execution
+ **        1 on error
+ */
 int	ft_process_input_and_execute(t_minishell *ms)
 {
 	if (ft_handle_and_tokenize_input(ms))
 	{
-		if (exit_code(ms) == 2)
+		if (ft_exit_code(ms) == 2)
 			return (1);
 		else
 			return (ft_putstr_and_return("minishell: unclosed quotes\n", 1));
@@ -168,6 +227,12 @@ int	ft_process_input_and_execute(t_minishell *ms)
 	return (0);
 }
 
+/**
+ * @brief  Handle stuck "cat" commands waiting for input.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return void
+ */
 void ft_clean_stuck_cats(t_minishell *ms)
 {
 	char c;
@@ -184,10 +249,17 @@ void ft_clean_stuck_cats(t_minishell *ms)
 				break ;
 		}
 	}
-	set_exit_code(ms, 0);
+	ft_set_exit_code(ms, 0);
 	return ;
 }
 
+/**
+ * @brief  Find and count stuck "cat" commands in the AST.
+ * 
+ * @param  ms    Pointer to the minishell structure.
+ * @param  node  Current node in the AST.
+ * @return void
+ */
 void ft_find_stuck_cats(t_minishell *ms, t_node *node)
 {
 	t_node *current;

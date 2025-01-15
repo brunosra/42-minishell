@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_env.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/31 14:18:52 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/15 04:47:36 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,13 @@ int		ft_revalue_heredock_input(char **input, t_minishell *ms);
 char	*ft_get_env_value(const char *str, t_minishell *ms, char **key);
 char	*ft_get_env(const char *key, t_minishell *ms);
 
-
+/**
+ * @brief  Duplicates the environment variables array.
+ * 
+ * @param  envp  Array of environment variables to duplicate.
+ * @return char**  Pointer to the newly allocated duplicate of `envp`.
+ **         NULL if memory allocation fails.
+ */
 char	**ft_duplicate_envp(char **envp)
 {
 	int		i;
@@ -49,6 +55,14 @@ char	**ft_duplicate_envp(char **envp)
 	return (new_envp);
 }
 
+/**
+ * @brief  Replaces tokens in the input with their corresponding environment variable values.
+ * 
+ * @param  ms  Pointer to the minishell structure containing tokens and environment variables.
+ * @return int Status of the operation.
+ **         0 on success.
+ **         1 on error or if expansion fails.
+ */
 int	ft_revalue_token_variable(t_minishell *ms)
 {
 	int		i;
@@ -92,8 +106,8 @@ int	ft_revalue_token_variable(t_minishell *ms)
 				else if (ft_check_if_expand(ms->tokens[i].value, ptr, 0) == 2)
 				{
 					key = ft_strdup("?");
-					// printf("%lu\n", ft_strlen(ft_itoa(exit_code(ms))));
-					ft_replace_str(&ms->tokens[i].value, key, ptr, ft_itoa(exit_code(ms)));
+					// printf("%lu\n", ft_strlen(ft_itoa(ft_exit_code(ms))));
+					ft_replace_str(&ms->tokens[i].value, key, ptr, ft_itoa(ft_exit_code(ms)));
 					free(key);
 					ptr = ft_strchr(ms->tokens[i].value, '$');
 					if (!ptr)
@@ -112,6 +126,15 @@ int	ft_revalue_token_variable(t_minishell *ms)
 	return (0);
 }
 
+/**
+ * @brief  Extracts the value of an environment variable from a given string.
+ * 
+ * @param  str  String containing the variable name (e.g., `$VAR`).
+ * @param  ms   Pointer to the minishell structure.
+ * @param  key  Pointer to store the extracted variable name.
+ * @return char*  Value of the environment variable.
+ **         NULL if the variable does not exist.
+ */
 char	*ft_get_env_value(const char *str, t_minishell *ms, char **key)
 {
 	int		i;
@@ -133,6 +156,17 @@ char	*ft_get_env_value(const char *str, t_minishell *ms, char **key)
 	return (value);
 }
 
+/**
+ * @brief  Replaces a substring in a string with a new value.
+ * 
+ * @param  value      Pointer to the string to modify.
+ * @param  key        Substring (key) to replace.
+ * @param  ptr        Pointer to the position of the key in the string.
+ * @param  env_value  New value to replace the key with.
+ * @return int        Status of the replacement.
+ **         0 on success.
+ **         1 on error.
+ */
 int	ft_replace_str(char **value, char *key, char *ptr, char *env_value)
 {
 	char	*new_value;
@@ -180,6 +214,15 @@ int	ft_replace_str(char **value, char *key, char *ptr, char *env_value)
 	return (0);
 }
 
+/**
+ * @brief  Checks if the quotes in a string are balanced up to a specific index.
+ * 
+ * @param  str  String to check.
+ * @param  idx  Index up to which the string should be checked.
+ * @return int  Boolean indicating whether the quotes are balanced.
+ **         1 if balanced.
+ **         0 otherwise.
+ */
 int	ft_check_balanced_quotes(char *str, int idx)
 {
 	int		i;
@@ -205,7 +248,17 @@ int	ft_check_balanced_quotes(char *str, int idx)
 	return (is_balanced);
 }
 
-
+/**
+ * @brief  Determines if a variable should be expanded based on its context.
+ * 
+ * @param  str     String containing the variable.
+ * @param  ptr     Pointer to the position of the `$` character in the string.
+ * @param  heredoc Flag indicating if the check is within a heredoc.
+ * @return int     Expansion behavior.
+ **         1 to expand normally.
+ **         2 for special case `$?`.
+ **         0 if no expansion should occur.
+ */
 int	ft_check_if_expand(char *str, char *ptr, int heredoc)
 {
 	int		i;
@@ -249,6 +302,15 @@ int	ft_check_if_expand(char *str, char *ptr, int heredoc)
 	return (0); // Retorna 0 se não encontrar $ para expandir
 }
 
+/**
+ * @brief  Replaces variables in heredoc input with their corresponding environment values.
+ * 
+ * @param  input  Pointer to the heredoc input string.
+ * @param  ms     Pointer to the minishell structure.
+ * @return int    Status of the operation.
+ **         0 on success.
+ **         1 on error.
+ */
 int	ft_revalue_heredock_input(char **input, t_minishell *ms)
 {
 	char	*env_value;
@@ -285,8 +347,8 @@ int	ft_revalue_heredock_input(char **input, t_minishell *ms)
 			else if (ft_check_if_expand(*input, ptr, 1) == 2)
 			{
 				key = ft_strdup("?");
-				// printf("%lu\n", ft_strlen(ft_itoa(exit_code(ms))));
-				ft_replace_str(input, key, ptr, ft_itoa(exit_code(ms)));
+				// printf("%lu\n", ft_strlen(ft_itoa(ft_exit_code(ms))));
+				ft_replace_str(input, key, ptr, ft_itoa(ft_exit_code(ms)));
 				free(key);
 				ptr = ft_strchr(*input, '$');
 				if (!ptr)
@@ -306,6 +368,14 @@ int	ft_revalue_heredock_input(char **input, t_minishell *ms)
 	return (0);
 }
 
+/**
+ * @brief  Retrieves the value of an environment variable from the environment array.
+ * 
+ * @param  key  Variable name to search for.
+ * @param  ms   Pointer to the minishell structure.
+ * @return char*  Pointer to the value of the variable.
+ **         NULL if the variable does not exist.
+ */
 char	*ft_get_env(const char *key, t_minishell *ms)
 {
 	int		i;
@@ -326,6 +396,16 @@ char	*ft_get_env(const char *key, t_minishell *ms)
 	return (NULL);
 }
 
+/**
+ * @brief  Sets or updates an environment variable in the environment array.
+ * 
+ * @param  key    Variable name to set or update.
+ * @param  value  Value to assign to the variable.
+ * @param  ms     Pointer to the minishell structure.
+ * @return int    Status of the operation.
+ **         0 on success.
+ **         1 on error.
+ */
 int	ft_set_env(const char *key, const char *value, t_minishell *ms)
 {
 	int		i;
@@ -357,6 +437,15 @@ int	ft_set_env(const char *key, const char *value, t_minishell *ms)
 	return (0);
 }
 
+/**
+ * @brief  Unsets (removes) an environment variable from the environment array.
+ * 
+ * @param  key  Variable name to remove.
+ * @param  ms   Pointer to the minishell structure.
+ * @return int  Status of the operation.
+ **         0 on success.
+ **         1 if the variable does not exist or on error.
+ */
 int ft_unset_env(const char *key, t_minishell *ms)
 {
 	int i;

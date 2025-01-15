@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   execute_ast.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/31 17:30:49 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/15 04:47:19 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
 
 int	ft_execute_ast(t_node *node, t_minishell *ms);
@@ -29,7 +29,15 @@ int	ft_collect_heredocs(t_node *node, t_minishell *ms);
 int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
 static int ft_has_cat(t_node *node);
 
-
+/**
+ * @brief  Executes the AST based on the current node type.
+ * 
+ * @param  node  Pointer to the current AST node.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Execution status.
+ **         0 on success.
+ **         Non-zero in case of errors or syntax issues.
+ */
 int	ft_execute_ast(t_node *node, t_minishell *ms)
 {
 	if (!node || !ms->n_args)
@@ -39,7 +47,7 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
 		ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
 		ft_putstr_fd(node->token->value, STDERR_FILENO);
 		ft_putstr_fd("'\n", STDERR_FILENO);
-		set_exit_code(ms, 2);
+		ft_set_exit_code(ms, 2);
 		
 		return (1);
 	}
@@ -80,6 +88,12 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
 	return (0);
 }
 
+/**
+ * @brief  Swaps the values of redirect nodes to handle nested or reversed cases.
+ * 
+ * @param  node  Pointer to the current node in the AST.
+ * @param  type  Redirect type (input/output).
+ */
 void	ft_swap_redirects_values(t_node *node, t_type type)
 {
 	t_node	*current;
@@ -98,6 +112,15 @@ void	ft_swap_redirects_values(t_node *node, t_type type)
 	}
 }
 
+/**
+ * @brief  Handles heredoc redirection by reading user input until a delimiter is reached.
+ * 
+ * @param  node  Pointer to the heredoc node in the AST.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Execution status.
+ **         0 on success.
+ **         Non-zero in case of errors or syntax issues.
+ */
 int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 {
 	char	*input;
@@ -112,13 +135,13 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 	if (!node->right)
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", STDERR_FILENO);
-		set_exit_code(ms, 2);
+		ft_set_exit_code(ms, 2);
 		return (1);
 	}
 	if (pipe(ms->pipefd) == -1)
 	{
 		perror("pipe");
-		set_exit_code(ms, 1);
+		ft_set_exit_code(ms, 1);
 		return (1);
 	}
 	if (!isatty(STDOUT_FILENO))
@@ -129,7 +152,7 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 			perror("dup");
 			close(ms->pipefd[0]);
 			close(ms->pipefd[1]);
-			set_exit_code(ms, 1);
+			ft_set_exit_code(ms, 1);
 			return (1);
 		}
 		tty_fd = open("/dev/tty", O_WRONLY);
@@ -139,7 +162,7 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 			close(ms->pipefd[0]);
 			close(ms->pipefd[1]);
 			close(save_stdout);
-			set_exit_code(ms, 1);
+			ft_set_exit_code(ms, 1);
 			return (1);
 		}
 		if (dup2(ms->save_stdout, STDOUT_FILENO) == -1)
@@ -150,7 +173,7 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 			close(ms->pipefd[1]);
 			close(ms->save_stdout);
 			close(save_stdout);
-			set_exit_code(ms, 1);
+			ft_set_exit_code(ms, 1);
 			return (1);
 		}
 		close(tty_fd);
@@ -161,7 +184,7 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 		perror("fork");
 		close(ms->pipefd[0]);
 		close(ms->pipefd[1]);
-		set_exit_code(ms, 1);
+		ft_set_exit_code(ms, 1);
 		return (1);
 	}
 	ft_set_fork_signals();
@@ -177,7 +200,7 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 				ft_putstr_fd("minishell: warning: here-document delimited by end-of-file (wanted `", STDERR_FILENO);
 				ft_putstr_fd(node->right->token->value, STDERR_FILENO);
 				write(STDERR_FILENO, "')\n", 3); 
-				set_exit_code(ms, 0);
+				ft_set_exit_code(ms, 0);
 				break; // Contar heredocs, criar variavel para saber qdo tem de fechar exit 130
 			} 
 			if (!input || ft_strcmp(input, node->right->token->value) == 0)
@@ -208,7 +231,7 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 	{
 		perror("dup2");
 		close(ms->pipefd[0]);
-		set_exit_code(ms, 1);
+		ft_set_exit_code(ms, 1);
 		return (1);
 	}
 	close(ms->pipefd[0]);
@@ -220,18 +243,27 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 		{
 			perror("dup2");
 			close(save_stdout);
-			set_exit_code(ms, 1);
+			ft_set_exit_code(ms, 1);
 			return (1);
 		}
 		close(save_stdout);
 	}
 	if (WIFEXITED(ms->status))
-		set_exit_code(ms, WEXITSTATUS(ms->status));
+		ft_set_exit_code(ms, WEXITSTATUS(ms->status));
 	else
-		set_exit_code(ms, 1);
+		ft_set_exit_code(ms, 1);
 	return (ft_execute_ast(node->left, ms));
 }
 
+/**
+ * @brief  Handles output redirection to a file.
+ * 
+ * @param  node  Pointer to the output redirection node in the AST.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Execution status.
+ **         0 on success.
+ **         Non-zero in case of errors or syntax issues.
+ */
 int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 {
 	int	fd;
@@ -239,7 +271,7 @@ int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 	if (!node->right) // Verifica se o token à direita é inválido
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", STDERR_FILENO);
-		set_exit_code(ms, 2);
+		ft_set_exit_code(ms, 2);
 		return (1);
 	}
 	else if (ft_invalid_right_token_value(node->right->token->value))
@@ -250,12 +282,12 @@ int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 		else
 			ft_putstr_fd("newline", STDERR_FILENO);
 		ft_putstr_fd("'\n", STDERR_FILENO);
-		set_exit_code(ms, 2);
+		ft_set_exit_code(ms, 2);
 		return (1);
 	}
 /* 	if (ft_is_valid_file(node->right->token->value, O_WRONLY)) // Verifica se o arquivo é inválido// verificar se e um diretorio!!
 	{
-		set_exit_code(ms, 1);
+		ft_set_exit_code(ms, 1);
 		return (1);
 	} */
 	if (ft_strcmp(node->token->value, ">>") == 0) // Abre o arquivo para escrita ou append
@@ -265,7 +297,7 @@ int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 	if (fd == -1) // Trata erros ao abrir o arquivo
 	{
 		perror("open");
-		set_exit_code(ms, 1);
+		ft_set_exit_code(ms, 1);
 		return (1);
 	}
 	else
@@ -274,7 +306,7 @@ int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 	{
 		perror("dup2");
 		close(fd);
-		set_exit_code(ms, 1);
+		ft_set_exit_code(ms, 1);
 		return (1);
 	}
 	close(fd);
@@ -282,11 +314,20 @@ int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 		return (ft_execute_ast(node->left, ms));
 	else
 	{
-		set_exit_code(ms, 0);
+		ft_set_exit_code(ms, 0);
 		return (0);
 	}
 }
 
+/**
+ * @brief  Handles input redirection from a file.
+ * 
+ * @param  node  Pointer to the input redirection node in the AST.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Execution status.
+ **         0 on success.
+ **         Non-zero in case of errors or syntax issues.
+ */
 int	ft_handle_input_redirect(t_node *node, t_minishell *ms)
 {
 	int	fd;
@@ -294,7 +335,7 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms)
 	if (!node->right) // Verifica se o token à direita é inválido
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", STDERR_FILENO);
-		set_exit_code(ms, 2);
+		ft_set_exit_code(ms, 2);
 		return (1);
 	}
 	if (ft_invalid_right_token_value(node->right->token->value)) 	// Verifica se o token à direita é inválido
@@ -305,36 +346,44 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms)
 		else
 			ft_putstr_fd("newline", STDERR_FILENO);
 		ft_putstr_fd("'\n", STDERR_FILENO);
-		set_exit_code(ms, 2);
+		ft_set_exit_code(ms, 2);
 		return (1);
 	}	
 	if (ft_is_valid_file(node->right->token->value, O_RDONLY)) 	// Verifica se o arquivo é inválido
 	{
 		ft_remove_created_files(node->prev);
 		ft_create_files(node->left);
-		set_exit_code(ms, 1); // Checar se existem outputs_redirects para a frente em que os ficheiros precisem de ser criados!!
+		ft_set_exit_code(ms, 1); // Checar se existem outputs_redirects para a frente em que os ficheiros precisem de ser criados!!
 		return (1);
 	}
 	fd = open(node->right->token->value, O_RDONLY); // Abre o arquivo para leitura
 	if (fd == -1)
 	{
 		perror("open");
-		set_exit_code(ms, 1);
+		ft_set_exit_code(ms, 1);
 		return (1);
 	}
 	if (dup2(fd, STDIN_FILENO) == -1) // Redireciona STDIN para o arquivo
 	{
 		perror("dup2");
 		close(fd);
-		set_exit_code(ms, 1);
+		ft_set_exit_code(ms, 1);
 		return (1);
 	}
 	close(fd);
-	set_exit_code(ms, 0); // Redirecionamento bem-sucedido
+	ft_set_exit_code(ms, 0); // Redirecionamento bem-sucedido
 	return (ft_execute_ast(node->left, ms));
 }
 
-static int ft_has_cat(t_node *node)
+/**
+ * @brief  Checks if the command node contains the "cat" command.
+ * 
+ * @param  node  Pointer to the command node in the AST.
+ * @return int   Boolean value indicating presence of "cat".
+ **         1 if "cat" is found.
+ **         0 otherwise.
+ */
+static int ft_has_cat(t_node *node) // FUNCAO DESENRASQUE ALTERAR
 {
 	t_node *current;
 
@@ -353,6 +402,15 @@ static int ft_has_cat(t_node *node)
 	// ft_has_cat(current->right);
 }
 
+/**
+ * @brief  Handles piping between commands in the AST.
+ * 
+ * @param  node  Pointer to the pipe node in the AST.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Execution status.
+ **         0 on success.
+ **         Non-zero in case of errors or syntax issues.
+ */
 int	ft_handle_pipe(t_node *node, t_minishell *ms)
 {
 	char *input;
@@ -362,7 +420,7 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 	if (!node->left)
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", STDERR_FILENO);
-		set_exit_code(ms, 2); // Código de erro para erro de sintaxe
+		ft_set_exit_code(ms, 2); // Código de erro para erro de sintaxe
 		return (2);
 	}
 	else if (!node->right) // Caso de pipe sem lado direito
@@ -371,7 +429,7 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 		if (!input) // Ctrl-D
 		{
 			ft_putstr_fd("minishell: syntax error: unexpected end of file\n", STDERR_FILENO);
-			set_exit_code(ms, 258); // Código típico de erro de sintaxe
+			ft_set_exit_code(ms, 258); // Código típico de erro de sintaxe
 			return (258);
 		}
 		temp = ft_strjoin(ms->input, " ");
@@ -388,14 +446,14 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 	if (pipe(ms->pipefd) == -1)
 	{
 		perror("pipe");
-		set_exit_code(ms, 1);
+		ft_set_exit_code(ms, 1);
 		return (1);
 	}
 	ms->pid = fork();
 	if (ms->pid == -1)
 	{
 		perror("fork");
-		set_exit_code(ms, 1);
+		ft_set_exit_code(ms, 1);
 		return (1);
 	}
 	if (ms->pid == 0)
@@ -415,15 +473,24 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 	if (dup2(ms->pipefd[0], STDIN_FILENO) == -1)
 	{
 		perror("dup2");
-		set_exit_code(ms, 1);
+		ft_set_exit_code(ms, 1);
 		close(ms->pipefd[0]);
 		return (1);
 	}
 	close(ms->pipefd[0]);
-	set_exit_code(ms, 0);
+	ft_set_exit_code(ms, 0);
 	return (ft_execute_ast(node->right, ms));
 }
 
+/**
+ * @brief  Executes a single command or builtin in a child process.
+ * 
+ * @param  node  Pointer to the command node in the AST.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Exit code of the command.
+ **         0 on success.
+ **         Non-zero in case of error or if the command was not found.
+ */
 int	ft_execute_command(t_node *node, t_minishell *ms)
 {
 	int	valid;
@@ -434,14 +501,14 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 /* 	if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
 	{
 		ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
-		set_exit_code(ms, 127);
+		ft_set_exit_code(ms, 127);
 		return (127); // Código de erro para "command not found"
 	} */
 	ms->pid = fork();
 	if (ms->pid == -1)
 	{
 		perror("fork");
-		set_exit_code(ms, 1); // Código genérico para erro de fork
+		ft_set_exit_code(ms, 1); // Código genérico para erro de fork
 		return (1);
 	}
 	if (ms->pid == 0)
@@ -450,7 +517,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 		if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
 		{
 /* 			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
-			set_exit_code(ms, 127);
+			ft_set_exit_code(ms, 127);
  */			return (42); // Código de erro para "command not found"
 		}
 		if (node->token->type == TOKEN_BUILTIN)
@@ -487,14 +554,14 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	waitpid(ms->pid, &ms->status, 0);
 	if (WIFEXITED(ms->status)) // Processo terminou normalmente
 	{
-		set_exit_code(ms, WEXITSTATUS(ms->status));
- 		if (exit_code(ms) == 42)
+		ft_set_exit_code(ms, WEXITSTATUS(ms->status));
+ 		if (ft_exit_code(ms) == 42)
 		{
 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
 			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
-			set_exit_code(ms, 127);
+			ft_set_exit_code(ms, 127);
 		}
-		else if (exit_code(ms) == 0)
+		else if (ft_exit_code(ms) == 0)
 		{
 			if (node->token->type == TOKEN_BUILTIN)
 				ft_exec_builtins(node, ms);
@@ -503,27 +570,32 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	else if (WIFSIGNALED(ms->status)) // Processo foi terminado por um sinal
 	{
 		sig = WTERMSIG(ms->status);
-		set_exit_code(ms, 128 + sig);
+		ft_set_exit_code(ms, 128 + sig);
 		if (sig == SIGINT)
 			write(STDERR_FILENO, "\n", 1);
 	}
 	else
-		set_exit_code(ms, 1);
+		ft_set_exit_code(ms, 1);
 	ft_set_main_signals();
-	if (exit_code(ms) != 0 && node->prev && node->prev->token->type == TOKEN_INPUT_REDIRECT) // Remoção de arquivos criados caso o comando falhe
+	if (ft_exit_code(ms) != 0 && node->prev && node->prev->token->type == TOKEN_INPUT_REDIRECT) // Remoção de arquivos criados caso o comando falhe
 	{
 		ft_remove_created_files(node->prev);
 	}
-	if (node->token->type == TOKEN_BUILTIN && !ft_strcmp(node->cmd_ready[0], "exit") && exit_code(ms) != 1) // Finaliza o shell se for exit
+	if (node->token->type == TOKEN_BUILTIN && !ft_strcmp(node->cmd_ready[0], "exit") && ft_exit_code(ms) != 1) // Finaliza o shell se for exit
 	{
 		ft_free_tokens(ms->tokens);
 		ft_free_ast(ms->ast_root);
 		free(ms->input);
-		exit(exit_code(ms));
+		exit(ft_exit_code(ms));
 	}
-	return (exit_code(ms));
+	return (ft_exit_code(ms));
 }
 
+/**
+ * @brief  Removes files created during the execution of output redirection nodes.
+ * 
+ * @param  node  Pointer to the node in the AST containing the output redirection.
+ */
 void	ft_remove_created_files(t_node *node)
 {
 	if (!node)
@@ -544,6 +616,11 @@ void	ft_remove_created_files(t_node *node)
 		ft_remove_created_files(node->prev);
 }
 
+/**
+ * @brief  Creates files for output redirection nodes if they don't already exist.
+ * 
+ * @param  node  Pointer to the node in the AST containing the output redirection.
+ */
 void	ft_create_files(t_node *node)
 {
 	int fd;
@@ -565,6 +642,15 @@ void	ft_create_files(t_node *node)
 		ft_create_files(node->left);
 }
 
+/**
+ * @brief  Searches for an executable file in the system PATH.
+ * 
+ * @param  ms   Pointer to the minishell structure containing environment variables.
+ * @param  cmd  Command to search for in the PATH.
+ * @return int  Status of the search.
+ **         0 if the executable is found.
+ **         127 if not found or if PATH is invalid.
+ */
 int	ft_find_executable(t_minishell *ms, char *cmd)
 {
 	int	i;
@@ -599,6 +685,14 @@ int	ft_find_executable(t_minishell *ms, char *cmd)
 	return (127); // Comando não encontrado
 }
 
+/**
+ * @brief  Checks if the token value on the right side is invalid for redirection or other syntax.
+ * 
+ * @param  value  Token value to check.
+ * @return int    Boolean indicating validity.
+ **         1 if invalid.
+ **         0 if valid.
+ */
 int	ft_invalid_right_token_value(char *value)
 {
 	if (!value || 
@@ -610,6 +704,16 @@ int	ft_invalid_right_token_value(char *value)
 	return (0);
 }
 
+/**
+ * @brief  Checks if the given file is valid and accessible for the specified mode.
+ * 
+ * @param  filepath  Path to the file.
+ * @param  mode      Access mode to check (e.g., read, write, execute).
+ * @return int       Status code.
+ **         0 if the file is valid.
+ **         127 if the file does not exist.
+ **         126 if it is a directory or lacks necessary permissions.
+ */
 int	ft_is_valid_file(char *filepath, int mode)
 {
 	struct stat	file_stat;
@@ -671,7 +775,15 @@ int	ft_is_valid_file(char *filepath, int mode)
 	return (0); // Arquivo válido
 }
 
-
+/**
+ * @brief  Handles multiple heredocs consecutively and passes the data to the next AST node.
+ * 
+ * @param  node  Pointer to the AST node containing multiple heredocs.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Execution status.
+ **         0 on success.
+ **         Non-zero in case of errors or interruptions.
+ */
 int ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
 {
     char *input;
@@ -700,7 +812,7 @@ int ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
     {
         if (g_interrupt)
         {
-            set_exit_code(ms, 130);
+            ft_set_exit_code(ms, 130);
             break;
         }
         if (pipe(ms->pipefd) == -1) // Criar o pipe para o heredoc
@@ -760,13 +872,13 @@ int ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
         if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
         {
             g_interrupt = 1;
-            set_exit_code(ms, 130);
+            ft_set_exit_code(ms, 130);
             close(ms->pipefd[0]);
             break;
         }
         if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
         {
-            set_exit_code(ms, 130);
+            ft_set_exit_code(ms, 130);
             close(ms->pipefd[0]);
             break;
         }
@@ -778,7 +890,7 @@ int ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
         {
             perror("dup2 aqui");
             close(ms->pipefd[0]);
-            set_exit_code(ms, 1);
+            ft_set_exit_code(ms, 1);
             return (1);
         }
     }
@@ -790,7 +902,7 @@ int ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
         {
             perror("dup2 este");
             close(save_stdout);
-            set_exit_code(ms, 1);
+            ft_set_exit_code(ms, 1);
             return (1);
         }
         close(save_stdout);
@@ -807,7 +919,15 @@ int ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
     return (ft_execute_ast(node->left, ms));
 }
 
-
+/**
+ * @brief  Collects all heredocs from the current node and its left branch.
+ * 
+ * @param  node  Pointer to the starting heredoc node in the AST.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Status of the collection.
+ **         0 on success.
+ **         Non-zero in case of syntax errors.
+ */
 int	ft_collect_heredocs(t_node *node, t_minishell *ms)
 {
 	t_node	*current;
@@ -842,7 +962,7 @@ int	ft_collect_heredocs(t_node *node, t_minishell *ms)
 			//ft_putstr_fd(current->left->token->value, STDERR_FILENO);
 			ft_putchar_fd(current->left->token->value[0], STDERR_FILENO);
 			ft_putstr_fd("'\n", STDERR_FILENO);
-			set_exit_code(ms, 2);
+			ft_set_exit_code(ms, 2);
 			return (1);
 		}
 		node->heredoc_stops[i] = current->right->token->value;

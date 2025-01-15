@@ -3,15 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/06 12:16:09 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/15 03:57:32 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
+
+static int ft_check_valid_varname(char *arg);
+static int ft_check_option(char *arg);
+void	ft_builtin_unset(char **args, t_minishell *ms);
 
 /**
  * @brief	Check if arguments are valid for unset
@@ -68,7 +72,7 @@ void	ft_builtin_unset(char **args, t_minishell *ms)
 			ft_unset_env(args[i], ms);
 		i++;
 	}
-	set_exit_code(ms, 0);
+	ft_set_exit_code(ms, 0);
 }
 
 /* 

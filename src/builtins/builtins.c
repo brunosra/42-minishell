@@ -3,17 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/07 07:11:48 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/15 04:45:29 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
 
-int		ft_builtin_error(char *msg, int err)
+int	ft_builtin_error(char *msg, int err);
+int	ft_exec_builtins_check(t_node *node, t_minishell *ms);
+int	ft_exec_builtins(t_node *node, t_minishell *ms);
+
+/**
+ * @brief  Print an error message using perror and return a specified error code.
+ * 
+ * @param  msg  The error message to display.
+ * @param  err  The error code to return.
+ * @return int  The specified error code.
+ */
+int	ft_builtin_error(char *msg, int err)
 {
 	perror(msg);
 	return (err);
@@ -67,5 +78,5 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 		ft_builtin_export(node->cmd_ready, ms);
 	else if (!ft_strcmp(node->token->value, "unset"))
 		ft_builtin_unset(node->cmd_ready, ms);
-	return (exit_code(ms));
+	return (ft_exit_code(ms));
 }

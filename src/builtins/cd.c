@@ -3,15 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/08 18:08:59 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/15 03:48:05 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
+
+static char *ft_strtok(char *str, const char *delim);
+void		ft_resolve_relative_path(const char *base_path, const char *relative_path, char *resolved_path);
+int			ft_builtin_cd_check(char **args, t_minishell *ms);
+void		ft_builtin_cd(char **args, t_minishell *ms);
 
 /**
  * @brief 	Tokenize a string and returns them in order
@@ -20,7 +25,8 @@ extern volatile sig_atomic_t g_interrupt;
  * @param 	delim 	Token delimiter
  * @return 	char* 	Pointer to the first char of the first pointer.
  */
-static char *ft_strtok(char *str, const char *delim) {
+static char *ft_strtok(char *str, const char *delim)
+{
 	static char *last = NULL;
 	char *start = NULL;
 
@@ -30,7 +36,8 @@ static char *ft_strtok(char *str, const char *delim) {
 		return NULL;
 	while (*last && strchr(delim, *last) != NULL)
 		last++;
-	if (*last == '\0') {
+	if (*last == '\0')
+	{
 		last = NULL;
 		return NULL;
 	}
@@ -53,8 +60,8 @@ static char *ft_strtok(char *str, const char *delim) {
  * @param	relative_path 	the path to solve to
  * @param	resolved_path 	pointer to where to store the resolved path
  */
-
-void ft_resolve_relative_path(const char *base_path, const char *relative_path, char *resolved_path) {
+void ft_resolve_relative_path(const char *base_path, const char *relative_path, char *resolved_path)
+{
     char temp_path[PATH_MAX];
 	const char *home_dir;
 	char normalized_path[PATH_MAX];
@@ -62,7 +69,8 @@ void ft_resolve_relative_path(const char *base_path, const char *relative_path, 
 	size_t len;
 	char *last_slash;
 
-    if (relative_path[0] == '~') {
+    if (relative_path[0] == '~')
+	{
         home_dir = getenv("HOME");
         if (relative_path[1] == '\0')
             ft_strncpy(temp_path, home_dir, PATH_MAX - 1);
@@ -178,7 +186,7 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 	curpwd = ft_get_env("PWD", ms);
 	if (curpwd == NULL)
 	{
-		set_exit_code(ms, errno);
+		ft_set_exit_code(ms, errno);
 		return ;
 	}
 	if (ft_get_env("OLDPWD", ms) != NULL)
@@ -200,7 +208,7 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 	ft_set_env("PWD", resolved_path, ms);
 	ft_strlcpy(ms->currpath, resolved_path, ft_strlen(resolved_path) + 1);
 	chdir(ms->currpath);
-	set_exit_code(ms, 0);
+	ft_set_exit_code(ms, 0);
 }
 
 /* HELP FROM BASH CD

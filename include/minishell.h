@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/08 18:03:13 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/15 04:46:27 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,8 +200,8 @@ int		ft_unset_env(const char *key, t_minishell *ms);
 /**__UTILS__ **/
 int 	ft_perror(char *error, int return_value);
 int 	ft_putstr_and_return(char *msg, int return_value);
-void	set_exit_code(t_minishell *ms, int exit_code);
-int		exit_code(t_minishell *ms);
+void	ft_set_exit_code(t_minishell *ms, int exit_code);
+int		ft_exit_code(t_minishell *ms);
 
 /**__MISC_UTILS__**/
 void	ft_print_str_arr(char **arr);

@@ -3,16 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/31 17:24:37 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/01 12:16:08 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/15 04:45:29 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
 
+static int 			ft_value_is_numeric(char *str);
+static long long	ft_atoll(char *str, int i, long long res);
+int					ft_builtin_exit(char **args);
+
+/**
+ * @brief	Check if a string contains numeric characters.
+ * 
+ * @param	str	String to check for numeric characters.
+ * @return	int
+ * 			1 if the string contains numeric characters, 0 otherwise.
+ */
 static int ft_value_is_numeric(char *str)
 {
 	int i;
@@ -28,12 +39,18 @@ static int ft_value_is_numeric(char *str)
 }
 
 /**
- * @brief	Str to Long Long conversion
+ * @brief	Convert a string to a long long integer with error handling.
  * 
- * @param 	str	String to be converted
- * @param 	i	Initial Offset in the string to convert 
- * @param 	res	Initial value to be added to object
- * @return long long number
+ * @param	str	String to be converted.
+ * @param	i	Initial offset in the string for conversion.
+ * @param	res	Initial value to use for the result (typically 0).
+ * @return	long long
+ * 			The converted value as a signed long long integer.
+ * 
+ * @details
+ * - Handles leading whitespace and optional '+' or '-' signs.
+ * - Detects overflow or invalid characters in the input string.
+ * - Prints an error message and exits with code 2 if the string is not numeric or overflows.
  */
 static long long ft_atoll(char *str, int i, long long res)
 {
@@ -80,6 +97,19 @@ static long long ft_atoll(char *str, int i, long long res)
 	return (res * sig);
 }
 
+/**
+ * @brief	Implement the `exit` builtin command.
+ * 
+ * @param	args	Array of arguments passed to the `exit` command.
+ * @return	int
+ * 			Exit code to be used when terminating the shell.
+ * 
+ * @details
+ * - No arguments: Returns 0, indicating a successful exit.
+ * - Single argument: Converts the argument to a numeric exit code modulo 256.
+ * - Multiple arguments: Prints an error message for too many arguments and returns 1.
+ * - Non-numeric argument: Prints an error message and returns 2.
+ */
 int	ft_builtin_exit(char **args)
 {
 	int mod;
@@ -91,7 +121,7 @@ int	ft_builtin_exit(char **args)
 		i++;
 	if (i == 1)
 		return (0);
-		// set_exit_code(ms, 0);
+		// ft_set_exit_code(ms, 0);
 	else if (i > 2 && ft_atoll(args[1], 0, 0))
 	{
 		ft_putstr_fd("exit\nminishell: exit: too many arguments\n", STDERR_FILENO);
@@ -101,8 +131,8 @@ int	ft_builtin_exit(char **args)
 	else if (ft_value_is_numeric(args[1]))
 	{
 		mod = ft_atoll(args[1], 0, 0) % 256;
-		// set_exit_code(ms, mod);
-		// exit(exit_code(ms));
+		// ft_set_exit_code(ms, mod);
+		// exit(ft_exit_code(ms));
 		return (mod);
 	}
 	else if (!ft_value_is_numeric(args[1]))
@@ -115,7 +145,7 @@ int	ft_builtin_exit(char **args)
 	}
 	else
 		return (0);
-		// set_exit_code(ms, 0);
+		// ft_set_exit_code(ms, 0);
 	return (0);
-	// exit(exit_code(ms));
+	// exit(ft_exit_code(ms));
 }
