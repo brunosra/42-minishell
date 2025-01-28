@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_signal.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2024/12/26 15:50:52 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/15 02:52:44 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void		ft_signal_heredoc_handler(int sig);
 
 // void	ft_check_signals();
 
+
 void	ft_signal_handler(int sig)
 {
 	t_minishell	*ms;
@@ -33,7 +34,7 @@ void	ft_signal_handler(int sig)
 		rl_replace_line("", 0);
 		rl_on_new_line();
 		rl_redisplay();
-		set_exit_code(ms, 130); // Código típico para interrupções via Ctrl-C
+		ft_set_exit_code(ms, 130); // Código típico para interrupções via Ctrl-C
 	}
 /* 	else if (sig == SIGQUIT) // Ctrl-'\'
 	{

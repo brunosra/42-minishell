@@ -3,15 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   pwd.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/05 15:06:46 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/01/15 03:56:46 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 extern volatile sig_atomic_t g_interrupt;
+
+int	ft_builtin_pwd();
 
 /**
  * @brief	pwd - print name of current/working directory
@@ -19,7 +21,6 @@ extern volatile sig_atomic_t g_interrupt;
  * @param 	ms minishell pointer
  * @return 	int 
  */
-
 int	ft_builtin_pwd()
 {	
 	char cwd[PATH_MAX];
