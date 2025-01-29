@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/15 04:46:27 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/01/29 03:07:47 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,17 @@ typedef struct s_minishell
 	char				*prompt;
 	char				currpath[PATH_MAX];
 }				t_minishell;
+
+/**
+ * @brief Structure to hold AST-related pointers for processing.
+ */
+typedef struct s_ast_helper
+{
+	t_node	**current;
+	t_node	**root;
+	t_node	*op_node;
+}	t_ast_helper;
+
 
 /**__HANDLE_and_LEXING_INPUT__**/
 void ft_init_ms(t_minishell *ms);
