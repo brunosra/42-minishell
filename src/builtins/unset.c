@@ -6,13 +6,13 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/18 18:23:12 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/18 19:05:50 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-extern volatile int	g_interrupt;
 
+extern volatile int	g_interrupt;
 static int	ft_check_valid_varname(char *arg);
 static int	ft_check_option(char *arg);
 void		ft_builtin_unset(char **args, t_minishell *ms);
@@ -29,7 +29,6 @@ static int	ft_check_valid_varname(char *arg)
 {
 	if (!arg[0] || !ft_isalpha(arg[0]) || arg[0] == '_')
 		return (1);
-	printf("arg[0]: %c\n", arg[0]);
 	return (0);
 }
 

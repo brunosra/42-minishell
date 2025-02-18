@@ -6,13 +6,13 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/18 18:22:59 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/18 19:13:16 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-extern volatile int	g_interrupt;
 
+extern volatile int	g_interrupt;
 int	ft_builtin_error(char *msg, int err);
 int	ft_exec_builtins_check(t_node *node, t_minishell *ms);
 int	ft_exec_builtins(t_node *node, t_minishell *ms);
@@ -24,7 +24,8 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms);
  * @param  err  The error code to return.
  * @return int  The specified error code.
  */
-int	ft_builtin_error(char *msg, int err) // temos mais duas funcoes que fazem o mesmo! UNIFORMIZAR
+// TODO: temos mais duas funcoes que fazem o mesmo! UNIFORMIZAR
+int	ft_builtin_error(char *msg, int err)
 {
 	ft_putstr_fd(msg, STDERR_FILENO);
 	return (err);
@@ -41,17 +42,15 @@ int	ft_builtin_error(char *msg, int err) // temos mais duas funcoes que fazem o 
  */
 int	ft_exec_builtins_check(t_node *node, t_minishell *ms)
 {
-	if (!ft_strcmp(node->token->value, "echo") ||
-		!ft_strcmp(node->token->value, "exit") ||
-		!ft_strcmp(node->token->value, "pwd") ||
-		!ft_strcmp(node->token->value, "env"))
+	if (!ft_strcmp(node->token->value, "echo")
+		|| !ft_strcmp(node->token->value, "exit")
+		|| !ft_strcmp(node->token->value, "pwd")
+		|| !ft_strcmp(node->token->value, "env"))
 		return (0);
 	else if (!ft_strcmp(node->token->value, "cd"))
 		return (ft_builtin_cd_check(node->cmd_ready, ms));
 	else if (!ft_strcmp(node->token->value, "export"))
 		ft_builtin_export_check(node->cmd_ready, ms);
-	// else if (!ft_strcmp(node->token->value, "unset"))
-	// 	return (ft_builtin_unset_check(node->cmd_ready));
 	return (EX_OK);
 }
 
@@ -67,11 +66,11 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 	if (!ft_strcmp(node->token->value, "echo"))
 		ft_builtin_echo(node->cmd_ready, ms);
 	else if (!ft_strcmp(node->token->value, "exit"))
-	 	ft_builtin_exit(node->cmd_ready);
+		ft_builtin_exit(node->cmd_ready);
 	else if (!ft_strcmp(node->token->value, "env"))
 		ft_builtin_env(node->cmd_ready, ms);
 	else if (!ft_strcmp(node->token->value, "pwd"))
-	 	ft_builtin_pwd(ms);
+		ft_builtin_pwd(ms);
 	else if (!ft_strcmp(node->token->value, "cd"))
 		ft_builtin_cd(node->cmd_ready, ms);
 	else if (!ft_strcmp(node->token->value, "export"))
