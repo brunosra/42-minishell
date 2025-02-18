@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/18 20:10:50 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/18 21:20:07 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ void	ft_resolve_rel_p(const char *base_p,
 {
 	char		tmp_p[PATH_MAX];
 	char		norm_pth[PATH_MAX];
-	
+
 	if (rel_p[0] == '~')
 	{
 		if (rel_p[1] == '\0')

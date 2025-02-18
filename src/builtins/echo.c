@@ -6,16 +6,15 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/31 17:18:39 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/18 18:22:59 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/18 21:12:14 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-extern volatile int	g_interrupt;
 
+extern volatile int	g_interrupt;
 static int	ft_check_valid_echo_opt(char *opt);
 void		ft_builtin_echo(char **args, t_minishell *ms);
-
 
 /**
  * @brief 		Check if arg from echo is a valid variation of -n
@@ -24,7 +23,7 @@ void		ft_builtin_echo(char **args, t_minishell *ms);
  * @return int	1: is a valid variation of -n
  * 				0: is not
  */
-static int		ft_check_valid_echo_opt(char *opt)
+static int	ft_check_valid_echo_opt(char *opt)
 {
 	int	i;
 
@@ -51,15 +50,15 @@ static int		ft_check_valid_echo_opt(char *opt)
  */
 void	ft_builtin_echo(char **args, t_minishell *ms)
 {
-	int i;
-	int newline;
+	int	i;
+	int	newline;
 
 	i = 1;
 	newline = 1;
 	while (args[i])
 	{
 		if (ft_check_valid_echo_opt(args[i]) == 0)
-			break;
+			break ;
 		newline = 0;
 		i++;
 	}

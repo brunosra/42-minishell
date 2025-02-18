@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 22:18:23 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/03 10:56:32 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/18 21:05:46 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,4 +30,5 @@
 # define EX_EXITARGERR		128
 # define EX_OUTOFRANGEERR	255
 
+# define MSG_ERR_EXIT		"exit\nminishell: exit:"
 #endif
