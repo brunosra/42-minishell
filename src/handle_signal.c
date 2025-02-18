@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   handle_signal.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/15 02:52:44 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/18 18:22:59 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-extern volatile sig_atomic_t g_interrupt;
+extern volatile int	g_interrupt;
 
 void		ft_signal_handler(int sig);
 t_minishell	*ft_ms_struct(t_minishell *ms, int flag);

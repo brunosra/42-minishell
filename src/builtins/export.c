@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/27 11:28:18 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/15 03:55:57 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/18 18:31:14 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-extern volatile sig_atomic_t g_interrupt;
+extern volatile int	g_interrupt;
 
 void	ft_dup_envp(char **src, char **dest, int count);
 void	free_dup_envp(char **arr);
@@ -33,19 +33,20 @@ void	ft_sort_envp(char **arr, int count);
  */
 void	ft_dup_envp(char **src, char **dest, int count)
 {
-    int i;
+    int	i;
 
 	i = 0;
-    while (i < count) {
+    while (i < count)
+	{
         dest[i] = malloc(ft_strlen(src[i]) + 1);
-        if (!dest[i]) {
+        if (!dest[i])
+		{
             perror("malloc failed");
             exit(EXIT_FAILURE);
         }
         ft_strcpy(dest[i], src[i]);
         i++;
     }
-
     dest[i] = NULL;
 }
 
@@ -107,9 +108,11 @@ void ft_sort_envp(char **arr, int count)
 	int j;
 
 	i = 0;
-	while (i < count - 1) {
+	while (i < count - 1)
+	{
 		j = 0;
-		while (j < count - i - 1) {
+		while (j < count - i - 1)
+		{
 			if (ft_strcmp(arr[j], arr[j + 1]) > 0)
 				ft_swap_env(&arr[j], &arr[j + 1]);
 			j++;
@@ -117,10 +120,6 @@ void ft_sort_envp(char **arr, int count)
 		i++;
 	}
 }
-
-
-
-
 
 /**
  * @brief	Check if arguments are valid for export

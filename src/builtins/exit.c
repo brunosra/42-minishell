@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/31 17:24:37 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/15 04:45:29 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/18 18:22:59 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-extern volatile sig_atomic_t g_interrupt;
+extern volatile int	g_interrupt;
 
 static int 			ft_value_is_numeric(char *str);
 static long long	ft_atoll(char *str, int i, long long res);

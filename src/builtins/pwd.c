@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   pwd.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/15 03:56:46 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/18 18:22:59 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-extern volatile sig_atomic_t g_interrupt;
+extern volatile int	g_interrupt;
 
 int	ft_builtin_pwd();
 

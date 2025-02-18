@@ -6,14 +6,14 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/27 11:32:18 by bschwell          #+#    #+#             */
-/*   Updated: 2024/12/31 17:25:42 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/18 18:22:59 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 // TODO: Decide if we want to delete or not this file afterwards
 
 #include "../include/minishell.h"
-extern volatile sig_atomic_t g_interrupt;
+extern volatile int	g_interrupt;
 
 /**
  * @brief 		Prints an array of Strings

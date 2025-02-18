@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   lexing_input.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/28 02:12:26 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/18 18:35:56 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-extern volatile sig_atomic_t g_interrupt;
+extern volatile int	g_interrupt;
 
 t_token			*ft_tokenize_input(char *str, int n_args, int i, int j);
 int				ft_tokenize(char *str, int *i, t_token *tokens, int *j);
@@ -258,14 +258,14 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 		return (type);
 	if (str && (str[0] == '$' || ft_strchr(str, '$')))
 		return (ft_check_variable_or_filename(str, prev_type));
-	if (ft_check_builtins(str))
-		return (TOKEN_BUILTIN);
 	if (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL)
 		return (TOKEN_COMMAND);
 	if (prev_type == TOKEN_COMMAND || prev_type == TOKEN_BUILTIN ||
 		prev_type == TOKEN_ARGUMENT || prev_type == TOKEN_VARIABLE ||
 		prev_type == TOKEN_FILENAME)
 		return (TOKEN_ARGUMENT);
+	if (ft_check_builtins(str))
+		return (TOKEN_BUILTIN);
 	return (TOKEN_COMMAND);
 }
 

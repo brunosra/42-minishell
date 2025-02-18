@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/15 04:45:29 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/18 18:23:07 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 // TODO: nao podemos usar esta variavel global para ter os sinais.
 // TODO: Somente podemos usar um int para receber. nao podemos usar sig_atomic_t
-volatile sig_atomic_t g_interrupt;
+volatile int	g_interrupt;
 
 int	main(int argc, char **argv, char **envp);
 void ft_init_ms(t_minishell *ms);
