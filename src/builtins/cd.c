@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
-/*   Updated: 2025/01/15 03:48:05 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/18 18:22:59 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-extern volatile sig_atomic_t g_interrupt;
+extern volatile int	g_interrupt;
 
 static char *ft_strtok(char *str, const char *delim);
 void		ft_resolve_relative_path(const char *base_path, const char *relative_path, char *resolved_path);
@@ -44,7 +44,8 @@ static char *ft_strtok(char *str, const char *delim)
 	start = last;
 	while (*last && strchr(delim, *last) == NULL)
 		last++;
-	if (*last) {
+	if (*last)
+	{
 		*last = '\0';
 		last++;
 	} 
@@ -127,7 +128,6 @@ void ft_resolve_relative_path(const char *base_path, const char *relative_path, 
  * @return 	int
  * *		0: OK!
  * * 		N: not ok, cd should not be run.
- * TODO: 	remove comments
  */
 int		ft_builtin_cd_check(char **args, t_minishell *ms)
 {
@@ -142,7 +142,6 @@ int		ft_builtin_cd_check(char **args, t_minishell *ms)
 		if (ft_get_env("HOME", ms) == NULL)
 			return (ft_builtin_error("cd: HOME not set", 1));
 		ft_strncpy(resolved_path, ft_get_env("HOME", ms), PATH_MAX - 1);
-		// printf("resolved path %s: %s\n", "HOME", resolved_path);
 	}
 	else if (args[2] == NULL)
 	{
@@ -151,15 +150,9 @@ int		ft_builtin_cd_check(char **args, t_minishell *ms)
 			if (ft_get_env("OLDPWD", ms) == NULL)
 				return(ft_builtin_error("cd: OLDPWD not set", 2));
 			ft_strncpy(resolved_path, ft_get_env("OLDPWD", ms), PATH_MAX - 1);
-			// printf("resolved path %s: %s\n", "OLDPWD", resolved_path);
 		}
 		else
-		{
-			// printf("curpwd : %s\n", curpwd);
-			// printf("args[1]: %s\n", args[1]);
 			ft_resolve_relative_path(curpwd, args[1], resolved_path);
-		}
-		// printf("resolved path %s: %s\n", "1 ARG", resolved_path);
 	}
 	else
 		return (ft_builtin_error("minishell: cd: too many arguments\n", 1));
@@ -182,7 +175,6 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 	char	oldpwd[PATH_MAX];
 	char	resolved_path[PATH_MAX];
 
-	// printf("execute cd \n");
 	curpwd = ft_get_env("PWD", ms);
 	if (curpwd == NULL)
 	{
@@ -202,8 +194,6 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 		else
 			ft_resolve_relative_path(curpwd, args[1], resolved_path);
 	}
-	// printf("OLDPWD: %s\n", curpwd);
-	// printf("PWD: %s\n", resolved_path);
 	ft_set_env("OLDPWD", curpwd, ms);
 	ft_set_env("PWD", resolved_path, ms);
 	ft_strlcpy(ms->currpath, resolved_path, ft_strlen(resolved_path) + 1);
