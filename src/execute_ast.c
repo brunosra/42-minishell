@@ -498,12 +498,6 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 
 	valid = -1;
 	sig = 0;
-/* 	if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
-	{
-		ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
-		ft_set_exit_code(ms, 127);
-		return (127); // Código de erro para "command not found"
-	} */
 	ms->pid = fork();
 	if (ms->pid == -1)
 	{
@@ -515,11 +509,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	{
 		//ft_set_fork_signals();
 		if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
-		{
-/* 			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
-			ft_set_exit_code(ms, 127);
- */			return (42); // Código de erro para "command not found"
-		}
+			exit(0);
 		if (node->token->type == TOKEN_BUILTIN)
 			exit(ft_exec_builtins_check(node, ms));
 		if (node->cmd_ready[0][0] == '/' || 									// Caminho absoluto ou relativo
@@ -555,7 +545,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	if (WIFEXITED(ms->status)) // Processo terminou normalmente
 	{
 		ft_set_exit_code(ms, WEXITSTATUS(ms->status));
- 		if (ft_exit_code(ms) == 42)
+ 		if (ft_exit_code(ms) == 42 && node->cmd_ready[0])
 		{
 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
 			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found

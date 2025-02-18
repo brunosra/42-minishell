@@ -97,8 +97,8 @@ int	ft_revalue_token_variable(t_minishell *ms)
 						perror("");
 						return (1);
 					}
-					if (ms->tokens[i].value[0] == '\0' && ms->tokens[i].type == TOKEN_COMMAND)
-						ms->tokens[i].type = TOKEN_VARIABLE; // alaterar para TOKEN_EMPTY para ser ignorado no parsing. outra e perceber a quando do tokenixe type se a expansao da var e nula e se assim for passa a TOKEN_EMPTY...
+					// if (ms->tokens[i].value[0] == '\0' && ms->tokens[i].type == TOKEN_COMMAND)
+					// 	ms->tokens[i].type = TOKEN_VARIABLE; // alaterar para TOKEN_EMPTY para ser ignorado no parsing. outra e perceber a quando do tokenixe type se a expansao da var e nula e se assim for passa a TOKEN_EMPTY...
 					ptr = ft_strchr(ms->tokens[i].value, '$');
 					if (!ptr)
 						break ;
