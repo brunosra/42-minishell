@@ -208,7 +208,7 @@ int	ft_process_input_and_execute(t_minishell *ms)
 	}
  	ms->ast_root = ft_parse_ast(ms->tokens);
 	ft_find_stuck_cats(ms, ms->ast_root);
-	// print_ast(ms->ast_root, 5); // Para testar a estrutura da AST, se necessário
+	print_ast(ms->ast_root, 5); // Para testar a estrutura da AST, se necessário
 	if (ms->ast_root)
 	{
 		ms->status = ft_execute_ast(ms->ast_root, ms);

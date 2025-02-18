@@ -222,6 +222,8 @@ static t_type	ft_check_operator_or_exception(char *str)
  */
 static t_type	ft_check_variable_or_filename(char *str, t_type prev_type)
 {
+	if (prev_type == TOKEN_NULL || prev_type == TOKEN_OPERATOR)
+		return(TOKEN_COMMAND);
 	if (str[0] == '$')
 		return (TOKEN_VARIABLE);
 	if (ft_verify_variable_value(str))
