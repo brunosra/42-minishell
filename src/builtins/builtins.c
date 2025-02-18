@@ -24,9 +24,9 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms);
  * @param  err  The error code to return.
  * @return int  The specified error code.
  */
-int	ft_builtin_error(char *msg, int err)
+int	ft_builtin_error(char *msg, int err) // temos mais duas funcoes que fazem o mesmo! UNIFORMIZAR
 {
-	perror(msg);
+	ft_putstr_fd(msg, STDERR_FILENO);
 	return (err);
 }
 

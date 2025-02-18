@@ -36,8 +36,9 @@ void	ft_builtin_env(char **args, t_minishell *ms)
 	env = ms->env.envp;
 	if (args[1])
 	{
-		printf("[env error]: doesn't support arguments\n");
-		ft_set_exit_code(ms, EX_EXITARGERR);
+		printf("env: ‘%s’: No such file or directory\n", args[1]);
+		// printf("[env error]: doesn't support arguments\n");
+		ft_set_exit_code(ms, EX_NOTFOUNDERR);
 		return ;
 	}
 	else

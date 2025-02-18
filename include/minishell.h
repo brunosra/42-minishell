@@ -109,6 +109,22 @@ typedef struct s_ast_helper
 	t_node	*op_node;
 }	t_ast_helper;
 
+/**
+ * @brief Structure to hold grouop_cmd-related variables for processing.
+ */
+typedef struct s_cmd_helper
+{
+	int		arg_count;
+	int		i;
+	int		j;
+	int		len_value;
+	int		n_args_cmd_nd_values;
+	int		c_except;
+	int		empty;
+	int		stop;
+	char	**cmd_nd_value;
+}	t_cmd_helper;
+
 
 /**__HANDLE_and_LEXING_INPUT__**/
 void ft_init_ms(t_minishell *ms);

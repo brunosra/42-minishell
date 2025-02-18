@@ -25,6 +25,14 @@ static t_node	*ft_handle_cmd_node(t_token *tokens, int *i, t_node **current,
 t_node	*ft_create_cmd_node(t_token *token);
 t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right);
 t_node	*ft_group_command_tokens(t_token *tokens, int *index);
+static void	ft_process_cmd_value(t_node *cmd_node, t_cmd_helper *h);
+static void	ft_fill_cmd_node(t_token *tokens, int *index, t_node *cmd_node,
+								t_cmd_helper *h);
+static void	ft_handle_individual_token(t_token *tokens, int *index,
+										t_node *cmd_node, t_cmd_helper *h);
+static void	ft_handle_redirects(t_token *tokens, int *index, t_cmd_helper *h);
+static void	ft_collect_arguments(t_token *tokens, int *index, t_cmd_helper *h);
+t_cmd_helper	ft_init_cmd_helper(t_node *cmd_node);
 int		ft_verify_cmd_node_value(t_node *cmd_node);
 char	*ft_remove_quotes(char *value);
 static void	ft_concat_new_value(char **final, char *sub);
@@ -207,7 +215,8 @@ static void	ft_adjust_input_redirect(t_token *tokens, int *i,
 				t_ast_helper *ast)
 {
 	if (tokens[*i].type == TOKEN_INPUT_REDIRECT && *(ast->current)
-		&& (*(ast->current))->prev && (*(ast->current))->prev->right == *(ast->current)
+		&& (*(ast->current))->prev
+		&& (*(ast->current))->prev->right == *(ast->current)
 		&& (*(ast->current))->prev->token->type == TOKEN_OPERATOR)
 	{
 		*(ast->root) = (*(ast->current))->prev;
@@ -312,124 +321,346 @@ t_node	*ft_parse_ast(t_token *tokens)
 }
 
 
-/**
- * @brief  Groups command-related tokens into a single command node.
- * 
- * @param  tokens  Array of tokens.
- * @param  index   Pointer to the current token index.
- * @return t_node* Pointer to the created command node.
- */
-t_node	*ft_group_command_tokens(t_token *tokens, int *index)
-{
-	t_node	*cmd_node;
-	int		arg_count;
-	int		i;
-	char 	**cmd_nd_value;
-	int		j;
-	int		n_args_cmd_nd_values;
-	int		len_value;
-	int		c_except;
-	int		stop;
-	int		empty;
+// /**
+//  * @brief  Groups command-related tokens into a single command node.
+//  * 
+//  * @param  tokens  Array of tokens.
+//  * @param  index   Pointer to the current token index.
+//  * @return t_node* Pointer to the created command node.
+//  */
+// t_node	*ft_group_command_tokens(t_token *tokens, int *index)
+// {
+// 	t_node	*cmd_node;
+// 	int		arg_count;
+// 	int		i;
+// 	char 	**cmd_nd_value;
+// 	int		j;
+// 	int		n_args_cmd_nd_values;
+// 	int		len_value;
+// 	int		c_except;
+// 	int		stop;
+// 	int		empty;
 
-	cmd_node = ft_create_cmd_node(&tokens[*index]);
-	c_except = 0;
-	empty = 0;
-	cmd_nd_value = NULL;
-	arg_count = 1;
-	i = 0;
-	j = 0;
-	len_value = ft_strlen(cmd_node->token->value);
-	n_args_cmd_nd_values = ft_verify_cmd_node_value(cmd_node);
-	(*index)++;
-	while (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE))
+// 	cmd_node = ft_create_cmd_node(&tokens[*index]);
+// 	c_except = 0;
+// 	empty = 0;
+// 	cmd_nd_value = NULL;
+// 	arg_count = 1;
+// 	i = 0;
+// 	j = 0;
+// 	len_value = ft_strlen(cmd_node->token->value);
+// 	n_args_cmd_nd_values = ft_verify_cmd_node_value(cmd_node);
+// 	(*index)++;
+// 	while (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE))
+// 	{
+// 		if (tokens[*index].value[0] == '\0')
+// 		{
+// 			(*index)++;
+// 			empty++;
+// 		}	
+// 		else
+// 		{
+// 			arg_count++;
+// 			(*index)++;
+// 		}
+// 		// printf("%i = %s\n", *index, tokens[*index].value);
+// 	}
+// 	stop = *index;
+// 	while (tokens[*index].value && (tokens[*index].type != TOKEN_OPERATOR && tokens[*index].type != TOKEN_EXCEPT && tokens[*index].type != TOKEN_COMMAND))
+// 	{
+// 		if (tokens[*index].type == TOKEN_INPUT_REDIRECT || tokens[*index].type == TOKEN_OUTPUT_REDIRECT || tokens[*index].type == TOKEN_HEREDOC || tokens[*index].type == TOKEN_FILENAME)
+// 		{
+// 			c_except++;
+// 			(*index)++;
+// 			if (tokens[*index].type == TOKEN_FILENAME)
+// 			{
+// 				c_except++;
+// 				(*index)++;
+// 			}
+// 		}
+// 		while (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE))
+// 		{
+// 			if (tokens[*index].value[0] == '\0')
+// 			{
+// 				(*index)++;
+// 				empty++;
+// 			}	
+// 			else
+// 			{
+// 				arg_count++;
+// 				(*index)++;
+// 			}
+// 		// printf("%i = %s\n", *index, tokens[*index].value);
+// 		}
+// 	}
+// 	cmd_node->cmd_ready = malloc(sizeof(char *) * (arg_count + (n_args_cmd_nd_values - 1) + 1));
+// 	if (!cmd_node->cmd_ready)
+// 		return (NULL);
+// 	if (n_args_cmd_nd_values > 1)
+// 	{
+// 		cmd_nd_value = ft_split(cmd_node->token->value, ' ');
+// 		while (cmd_nd_value[j])
+// 		{
+// 			cmd_node->cmd_ready[j] = ft_strdup(cmd_nd_value[j]);
+// 			j++;
+// 		}
+// 		ft_free_split(cmd_nd_value);
+// 		arg_count--;
+// 	}
+// 	else if (ft_cmp_str_str(cmd_node->token->value, "\"", len_value) || ft_cmp_str_str(cmd_node->token->value, "\'", len_value))
+// 		cmd_node->token->value = ft_remove_quotes(cmd_node->token->value);
+// 	*index -= (arg_count + c_except + empty); // Ajusta o índice para voltar ao início do comando
+// 	i = j;
+// 	if (n_args_cmd_nd_values != 1)
+// 		arg_count += n_args_cmd_nd_values;
+// 	while (i < arg_count)
+// 	{
+// 		if (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE || tokens[*index].type == TOKEN_COMMAND || tokens[*index].type == TOKEN_BUILTIN))
+// 		{
+// 			if (tokens[*index].value[0] == '\0')
+// 			{
+// 				(*index)++;
+// 				continue ;		
+// 			}	// cmd_node->cmd_ready[i] = ft_strdup(""); // talvez seja para mudar!
+// 			if (i > j)
+// 				tokens[*index].value = ft_remove_quotes(tokens[*index].value);
+// 			if (tokens[*index].value/* [0] != '\0' */)
+// 				cmd_node->cmd_ready[i] = ft_strdup(tokens[*index].value);
+// 			i++;
+// 			(*index)++;
+// 		}
+// 		else if ((tokens[*index].type == TOKEN_INPUT_REDIRECT || tokens[*index].type == TOKEN_OUTPUT_REDIRECT || tokens[*index].type == TOKEN_HEREDOC || tokens[*index].type == TOKEN_FILENAME))
+// 			(*index)++;
+// 		else
+// 			break ;
+// 		// 	return (NULL);
+// 	}
+// 	if (c_except)
+// 		*index = stop;
+// 	cmd_node->cmd_ready[i] = NULL;
+// 	cmd_node->cmd_ready = ft_remove_null_values(cmd_node->cmd_ready, arg_count);
+// 	return (cmd_node);
+// }
+
+/**
+ * @brief  Initializes a helper structure to group command tokens.
+ * 
+ * This function initializes a structure that is used to keep track of
+ * various states during the process of handling command tokens, including
+ * the argument count, token value length, and the number of arguments.
+ * 
+ * @param cmd_node  A pointer to the node representing the command.
+ * 
+ * @return t_cmd_helper  The initialized helper structure.
+ */
+t_cmd_helper	ft_init_cmd_helper(t_node *cmd_node)
+{
+	t_cmd_helper h;
+
+	h.cmd_nd_value = NULL;
+	h.arg_count = 1;
+	h.i = 0;
+	h.j = 0;
+	h.len_value = ft_strlen(cmd_node->token->value);
+	h.n_args_cmd_nd_values = ft_verify_cmd_node_value(cmd_node);
+	h.c_except = 0;
+	h.empty = 0;
+	return (h);
+}
+
+/**
+ * @brief  Counts arguments and handles empty values.
+ * 
+ * This function processes the tokens from the provided index and counts
+ * the number of arguments, incrementing the argument count for valid
+ * tokens while handling empty values by incrementing a separate counter.
+ * 
+ * @param tokens  An array of tokens.
+ * @param index   A pointer to the current index in the tokens array.
+ * @param h       A pointer to the helper structure.
+ */
+static void	ft_collect_arguments(t_token *tokens, int *index, t_cmd_helper *h)
+{
+	while (tokens[*index].value && 
+		(tokens[*index].type == TOKEN_ARGUMENT || 
+		tokens[*index].type == TOKEN_VARIABLE))
 	{
 		if (tokens[*index].value[0] == '\0')
 		{
 			(*index)++;
-			empty++;
-		}	
+			h->empty++;
+		}
 		else
 		{
-			arg_count++;
+			h->arg_count++;
 			(*index)++;
 		}
-		// printf("%i = %s\n", *index, tokens[*index].value);
 	}
-	stop = *index;
-	while (tokens[*index].value && (tokens[*index].type != TOKEN_OPERATOR && tokens[*index].type != TOKEN_EXCEPT && tokens[*index].type != TOKEN_COMMAND))
+}
+
+/**
+ * @brief  Handles redirects and counts special cases.
+ * 
+ * This function processes tokens that represent redirects (input,
+ * output, heredoc) or filenames and updates the helper structure
+ * accordingly, including special handling for redirects.
+ * 
+ * @param tokens  An array of tokens.
+ * @param index   A pointer to the current index in the tokens array.
+ * @param h       A pointer to the helper structure.
+ */
+static void	ft_handle_redirects(t_token *tokens, int *index, t_cmd_helper *h)
+{
+	while (tokens[*index].value && 
+		(tokens[*index].type != TOKEN_OPERATOR && 
+		tokens[*index].type != TOKEN_EXCEPT &&
+		tokens[*index].type != TOKEN_COMMAND))
 	{
-		if (tokens[*index].type == TOKEN_INPUT_REDIRECT || tokens[*index].type == TOKEN_OUTPUT_REDIRECT || tokens[*index].type == TOKEN_HEREDOC || tokens[*index].type == TOKEN_FILENAME)
+		if (tokens[*index].type == TOKEN_INPUT_REDIRECT || 
+			tokens[*index].type == TOKEN_OUTPUT_REDIRECT || 
+			tokens[*index].type == TOKEN_HEREDOC || 
+			tokens[*index].type == TOKEN_FILENAME)
 		{
-			c_except++;
+			h->c_except++;
 			(*index)++;
 			if (tokens[*index].type == TOKEN_FILENAME)
 			{
-				c_except++;
+				h->c_except++;
 				(*index)++;
 			}
 		}
-		while (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE))
-		{
-			if (tokens[*index].value[0] == '\0')
-			{
-				(*index)++;
-				empty++;
-			}	
-			else
-			{
-				arg_count++;
-				(*index)++;
-			}
-		// printf("%i = %s\n", *index, tokens[*index].value);
-		}
+		ft_collect_arguments(tokens, index, h);
 	}
-	cmd_node->cmd_ready = malloc(sizeof(char *) * (arg_count + (n_args_cmd_nd_values - 1) + 1));
-	if (!cmd_node->cmd_ready)
-		return (NULL);
-	if (n_args_cmd_nd_values > 1)
+}
+
+/**
+ * @brief  Handles an individual token and updates the command node's `cmd_ready`.
+ * 
+ * This helper function processes an individual token, checking if the
+ * token value is empty and skipping it if necessary. It also removes
+ * quotes from the token's value if required and then copies the value
+ * to the command node's `cmd_ready` array.
+ * 
+ * @param tokens   An array of tokens.
+ * @param index    A pointer to the current index in the tokens array.
+ * @param cmd_node A pointer to the command node to be filled.
+ * @param h        A pointer to the helper structure.
+ */
+static void	ft_handle_individual_token(t_token *tokens, int *index,
+										t_node *cmd_node, t_cmd_helper *h)
+{
+	if (tokens[*index].value[0] == '\0')
 	{
-		cmd_nd_value = ft_split(cmd_node->token->value, ' ');
-		while (cmd_nd_value[j])
-		{
-			cmd_node->cmd_ready[j] = ft_strdup(cmd_nd_value[j]);
-			j++;
-		}
-		ft_free_split(cmd_nd_value);
-		arg_count--;
+		(*index)++;
+		return;
 	}
-	else if (ft_cmp_str_str(cmd_node->token->value, "\"", len_value) || ft_cmp_str_str(cmd_node->token->value, "\'", len_value))
-		cmd_node->token->value = ft_remove_quotes(cmd_node->token->value);
-	*index -= (arg_count + c_except + empty); // Ajusta o índice para voltar ao início do comando
-	i = j;
-	if (n_args_cmd_nd_values != 1)
-		arg_count += n_args_cmd_nd_values;
-	while (i < arg_count)
+	if (h->i > h->j)
+		tokens[*index].value = ft_remove_quotes(tokens[*index].value);
+	cmd_node->cmd_ready[h->i] = ft_strdup(tokens[*index].value);
+	h->i++;
+	(*index)++;
+}
+
+/**
+ * @brief  Fills the command node with token values.
+ * 
+ * This function fills the command node's `cmd_ready` array with token
+ * values from the tokens array. It processes argument and redirection
+ * tokens, removing quotes from arguments if necessary.
+ * 
+ * @param tokens   An array of tokens.
+ * @param index    A pointer to the current index in the tokens array.
+ * @param cmd_node A pointer to the command node to be filled.
+ * @param h        A pointer to the helper structure.
+ */
+static void	ft_fill_cmd_node(t_token *tokens, int *index, t_node *cmd_node,
+								t_cmd_helper *h)
+{
+	h->i = h->j;
+	if (h->n_args_cmd_nd_values != 1)
+		h->arg_count += h->n_args_cmd_nd_values;
+	while (h->i < h->arg_count)
 	{
-		if (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE || tokens[*index].type == TOKEN_COMMAND || tokens[*index].type == TOKEN_BUILTIN))
+		if (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT
+			|| tokens[*index].type == TOKEN_VARIABLE 
+			|| tokens[*index].type == TOKEN_COMMAND
+			|| tokens[*index].type == TOKEN_BUILTIN))
 		{
-			if (tokens[*index].value[0] == '\0')
-			{
-				(*index)++;
-				continue ;		
-			}	// cmd_node->cmd_ready[i] = ft_strdup(""); // talvez seja para mudar!
-			if (i > j)
-				tokens[*index].value = ft_remove_quotes(tokens[*index].value);
-			if (tokens[*index].value/* [0] != '\0' */)
-				cmd_node->cmd_ready[i] = ft_strdup(tokens[*index].value);
-			i++;
-			(*index)++;
+			ft_handle_individual_token(tokens, index, cmd_node, h);
 		}
-		else if ((tokens[*index].type == TOKEN_INPUT_REDIRECT || tokens[*index].type == TOKEN_OUTPUT_REDIRECT || tokens[*index].type == TOKEN_HEREDOC || tokens[*index].type == TOKEN_FILENAME))
+		else if ((tokens[*index].type == TOKEN_INPUT_REDIRECT
+				|| tokens[*index].type == TOKEN_OUTPUT_REDIRECT
+				|| tokens[*index].type == TOKEN_HEREDOC
+				|| tokens[*index].type == TOKEN_FILENAME))
 			(*index)++;
 		else
-			break ;
-		// 	return (NULL);
+			break;
 	}
-	if (c_except)
-		*index = stop;
-	cmd_node->cmd_ready[i] = NULL;
-	cmd_node->cmd_ready = ft_remove_null_values(cmd_node->cmd_ready, arg_count);
+}
+
+/**
+ * @brief  Processes the command node value, handling spaces and quotes.
+ * 
+ * This function processes the value of the command node, handling spaces
+ * by splitting the value into multiple parts and quotes by removing them
+ * from the value.
+ * 
+ * @param cmd_node A pointer to the command node.
+ * @param h        A pointer to the helper structure.
+ */
+static void	ft_process_cmd_value(t_node *cmd_node, t_cmd_helper *h)
+{
+	if (h->n_args_cmd_nd_values > 1)
+	{
+		h->cmd_nd_value = ft_split(cmd_node->token->value, ' ');
+		while (h->cmd_nd_value[h->j])
+		{
+			cmd_node->cmd_ready[h->j] = ft_strdup(h->cmd_nd_value[h->j]);
+			h->j++;
+		}
+		ft_free_split(h->cmd_nd_value);
+		h->arg_count--;
+	}
+	else if (ft_cmp_str_str(cmd_node->token->value, "\"", h->len_value)
+			|| ft_cmp_str_str(cmd_node->token->value, "'", h->len_value))
+		cmd_node->token->value = ft_remove_quotes(cmd_node->token->value);
+}
+
+/**
+ * @brief  Groups command-related tokens into a single command node.
+ * 
+ * This function groups tokens related to a single command, processing
+ * arguments, redirects, and command values, and returns a command node
+ * that represents the complete command structure with associated values.
+ * 
+ * @param tokens  An array of tokens.
+ * @param index   A pointer to the current index in the tokens array.
+ * 
+ * @return t_node*  A pointer to the command node.
+ */
+t_node	*ft_group_command_tokens(t_token *tokens, int *index)
+{
+	t_node		*cmd_node;
+	t_cmd_helper h;
+
+	cmd_node = ft_create_cmd_node(&tokens[*index]);
+	h = ft_init_cmd_helper(cmd_node);
+	(*index)++;
+	ft_collect_arguments(tokens, index, &h);
+	h.stop = *index;
+	ft_handle_redirects(tokens, index, &h);
+	cmd_node->cmd_ready = malloc(sizeof(char *) * (h.arg_count + 
+		(h.n_args_cmd_nd_values - 1) + 1));
+	if (!cmd_node->cmd_ready)
+		return (NULL);
+	ft_process_cmd_value(cmd_node, &h);
+	*index -= (h.arg_count + h.c_except + h.empty);
+	ft_fill_cmd_node(tokens, index, cmd_node, &h);
+	if (h.c_except)
+		*index = h.stop;
+	cmd_node->cmd_ready[h.i] = NULL;
+	cmd_node->cmd_ready = ft_remove_null_values(cmd_node->cmd_ready,
+												h.arg_count);
 	return (cmd_node);
 }
 
@@ -513,7 +744,8 @@ static int	ft_count_valid_args(char **cmd_ready)
  * @param  new_cmd_ready  New allocated array for valid arguments.
  * @param  valid_count    Number of valid arguments.
  */
-static void	ft_copy_valid_args(char **cmd_ready, char **new_cmd_ready, int valid_count)
+static void	ft_copy_valid_args(char **cmd_ready, char **new_cmd_ready,
+								int valid_count)
 {
 	int	i;
 	int	j;
@@ -826,7 +1058,8 @@ void	print_ast(t_node *node, int depth)
 		printf("\n");
 	}
 	else
-    	printf("Node Type: %d, Value: %s\n", node->token->type, node->token->value);
+    	printf("Node Type: %d, Value: %s\n", node->token->type,
+				node->token->value);
     print_ast(node->left, depth + 1);
     print_ast(node->right, depth + 1);
 }

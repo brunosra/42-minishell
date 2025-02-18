@@ -162,7 +162,7 @@ int		ft_builtin_cd_check(char **args, t_minishell *ms)
 		// printf("resolved path %s: %s\n", "1 ARG", resolved_path);
 	}
 	else
-		return (printf("cd: too many arguments\n"));
+		return (ft_builtin_error("minishell: cd: too many arguments\n", 1));
 	if (chdir(resolved_path) != 0)
 		return (ft_builtin_error("cd error", errno));
 	return (0);
