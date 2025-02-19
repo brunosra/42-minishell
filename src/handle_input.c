@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_input.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:39:44 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/18 18:22:59 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/19 16:59:38 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,10 @@ int			ft_handle_argument(char *str, int i);
  */
 int	ft_skip_operator(const char *str, int i)
 {
-	if (str[i] == '|' || str[i] == '<' || str[i] == '>')
+	if (str[i] == '|' || str[i] == '<' || str[i] == '>' || str[i] == ';' || str[i] == '&')
 	{
 		i++;
-		if (str[i + 1] && (str[i] == '<' || str[i] == '>'))
+		if (str[i + 1] && (str[i] == '<' || str[i] == '>' || str[i] == '&'))
 			i++;
 	}
 	return (i);
@@ -59,10 +59,10 @@ int	ft_count_args(char *str)
 			i++;
 		if (str[i] == '\0')
 			break ;
-		if (str[i] == '|' || str[i] == '<' || str[i] == '>')
+		if (str[i] == '|' || str[i] == '<' || str[i] == '>' || str[i] == ';' || str[i] == '&')
 		{
 			i++;
-			if (str[i] && str[i + 1] && (str[i] == '<' || str[i] == '>'))
+			if (str[i] && str[i + 1] && (str[i] == '<' || str[i] == '>' || str[i] == '&'))
 				i++;
 		}
 		else if (str[i] == '"' || str[i] == '\'')
@@ -169,8 +169,7 @@ int	ft_handle_quotes(char *str, int i, int *start, int *end)
 int	ft_handle_argument(char *str, int i)
 {
 	while (str[i] && str[i] != ' ' && str[i] != '|'
-				&& str[i] != '>' && str[i] != '<')
+				&& str[i] != '>' && str[i] != '<' && str[i] != ';' && str[i] != '&')
 		i++;
 	return (i);
-
 }
