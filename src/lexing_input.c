@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/19 17:19:11 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/19 18:33:36 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,7 +208,7 @@ static t_type	ft_check_operator_or_exception(char *str)
 {
 	if (!ft_strcmp(str, "|"))
 		return (TOKEN_OPERATOR);
-	else if (!ft_strcmp(str, "||") || !ft_strcmp(str, "&&") || !ft_strcmp(str, ";") || !ft_strcmp(str, "&"))
+	else if (!ft_strcmp(str, "||") || !ft_strcmp(str, "&&") || !ft_strcmp(str, ";") || !ft_strcmp(str, "&") || str[0] == ';' || str[0] == '&' || (str[0] == '|' && str[1]))
 		return (TOKEN_EXCEPT);
 	return (TOKEN_COMMAND);
 }
