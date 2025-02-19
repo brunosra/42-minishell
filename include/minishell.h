@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/01/29 03:07:47 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/19 19:24:23 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,6 +181,7 @@ int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
 
 /**__BUILTINS__**/
 int		ft_builtin_error(char *msg, int err);
+char	*ft_strtok(char *str, const char *delim);
 int		ft_exec_builtins_check(t_node *node, t_minishell *ms);
 int		ft_exec_builtins(t_node *node, t_minishell *ms);
 int		ft_check_builtins(char *str);
@@ -188,6 +189,7 @@ int		ft_builtin_exit(char **args);
 int		ft_builtin_pwd();
 void	ft_builtin_echo(char **args, t_minishell *ms);
 void 	ft_builtin_env(char **args, t_minishell *ms);
+void	ft_resolve_rel_p(const char *base_p, const char *rel_p, char *res_p);
 int		ft_builtin_cd_check(char **args, t_minishell *ms);
 void	ft_builtin_cd(char **args, t_minishell *ms);
 int		ft_builtin_export_check(char **args, t_minishell *ms);

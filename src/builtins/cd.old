@@ -6,13 +6,54 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/19 19:24:28 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/19 18:45:34 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 extern volatile int	g_interrupt;
+static char	*ft_strtok(char *str, const char *delim);
+void		ft_resolve_rel_p(const char *base_p,
+				const char *rel_p, char *res_p);
+int			ft_builtin_cd_check(char **args, t_minishell *ms);
+void		ft_builtin_cd(char **args, t_minishell *ms);
+
+/**
+ * @brief 	Tokenize a string and returns them in order
+ * 
+ * @param 	str 	String to be tokenized
+ * @param 	delim 	Token delimiter
+ * @return 	char* 	Pointer to the first char of the first pointer.
+ */
+static char	*ft_strtok(char *str, const char *delim)
+{
+	static char	*last = NULL;
+	char		*start;
+
+	if (str != NULL)
+		last = str;
+	else if (last == NULL)
+		return (NULL);
+	while (*last && strchr(delim, *last) != NULL)
+		last++;
+	if (*last == '\0')
+	{
+		last = NULL;
+		return (NULL);
+	}
+	start = last;
+	while (*last && strchr(delim, *last) == NULL)
+		last++;
+	if (*last)
+	{
+		*last = '\0';
+		last++;
+	}
+	else
+		last = NULL;
+	return (start);
+}
 
 /**
  * @brief 			Normatizes path
@@ -21,7 +62,6 @@ extern volatile int	g_interrupt;
  * @param norm_p 	normatized path pointer from main function
  * @return char* 	pointer to the normatized path
  */
-
 static char	*ft_norm_pth(char *tmp_p, char *norm_p)
 {
 	char		*token;
@@ -51,18 +91,6 @@ static char	*ft_norm_pth(char *tmp_p, char *norm_p)
 	return (norm_p);
 }
 
-static void	ft_resolve_tilde(const char *rel_p, char *tmp_p)
-{
-	if (rel_p[1] == '\0')
-		ft_strncpy(tmp_p, getenv("HOME"), PATH_MAX - 1);
-	else
-	{
-		ft_strncpy(tmp_p, getenv("HOME"), PATH_MAX - 1);
-		tmp_p[PATH_MAX - 1] = '\0';
-		ft_strncat(tmp_p, rel_p + 1, PATH_MAX - ft_strlen(tmp_p) - 1);
-	}
-}
-
 /**
  * @brief	resolve relative paths for cd
  * 
@@ -70,14 +98,22 @@ static void	ft_resolve_tilde(const char *rel_p, char *tmp_p)
  * @param	rel_p 		relative path to solve to
  * @param	res_p 		pointer to where to store the resolved path
  */
-void	ft_resolve_rel_p(const char *base_p, const char *rel_p, char *res_p)
+void	ft_resolve_rel_p(const char *base_p,
+		const char *rel_p, char *res_p)
 {
 	char		tmp_p[PATH_MAX];
 	char		norm_pth[PATH_MAX];
 
 	if (rel_p[0] == '~')
 	{
-		ft_resolve_tilde(rel_p, tmp_p);
+		if (rel_p[1] == '\0')
+			ft_strncpy(tmp_p, getenv("HOME"), PATH_MAX - 1);
+		else
+		{
+			ft_strncpy(tmp_p, getenv("HOME"), PATH_MAX - 1);
+			tmp_p[PATH_MAX - 1] = '\0';
+			ft_strncat(tmp_p, rel_p + 1, PATH_MAX - ft_strlen(tmp_p) - 1);
+		}
 	}
 	else if (rel_p[0] == '/')
 		ft_strncpy(tmp_p, rel_p, PATH_MAX - 1);
@@ -91,6 +127,88 @@ void	ft_resolve_rel_p(const char *base_p, const char *rel_p, char *res_p)
 	}
 	ft_strncpy(res_p, ft_norm_pth(tmp_p, norm_pth), PATH_MAX - 1);
 	res_p[PATH_MAX - 1] = '\0';
+}
+
+/**
+ * @brief 	checks if arguments are valid for cd 
+ * 
+ * @param 	args 	arguments received in the function
+ * @param 	ms 		minishell pointer
+ * @return 	int
+ * *		0: OK!
+ * * 		N: not ok, cd should not be run.
+ */
+// int	ft_builtin_cd_check(char **args, t_minishell *ms)
+// {
+// 	char	*curpwd;
+// 	char	res_p[PATH_MAX];
+
+// 	curpwd = ft_get_env("PWD", ms);
+// 	if (curpwd == NULL)
+// 		return (ft_builtin_error("getcwd:", errno));
+// 	if (args[1] == NULL)
+// 	{
+// 		if (ft_get_env("HOME", ms) == NULL)
+// 			return (ft_builtin_error("cd: HOME not set", 1));
+// 		ft_strncpy(res_p, ft_get_env("HOME", ms), PATH_MAX - 1);
+// 	}
+// 	else if (args[2] == NULL)
+// 	{
+// 		if (ft_strcmp(args[1], "-") == 0)
+// 		{
+// 			if (ft_get_env("OLDPWD", ms) == NULL)
+// 				return (ft_builtin_error("cd: OLDPWD not set", 2));
+// 			ft_strncpy(res_p, ft_get_env("OLDPWD", ms), PATH_MAX - 1);
+// 		}
+// 		else
+// 			ft_resolve_rel_p(curpwd, args[1], res_p);
+// 	}
+// 	else
+// 		return (ft_builtin_error("minishell: cd: too many arguments", 1));
+// 	if (chdir(res_p) != 0)
+// 		return (ft_builtin_error("cd error", errno));
+// 	return (0);
+// }
+
+static int	ft_cd_set_resolved_path_check(char **args, char *curpwd,
+				char *res_p, t_minishell *ms)
+{
+	if (args[1] == NULL)
+	{
+		if (ft_get_env("HOME", ms) == NULL)
+			return (ft_builtin_error("cd: HOME not set", 1));
+		ft_strncpy(res_p, ft_get_env("HOME", ms), PATH_MAX - 1);
+	}
+	else if (args[2] == NULL)
+	{
+		if (!ft_strcmp(args[1], "-"))
+		{
+			if (ft_get_env("OLDPWD", ms) == NULL)
+				return (ft_builtin_error("cd: OLDPWD not set", 2));
+			ft_strncpy(res_p, ft_get_env("OLDPWD", ms), PATH_MAX - 1);
+		}
+		else
+			ft_resolve_rel_p(curpwd, args[1], res_p);
+	}
+	else
+		return (ft_builtin_error("minishell: cd: too many arguments", 1));
+	return (0);
+}
+int	ft_builtin_cd_check(char **args, t_minishell *ms)
+{
+	char	*curpwd;
+	char	res_p[PATH_MAX];
+	int		ret;
+
+	curpwd = ft_get_env("PWD", ms);
+	if (curpwd == NULL)
+		return (ft_builtin_error("getcwd:", errno));
+	ret = ft_cd_set_resolved_path_check(args, curpwd, res_p, ms);
+	if (ret != 0)
+		return (ret);
+	if (chdir(res_p) != 0)
+		return (ft_builtin_error("cd error", errno));
+	return (0);
 }
 
 static void	ft_cd_set_resolved_path(char **args, char *curpwd, char *res_p,
@@ -121,8 +239,7 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 	char	*curpwd;
 	char	res_p[PATH_MAX];
 
-	curpwd = ft_get_env("PWD", ms);
-	if (curpwd == NULL)
+	if (!(curpwd = ft_get_env("PWD", ms)))
 	{
 		ft_set_exit_code(ms, errno);
 		return ;
@@ -135,46 +252,6 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 	ft_set_exit_code(ms, 0);
 }
 
-/**
- * @brief 	checks if arguments are valid for cd 
- * 
- * @param 	args 	arguments received in the function
- * @param 	ms 		minishell pointer
- * @return 	int
- * *		0: OK!
- * * 		N: not ok, cd should not be run.
- */
-/* int	ft_builtin_cd_check(char **args, t_minishell *ms)
-{
-	char	*curpwd;
-	char	res_p[PATH_MAX];
-
-	curpwd = ft_get_env("PWD", ms);
-	if (curpwd == NULL)
-		return (ft_builtin_error("getcwd:", errno));
-	if (args[1] == NULL)
-	{
-		if (ft_get_env("HOME", ms) == NULL)
-			return (ft_builtin_error("cd: HOME not set", 1));
-		ft_strncpy(res_p, ft_get_env("HOME", ms), PATH_MAX - 1);
-	}
-	else if (args[2] == NULL)
-	{
-		if (ft_strcmp(args[1], "-") == 0)
-		{
-			if (ft_get_env("OLDPWD", ms) == NULL)
-				return (ft_builtin_error("cd: OLDPWD not set", 2));
-			ft_strncpy(res_p, ft_get_env("OLDPWD", ms), PATH_MAX - 1);
-		}
-		else
-			ft_resolve_rel_p(curpwd, args[1], res_p);
-	}
-	else
-		return (ft_builtin_error("minishell: cd: too many arguments", 1));
-	if (chdir(res_p) != 0)
-		return (ft_builtin_error("cd error", errno));
-	return (0);
-} */
 
 /**
  * @brief	execute cd command. 3 cases needed:
