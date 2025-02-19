@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/18 19:13:16 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/19 19:24:16 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,44 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms);
 int	ft_builtin_error(char *msg, int err)
 {
 	ft_putstr_fd(msg, STDERR_FILENO);
+	printf("\n");
 	return (err);
+}
+
+/**
+ * @brief 	Tokenize a string and returns them in order
+ * 
+ * @param 	str 	String to be tokenized
+ * @param 	delim 	Token delimiter
+ * @return 	char* 	Pointer to the first char of the first pointer.
+ */
+char	*ft_strtok(char *str, const char *delim)
+{
+	static char	*last = NULL;
+	char		*start;
+
+	if (str != NULL)
+		last = str;
+	else if (last == NULL)
+		return (NULL);
+	while (*last && strchr(delim, *last) != NULL)
+		last++;
+	if (*last == '\0')
+	{
+		last = NULL;
+		return (NULL);
+	}
+	start = last;
+	while (*last && strchr(delim, *last) == NULL)
+		last++;
+	if (*last)
+	{
+		*last = '\0';
+		last++;
+	}
+	else
+		last = NULL;
+	return (start);
 }
 
 /**
