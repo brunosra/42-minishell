@@ -5,14 +5,14 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/27 11:28:18 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/18 18:31:14 by bschwell         ###   ########.fr       */
+/*   Created: 2025/02/18 21:13:47 by bschwell          #+#    #+#             */
+/*   Updated: 2025/02/18 21:17:00 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-extern volatile int	g_interrupt;
 
+extern volatile int	g_interrupt;
 void	ft_dup_envp(char **src, char **dest, int count);
 void	free_dup_envp(char **arr);
 void	ft_swap_env(char **a, char **b);
@@ -27,31 +27,33 @@ void	ft_sort_envp(char **arr, int count);
  * 
  * @details
  * - Allocates memory for each string in the destination array.
- * - Copies the content of each string from the source array to the destination array.
+ * - Copies the content of each string from the source array
+ * 	 to the destination array.
  * - Adds a NULL terminator at the end of the destination array.
  * - Exits the program if memory allocation fails.
  */
 void	ft_dup_envp(char **src, char **dest, int count)
 {
-    int	i;
+	int	i;
 
 	i = 0;
-    while (i < count)
+	while (i < count)
 	{
-        dest[i] = malloc(ft_strlen(src[i]) + 1);
-        if (!dest[i])
+		dest[i] = malloc(ft_strlen(src[i]) + 1);
+		if (!dest[i])
 		{
-            perror("malloc failed");
-            exit(EXIT_FAILURE);
-        }
-        ft_strcpy(dest[i], src[i]);
-        i++;
-    }
-    dest[i] = NULL;
+			perror("malloc failed");
+			exit(EXIT_FAILURE);
+		}
+		ft_strcpy(dest[i], src[i]);
+		i++;
+	}
+	dest[i] = NULL;
 }
 
 /**
- * @brief	Frees the memory allocated for a duplicated environment variable array.
+ * @brief	Frees the memory allocated for a duplicated
+ * 			environment variable array.
  * 
  * @param	arr	Array of strings to be freed.
  * 
@@ -62,11 +64,11 @@ void	ft_dup_envp(char **src, char **dest, int count)
  */
 void	free_dup_envp(char **arr)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (!arr)
-		return;
+		return ;
 	while (arr[i] != NULL)
 	{
 		free(arr[i]);
@@ -84,9 +86,11 @@ void	free_dup_envp(char **arr)
  * @details
  * - Swaps the values of the two pointers using a temporary variable.
  */
-void ft_swap_env(char **a, char **b)
+void	ft_swap_env(char **a, char **b)
 {
-	char *temp = *a;
+	char	*temp;
+
+	*temp = *a;
 	*a = *b;
 	*b = temp;
 }
@@ -102,10 +106,10 @@ void ft_swap_env(char **a, char **b)
  * - Swaps adjacent strings if they are out of order.
  * - Uses `ft_strcmp` to compare the strings.
  */
-void ft_sort_envp(char **arr, int count)
+void	ft_sort_envp(char **arr, int count)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	i = 0;
 	while (i < count - 1)
@@ -155,28 +159,28 @@ void ft_sort_envp(char **arr, int count)
 	return (0);
 } */
 
-int			ft_builtin_export_check(char **args, t_minishell *ms)
+// TODO: implement
+int	ft_builtin_export_check(char **args, t_minishell *ms)
 {
-	// TODO: implement
 	int		count;
 
 	count = 0;
-	while (args[count] != NULL) {
-        count++;
-    }
+	while (args[count] != NULL)
+	{
+		count++;
+	}
 	printf("export check: %s\n", ms->env.envp[0]);
 	return (0);
 }
 
-void		ft_builtin_export(char **args, t_minishell *ms)
+void	ft_builtin_export(char **args, t_minishell *ms)
 {
 	char	**dupenv;
 	int		count;
 
-	count = 0;
-	while (args[count] != NULL) {
-        count++;
-    }
+	count = -1;
+	while (args[++count] != NULL)
+		;
 	if (args[1] == NULL)
 	{
 		// only 1 arg
@@ -186,7 +190,6 @@ void		ft_builtin_export(char **args, t_minishell *ms)
 			perror("malloc error");
 			return ;
 		}
-
 		ft_print_str_arr(dupenv);
 		ft_dup_envp(ms->env.envp, dupenv, count);
 		ft_sort_envp(dupenv, count);
@@ -208,18 +211,18 @@ BASH HELP FOR EXPORT - FOR REFERENCE ONLY
 #########################################
 
 export: export [-fn] [name[=value] ...] or export -p
-    Set export attribute for shell variables.
-    
-    Marks each NAME for automatic export to the environment of subsequently
-    executed commands.  If VALUE is supplied, assign VALUE before exporting.
-    
-    Options:
-      -f	refer to shell functions
-      -n	remove the export property from each NAME
-      -p	display a list of all exported variables and functions
-    
-    An argument of `--' disables further option processing.
-    
-    Exit Status:
-    Returns success unless an invalid option is given or NAME is invalid.
+	Set export attribute for shell variables.
+	
+	Marks each NAME for automatic export to the environment of subsequently
+	executed commands.  If VALUE is supplied, assign VALUE before exporting.
+	
+	Options:
+	  -f	refer to shell functions
+	  -n	remove the export property from each NAME
+	  -p	display a list of all exported variables and functions
+	
+	An argument of `--' disables further option processing.
+	
+	Exit Status:
+	Returns success unless an invalid option is given or NAME is invalid.
  */
