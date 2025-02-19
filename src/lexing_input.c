@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexing_input.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/18 18:43:30 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/19 17:19:11 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ static int	ft_handle_quoted_token(char *str, int *i, t_token *tokens, int *j,
 static void	ft_handle_operator_token(char *str, int *i)
 {
 	*i += 1;
-	if (str[*i] == '>' || str[*i] == '<' || str[*i] == '|')
+	if (str[*i] == '>' || str[*i] == '<' || str[*i] == '|' || str[*i] == ';' || str[*i] == '&')
 		*i += 1;
 }
 
@@ -115,7 +115,7 @@ static void	ft_handle_regular_token(char *str, int *i)
 {
 	while (str[*i] && str[*i] != ' ')
 	{
-		if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<')
+		if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<' || str[*i] == ';' || str[*i] == '&')
 			break;
 		*i += 1;
 	}
@@ -143,7 +143,7 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 	tokens[*j].old_value = NULL;
 	if (str[*i] == '"' || str[*i] == '\'')
 		return (ft_handle_quoted_token(str, i, tokens, j, prev_type));
-	if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<')
+	if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<' || str[*i] == ';' || str[*i] == '&')
 		ft_handle_operator_token(str, i);
 	else
 		ft_handle_regular_token(str, i);
@@ -208,7 +208,7 @@ static t_type	ft_check_operator_or_exception(char *str)
 {
 	if (!ft_strcmp(str, "|"))
 		return (TOKEN_OPERATOR);
-	else if (!ft_strcmp(str, "||") || !ft_strcmp(str, "&&"))
+	else if (!ft_strcmp(str, "||") || !ft_strcmp(str, "&&") || !ft_strcmp(str, ";") || !ft_strcmp(str, "&"))
 		return (TOKEN_EXCEPT);
 	return (TOKEN_COMMAND);
 }
@@ -254,11 +254,13 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 	if (type != TOKEN_COMMAND)
 		return (type);
 	type = ft_check_operator_or_exception(str);
+	if (type == TOKEN_OPERATOR && (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_EXCEPT))
+		return (TOKEN_EXCEPT);
 	if (type != TOKEN_COMMAND)
 		return (type);
 	if (str && (str[0] == '$' || ft_strchr(str, '$')))
 		return (ft_check_variable_or_filename(str, prev_type));
-	if (ft_check_builtins(str) && prev_type != TOKEN_COMMAND)
+	if (ft_check_builtins(str) && (prev_type != TOKEN_COMMAND || prev_type != TOKEN_EXCEPT))
 		return (TOKEN_BUILTIN);
 	if (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL)
 		return (TOKEN_COMMAND);
