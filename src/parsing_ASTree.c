@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_ASTree.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/18 18:22:59 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/20 04:30:27 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,8 +276,8 @@ static void	ft_process_token(t_token *tokens, int *i, t_node **current,
 		|| tokens[*i].type == TOKEN_FILENAME
 		|| tokens[*i].type == TOKEN_ARGUMENT)
 	{
-		if (tokens[*i].type == TOKEN_FILENAME && *current
-			&& (*current)->token->type == TOKEN_HEREDOC)
+		if (tokens[*i].type == TOKEN_FILENAME /* && *current
+			&& (*current)->token->type == TOKEN_HEREDOC */)
 		{
 			tokens[*i].old_value = ft_strdup(tokens[*i].value);
 			tokens[*i].value = ft_remove_quotes(tokens[*i].value);
