@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 21:13:47 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/18 21:17:00 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/20 00:01:26 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ void	ft_swap_env(char **a, char **b)
 {
 	char	*temp;
 
-	*temp = *a;
+	temp = *a;
 	*a = *b;
 	*b = temp;
 }

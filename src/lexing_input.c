@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/19 18:33:36 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/21 01:32:55 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static void		ft_handle_regular_token(char *str, int *i);
 t_type			ft_get_token_type(char *str, t_type prev_type);
 static t_type	ft_check_redirection(char *str);
 static t_type	ft_check_operator_or_exception(char *str);
-static t_type	ft_check_variable_or_filename(char *str, t_type prev_type);
+static t_type	ft_check_variable(char *str);
 int				ft_verify_variable_value(char *str);
 char			*ft_revalue_quoted_value(char *value);
 static char		*ft_process_quoted_segment(char *value, int *i);
@@ -220,22 +220,12 @@ static t_type	ft_check_operator_or_exception(char *str)
  * @param prev_type Previous token type.
  * @return t_type Corresponding token type or TOKEN_ARGUMENT.
  */
-static t_type	ft_check_variable_or_filename(char *str, t_type prev_type)
+static t_type	ft_check_variable(char *str)
 {
-	if (prev_type == TOKEN_NULL || prev_type == TOKEN_OPERATOR)
-		return(TOKEN_COMMAND);
 	if (str[0] == '$')
 		return (TOKEN_VARIABLE);
 	if (ft_verify_variable_value(str))
 		return (TOKEN_VARIABLE);
-	if ((str[0] == '"' || str[0] == '\'') &&
-		(prev_type != TOKEN_COMMAND && prev_type != TOKEN_BUILTIN &&
-		 prev_type != TOKEN_VARIABLE && prev_type != TOKEN_OPERATOR &&
-		 prev_type != TOKEN_EXCEPT && prev_type != TOKEN_ARGUMENT))
-		return (TOKEN_FILENAME);
-	if (prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT
-		|| prev_type == TOKEN_HEREDOC)
-		return (TOKEN_FILENAME);
 	return (TOKEN_ARGUMENT);
 }
 
@@ -250,6 +240,12 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 {
 	t_type type;
 
+	if (prev_type == TOKEN_NULL || prev_type == TOKEN_OPERATOR)
+	{
+		if (ft_check_builtins(str) /* && (prev_type != TOKEN_COMMAND || prev_type != TOKEN_EXCEPT) */)
+			return (TOKEN_BUILTIN);
+		return(TOKEN_COMMAND);
+	}
 	type = ft_check_redirection(str);
 	if (type != TOKEN_COMMAND)
 		return (type);
@@ -259,11 +255,15 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 	if (type != TOKEN_COMMAND)
 		return (type);
 	if (str && (str[0] == '$' || ft_strchr(str, '$')))
-		return (ft_check_variable_or_filename(str, prev_type));
-	if (ft_check_builtins(str) && (prev_type != TOKEN_COMMAND || prev_type != TOKEN_EXCEPT))
-		return (TOKEN_BUILTIN);
-	if (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL)
-		return (TOKEN_COMMAND);
+		return (ft_check_variable(str));
+	if (prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT
+		|| prev_type == TOKEN_HEREDOC)
+		return (TOKEN_FILENAME);
+	if ((str[0] == '"' || str[0] == '\'') &&
+		(prev_type != TOKEN_COMMAND && prev_type != TOKEN_BUILTIN &&
+		 prev_type != TOKEN_VARIABLE && prev_type != TOKEN_OPERATOR &&
+		 prev_type != TOKEN_EXCEPT && prev_type != TOKEN_ARGUMENT && prev_type != TOKEN_FILENAME))
+		return (TOKEN_FILENAME);
 	if (prev_type == TOKEN_COMMAND || prev_type == TOKEN_BUILTIN ||
 		prev_type == TOKEN_ARGUMENT || prev_type == TOKEN_VARIABLE ||
 		prev_type == TOKEN_FILENAME)
