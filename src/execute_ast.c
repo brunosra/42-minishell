@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/22 17:14:05 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/22 17:23:15 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,8 @@ int	ft_execute_command(t_node *node, t_minishell *ms);
 int	ft_find_executable(t_minishell *ms, char *cmd);
 int	ft_invalid_right_token_value(char *value);
 int	ft_is_valid_file(char *filepath, int mode);
+static int	ft_check_file_access(char *filepath, int mode);
+static int	ft_file_error(char *filepath, char *msg, int code);
 void	ft_swap_redirects_values(t_node *node, t_type type);
 void	ft_remove_created_files(t_node *node);
 void	ft_create_files(t_node *node);
@@ -811,47 +813,6 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 	return (ft_execute_ast(node->right, ms));
 }
 
-// /**
-//  * @brief  Checks for syntax errors in pipe usage.
-//  * 
-//  * @param  node  Pointer to the pipe node.
-//  * @param  ms    Pointer to the minishell structure.
-//  * @return int   1 if there is a syntax error, 0 otherwise.
-//  */
-// static int	ft_check_pipe_syntax(t_node *node, t_minishell *ms)
-// {
-// 	char	*input;
-// 	char	*temp;
-
-// 	if (!node->left)
-// 	{
-// 		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n",
-// 			STDERR_FILENO);
-// 		ft_set_exit_code(ms, 2);
-// 		return (1);
-// 	}
-// 	if (node->right)
-// 		return (0);
-// 	input = readline("> ");
-// 	if (!input)
-// 	{
-// 		ft_putstr_fd("minishell: syntax error: unexpected end of file\n",
-// 			STDERR_FILENO);
-// 		ft_set_exit_code(ms, 258);
-// 		return (1);
-// 	}
-// 	temp = ft_strjoin(ms->input, " ");
-// 	free(ms->input);
-// 	ms->input = ft_strjoin(temp, input);
-// 	free(input);
-// 	free(temp);
-// 	ft_free_tokens(ms->tokens);
-// 	ft_free_ast(ms->ast_root);
-// 	ms->in_pipe = true;
-// 	ft_process_input_and_execute(ms);
-// 	return (1);
-// }
-
 /**
  * @brief  Checks for syntax errors in pipe usage.
  * 
@@ -1202,6 +1163,77 @@ int	ft_invalid_right_token_value(char *value)
 	return (0);
 }
 
+// /**
+//  * @brief  Checks if the given file is valid and accessible for the specified mode.
+//  * 
+//  * @param  filepath  Path to the file.
+//  * @param  mode      Access mode to check (e.g., read, write, execute).
+//  * @return int       Status code.
+//  **         0 if the file is valid.
+//  **         127 if the file does not exist.
+//  **         126 if it is a directory or lacks necessary permissions.
+//  */
+// int	ft_is_valid_file(char *filepath, int mode)
+// {
+// 	struct stat	file_stat;
+	
+// 	if (!filepath) // Verifica se o caminho é válido
+// 	{
+// 		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", STDERR_FILENO);
+// 		return (1);
+// 	}
+// 	if (stat(filepath, &file_stat) == -1) // Verifica se o arquivo existe
+// 	{
+// 		ft_putstr_fd("minishell: ", STDERR_FILENO);
+// 		ft_putstr_fd(filepath, STDERR_FILENO);
+// 		ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
+// 		return (127); // Código de erro para arquivo inexistente
+// 	}
+// 	if (S_ISDIR(file_stat.st_mode)) 	// Verifica se é um diretório
+// 	{
+// 		ft_putstr_fd("minishell: ", STDERR_FILENO);
+// 		ft_putstr_fd(filepath, STDERR_FILENO);
+// 		ft_putstr_fd(": Is a directory\n", STDERR_FILENO);
+// 		return (126); // Código de erro para diretório
+// 	}
+// 	if (mode == X_OK) // Verifica permissões de execução
+// 	{
+// 		if (access(filepath, X_OK) == -1)
+// 		{
+// 			ft_putstr_fd("minishell: ", STDERR_FILENO);
+// 			ft_putstr_fd(filepath, STDERR_FILENO);
+// 			ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
+// 			return (126); // Código de erro para permissão negada
+// 		}
+// 		return (0);
+// 	}
+// 	if (mode == O_RDONLY) 	// Verifica permissões de leitura
+// 	{
+// 		if (access(filepath, R_OK) == -1)
+// 		{
+// 			ft_putstr_fd("minishell: ", STDERR_FILENO);
+// 			ft_putstr_fd(filepath, STDERR_FILENO);
+// 			ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
+// 			return (126); // Código de erro para permissão negada
+// 		}
+// 		return (0);
+// 	}
+// 	if (mode == O_WRONLY || mode == (O_WRONLY | O_CREAT) || mode == (O_WRONLY | O_APPEND)) // Escrita
+// 	{
+// 		if (access(filepath, W_OK) == -1)
+// 		{
+// 			if (errno != ENOENT) // Arquivo existe, mas sem permissão de escrita
+// 			{
+// 				ft_putstr_fd("minishell: ", STDERR_FILENO);
+// 				ft_putstr_fd(filepath, STDERR_FILENO);
+// 				ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
+// 				return (126);
+// 			}
+// 		}	
+// 	}
+// 	return (0); // Arquivo válido
+// }
+
 /**
  * @brief  Checks if the given file is valid and accessible for the specified mode.
  * 
@@ -1215,63 +1247,64 @@ int	ft_invalid_right_token_value(char *value)
 int	ft_is_valid_file(char *filepath, int mode)
 {
 	struct stat	file_stat;
-	
-	if (!filepath) // Verifica se o caminho é válido
-	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", STDERR_FILENO);
-		return (1);
-	}
-	if (stat(filepath, &file_stat) == -1) // Verifica se o arquivo existe
-	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
+
+	if (!filepath)
+		return (ft_file_error(NULL, "syntax error near unexpected token `newline'", 1));
+	if (stat(filepath, &file_stat) == -1)
+		return (ft_file_error(filepath, "No such file or directory", 127));
+	if (S_ISDIR(file_stat.st_mode))
+		return (ft_file_error(filepath, "Is a directory", 126));
+	return (ft_check_file_access(filepath, mode));
+}
+
+/**
+ * @brief  Handles file-related error messages and returns the appropriate error code.
+ * 
+ * @param  filepath  Path to the file.
+ * @param  msg       Error message to display.
+ * @param  code      Error code to return.
+ * @return int       Always returns the provided error code.
+ */
+static int	ft_file_error(char *filepath, char *msg, int code)
+{
+	ft_putstr_fd("minishell: ", STDERR_FILENO);
+	if (filepath)
 		ft_putstr_fd(filepath, STDERR_FILENO);
-		ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
-		return (127); // Código de erro para arquivo inexistente
-	}
-	if (S_ISDIR(file_stat.st_mode)) 	// Verifica se é um diretório
-	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
-		ft_putstr_fd(filepath, STDERR_FILENO);
-		ft_putstr_fd(": Is a directory\n", STDERR_FILENO);
-		return (126); // Código de erro para diretório
-	}
-	if (mode == X_OK) // Verifica permissões de execução
+	ft_putstr_fd(": ", STDERR_FILENO);
+	ft_putstr_fd(msg, STDERR_FILENO);
+	ft_putstr_fd("\n", STDERR_FILENO);
+	return (code);
+}
+
+/**
+ * @brief  Checks the file's access permissions based on the requested mode.
+ * 
+ * @param  filepath  Path to the file.
+ * @param  mode      Access mode to check.
+ * @return int       Status code (0 if valid, 126 if permission denied).
+ */
+static int	ft_check_file_access(char *filepath, int mode)
+{
+	if (mode == X_OK)
 	{
 		if (access(filepath, X_OK) == -1)
-		{
-			ft_putstr_fd("minishell: ", STDERR_FILENO);
-			ft_putstr_fd(filepath, STDERR_FILENO);
-			ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
-			return (126); // Código de erro para permissão negada
-		}
+			return (ft_file_error(filepath, "Permission denied", 126));
 		return (0);
 	}
-	if (mode == O_RDONLY) 	// Verifica permissões de leitura
+	if (mode == O_RDONLY)
 	{
 		if (access(filepath, R_OK) == -1)
-		{
-			ft_putstr_fd("minishell: ", STDERR_FILENO);
-			ft_putstr_fd(filepath, STDERR_FILENO);
-			ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
-			return (126); // Código de erro para permissão negada
-		}
+			return (ft_file_error(filepath, "Permission denied", 126));
 		return (0);
 	}
-	if (mode == O_WRONLY || mode == (O_WRONLY | O_CREAT) || mode == (O_WRONLY | O_APPEND)) // Escrita
+	if (mode == O_WRONLY || mode == (O_WRONLY | O_CREAT) || mode == (O_WRONLY | O_APPEND))
 	{
-		if (access(filepath, W_OK) == -1)
-		{
-			if (errno != ENOENT) // Arquivo existe, mas sem permissão de escrita
-			{
-				ft_putstr_fd("minishell: ", STDERR_FILENO);
-				ft_putstr_fd(filepath, STDERR_FILENO);
-				ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
-				return (126);
-			}
-		}	
+		if (access(filepath, W_OK) == -1 && errno != ENOENT)
+			return (ft_file_error(filepath, "Permission denied", 126));
 	}
-	return (0); // Arquivo válido
+	return (0);
 }
+
 
 /**
  * @brief  Handles multiple heredocs consecutively and passes the data to the next AST node.
