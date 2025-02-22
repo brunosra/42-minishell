@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/19 19:25:28 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/22 19:51:03 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,11 +47,17 @@ int	ft_builtin_cd_check(char **args, t_minishell *ms)
 
 	curpwd = ft_get_env("PWD", ms);
 	if (curpwd == NULL)
+	{
+		printf("getcwd error\n");
 		return (ft_builtin_error("getcwd:", errno));
+	}
 	ret = ft_cd_set_resolved_path_check(args, curpwd, res_p, ms);
 	if (ret != 0)
 		return (ret);
 	if (chdir(res_p) != 0)
-		return (ft_builtin_error("cd error", errno));
+	{
+		printf("Minishell: cd: %s: No such file or directory\n", args[1]);
+		return (1);
+	}
 	return (0);
 }
