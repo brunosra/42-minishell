@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:47:54 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/18 21:09:06 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/20 01:19:03 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,12 +90,12 @@ static long long	ft_atoll(char *str, int i, long long res)
 	return (res * sig);
 }
 
-static void	ft_putstr_and_not_exit(char *str)
-{
-	ft_putstr_fd(MSG_ERR_EXIT, STDERR_FILENO);
-	ft_putstr_fd(str, STDERR_FILENO);
-	ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
-}
+// static void	ft_putstr_and_not_exit(char *str)
+// {
+// 	ft_putstr_fd(MSG_ERR_EXIT, STDERR_FILENO);
+// 	ft_putstr_fd(str, STDERR_FILENO);
+// 	ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
+// }
 
 /**
  * @brief	Implement the `exit` builtin command.
@@ -125,17 +125,17 @@ int	ft_builtin_exit(char **args)
 	else if (i > 2 && ft_atoll(args[1], 0, 0))
 	{
 		ft_putstr_fd(MSG_ERR_EXIT" too many arguments\n", STDERR_FILENO);
-		return (1);
+		exit (1);
 	}
 	else if (ft_value_is_numeric(args[1]))
 	{
 		mod = ft_atoll(args[1], 0, 0) % 256;
-		return (mod);
+		exit(mod);
 	}
 	else if (!ft_value_is_numeric(args[1]))
 	{
-		ft_putstr_and_not_exit(args[1]);
-		return (2);
+		ft_putstr_and_exit(args[1]);
+		// return (2);
 	}
 	return (0);
 }
