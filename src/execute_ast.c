@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/22 16:54:22 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/22 17:14:05 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,13 @@ static int	ft_handle_dup_error(int fd, t_minishell *ms);
 int	ft_handle_input_redirect(t_node *node, t_minishell *ms);
 static int	ft_validate_input_file(t_node *node, t_minishell *ms);
 int	ft_handle_pipe(t_node *node, t_minishell *ms);
+static int	ft_redirect_pipe_input(t_minishell *ms);
+static void	ft_execute_pipe_child(t_node *node, t_minishell *ms);
+static int	ft_handle_fork_error(t_minishell *ms);
+static int	ft_create_pipe(t_minishell *ms);
+static int	ft_check_pipe_syntax(t_node *node, t_minishell *ms);
+static int	ft_pipe_syntax_error(t_minishell *ms, char *token, int code);
+static void	ft_handle_unfinished_pipe(t_minishell *ms, char *input);
 int	ft_execute_command(t_node *node, t_minishell *ms);
 int	ft_find_executable(t_minishell *ms, char *cmd);
 int	ft_invalid_right_token_value(char *value);
@@ -701,7 +708,7 @@ static int ft_has_cat(t_node *node) // FUNCAO DESENRASQUE ALTERAR
  **         0 on success.
  **         Non-zero in case of errors or syntax issues.
  */
-int	ft_handle_pipe(t_node *node, t_minishell *ms)
+/* int	ft_handle_pipe(t_node *node, t_minishell *ms)
 {
 	char *input;
 	char *temp;
@@ -771,6 +778,210 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 	ft_set_exit_code(ms, 0);
 	return (ft_execute_ast(node->right, ms));
 }
+ */
+
+/**
+ * @brief  Handles piping between commands.
+ * 
+ * @param  node  Pointer to the pipe node in the AST.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Execution status.
+ *         0 on success.
+ *         Non-zero in case of errors or syntax issues.
+ */
+int	ft_handle_pipe(t_node *node, t_minishell *ms)
+{
+	if (ft_check_pipe_syntax(node, ms))
+	{
+		ft_set_exit_code(ms, 2);
+		return (2);
+	}
+	if (ft_create_pipe(ms))
+		return (1);
+	ms->pid = fork();
+	if (ms->pid == -1)
+		return (ft_handle_fork_error(ms));
+	if (ms->pid == 0)
+		ft_execute_pipe_child(node, ms);
+	close(ms->pipefd[1]);
+	if (!ft_has_cat(node))
+		waitpid(ms->pid, &ms->status, 0);
+	if (ft_redirect_pipe_input(ms))
+		return (1);
+	return (ft_execute_ast(node->right, ms));
+}
+
+// /**
+//  * @brief  Checks for syntax errors in pipe usage.
+//  * 
+//  * @param  node  Pointer to the pipe node.
+//  * @param  ms    Pointer to the minishell structure.
+//  * @return int   1 if there is a syntax error, 0 otherwise.
+//  */
+// static int	ft_check_pipe_syntax(t_node *node, t_minishell *ms)
+// {
+// 	char	*input;
+// 	char	*temp;
+
+// 	if (!node->left)
+// 	{
+// 		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n",
+// 			STDERR_FILENO);
+// 		ft_set_exit_code(ms, 2);
+// 		return (1);
+// 	}
+// 	if (node->right)
+// 		return (0);
+// 	input = readline("> ");
+// 	if (!input)
+// 	{
+// 		ft_putstr_fd("minishell: syntax error: unexpected end of file\n",
+// 			STDERR_FILENO);
+// 		ft_set_exit_code(ms, 258);
+// 		return (1);
+// 	}
+// 	temp = ft_strjoin(ms->input, " ");
+// 	free(ms->input);
+// 	ms->input = ft_strjoin(temp, input);
+// 	free(input);
+// 	free(temp);
+// 	ft_free_tokens(ms->tokens);
+// 	ft_free_ast(ms->ast_root);
+// 	ms->in_pipe = true;
+// 	ft_process_input_and_execute(ms);
+// 	return (1);
+// }
+
+/**
+ * @brief  Checks for syntax errors in pipe usage.
+ * 
+ * @param  node  Pointer to the pipe node.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   1 if there is a syntax error, 0 otherwise.
+ */
+static int	ft_check_pipe_syntax(t_node *node, t_minishell *ms)
+{
+	char	*input;
+
+	if (!node->left)
+		return (ft_pipe_syntax_error(ms, "|", 2));
+	if (node->right)
+		return (0);
+	input = readline("> ");
+	if (!input)
+		return (ft_pipe_syntax_error(ms, "unexpected end of file", 258));
+	ft_handle_unfinished_pipe(ms, input);
+	ft_process_input_and_execute(ms);
+	return (1);
+}
+
+/**
+ * @brief  Prints a syntax error message for pipes and sets the exit code.
+ * 
+ * @param  ms     Pointer to the minishell structure.
+ * @param  token  The unexpected token causing the error.
+ * @param  code   Exit code to set.
+ * @return int    Always returns 1.
+ */
+static int	ft_pipe_syntax_error(t_minishell *ms, char *token, int code)
+{
+	ft_putstr_fd("minishell: syntax error near unexpected token `",
+		STDERR_FILENO);
+	ft_putstr_fd(token, STDERR_FILENO);
+	ft_putstr_fd("'\n", STDERR_FILENO);
+	ft_set_exit_code(ms, code);
+	return (1);
+}
+
+/**
+ * @brief  Handles input continuation when the pipe is unfinished.
+ * 
+ * @param  ms     Pointer to the minishell structure.
+ * @param  input  User input after an unfinished pipe.
+ */
+static void	ft_handle_unfinished_pipe(t_minishell *ms, char *input)
+{
+	char	*temp;
+
+	temp = ft_strjoin(ms->input, " ");
+	free(ms->input);
+	ms->input = ft_strjoin(temp, input);
+	free(input);
+	free(temp);
+	ft_free_tokens(ms->tokens);
+	ft_free_ast(ms->ast_root);
+	ms->in_pipe = true;
+}
+
+
+/**
+ * @brief  Creates a pipe and handles potential errors.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return int 1 if an error occurred, 0 otherwise.
+ */
+static int	ft_create_pipe(t_minishell *ms)
+{
+	if (pipe(ms->pipefd) == -1)
+	{
+		perror("pipe");
+		ft_set_exit_code(ms, 1);
+		return (1);
+	}
+	return (0);
+}
+
+/**
+ * @brief  Handles fork errors.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return int Always returns 1.
+ */
+static int	ft_handle_fork_error(t_minishell *ms)
+{
+	perror("fork");
+	ft_set_exit_code(ms, 1);
+	return (1);
+}
+
+/**
+ * @brief  Executes the left side of the pipe in the child process.
+ * 
+ * @param  node  Pointer to the pipe node.
+ * @param  ms    Pointer to the minishell structure.
+ */
+static void	ft_execute_pipe_child(t_node *node, t_minishell *ms)
+{
+	close(ms->pipefd[0]);
+	if (dup2(ms->pipefd[1], STDOUT_FILENO) == -1)
+	{
+		perror("dup2");
+		exit(1);
+	}
+	close(ms->pipefd[1]);
+	exit(ft_execute_ast(node->left, ms));
+}
+
+/**
+ * @brief  Redirects pipe output to stdin for the next command.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return int 1 if an error occurred, 0 otherwise.
+ */
+static int	ft_redirect_pipe_input(t_minishell *ms)
+{
+	if (dup2(ms->pipefd[0], STDIN_FILENO) == -1)
+	{
+		perror("dup2");
+		ft_set_exit_code(ms, 1);
+		close(ms->pipefd[0]);
+		return (1);
+	}
+	close(ms->pipefd[0]);
+	ft_set_exit_code(ms, 0);
+	return (0);
+}
+
 
 /**
  * @brief  Executes a single command or builtin in a child process.
