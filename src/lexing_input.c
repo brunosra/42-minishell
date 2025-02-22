@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/21 01:32:55 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/21 18:29:18 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,16 +239,20 @@ static t_type	ft_check_variable(char *str)
 t_type	ft_get_token_type(char *str, t_type prev_type)
 {
 	t_type type;
+	static bool inverted = false;
 
-	if (prev_type == TOKEN_NULL || prev_type == TOKEN_OPERATOR)
+	type = ft_check_redirection(str);
+	if (type == TOKEN_OUTPUT_REDIRECT && prev_type == TOKEN_OPERATOR)
+		inverted = true;
+	if (type != TOKEN_COMMAND)
+		return (type);
+	if (prev_type == TOKEN_NULL || prev_type == TOKEN_OPERATOR || (prev_type == TOKEN_FILENAME && inverted == true))
 	{
+		inverted = false;
 		if (ft_check_builtins(str) /* && (prev_type != TOKEN_COMMAND || prev_type != TOKEN_EXCEPT) */)
 			return (TOKEN_BUILTIN);
 		return(TOKEN_COMMAND);
 	}
-	type = ft_check_redirection(str);
-	if (type != TOKEN_COMMAND)
-		return (type);
 	type = ft_check_operator_or_exception(str);
 	if (type == TOKEN_OPERATOR && (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_EXCEPT))
 		return (TOKEN_EXCEPT);

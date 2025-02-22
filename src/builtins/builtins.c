@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/18 19:13:16 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/22 05:03:17 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,7 @@ int	ft_builtin_error(char *msg, int err)
  */
 int	ft_exec_builtins_check(t_node *node, t_minishell *ms)
 {
-	if (!ft_strcmp(node->token->value, "echo")
-		|| !ft_strcmp(node->token->value, "exit")
+	if (!ft_strcmp(node->token->value, "exit")
 		|| !ft_strcmp(node->token->value, "pwd")
 		|| !ft_strcmp(node->token->value, "env"))
 		return (0);

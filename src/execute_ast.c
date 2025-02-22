@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute_ast.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/18 18:22:59 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/22 05:02:04 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 extern volatile int	g_interrupt;
 
 int	ft_execute_ast(t_node *node, t_minishell *ms);
+static int	ft_handle_syntax_error(t_node *node, t_minishell *ms);
+static int	ft_execute_output_redirect(t_node *node, t_minishell *ms);
+static int	ft_execute_input_redirect(t_node *node, t_minishell *ms);
+static int	ft_execute_heredoc(t_node *node, t_minishell *ms);
 int	ft_handle_heredoc(t_node *node, t_minishell *ms);
 int	ft_handle_output_redirect(t_node *node, t_minishell *ms);
 int	ft_handle_input_redirect(t_node *node, t_minishell *ms);
@@ -29,64 +33,163 @@ int	ft_collect_heredocs(t_node *node, t_minishell *ms);
 int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
 static int ft_has_cat(t_node *node);
 
+// /**
+//  * @brief  Executes the AST based on the current node type.
+//  * 
+//  * @param  node  Pointer to the current AST node.
+//  * @param  ms    Pointer to the minishell structure.
+//  * @return int   Execution status.
+//  **         0 on success.
+//  **         Non-zero in case of errors or syntax issues.
+//  */
+// int	ft_execute_ast(t_node *node, t_minishell *ms)
+// {
+// 	if (!node || !ms->n_args)
+// 		return (1);
+//  	if (node->token->type == TOKEN_EXCEPT)
+// 	{
+// 		ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
+// 		ft_putstr_fd(node->token->value, STDERR_FILENO);
+// 		ft_putstr_fd("'\n", STDERR_FILENO);
+// 		ft_set_exit_code(ms, 2);
+		
+// 		return (1);
+// 	}
+// 	if (node->token->type == TOKEN_OUTPUT_REDIRECT)
+// 	{
+// 		if (ms->swap_output_redirects == false)
+// 		{
+// 			ft_swap_redirects_values(node, TOKEN_OUTPUT_REDIRECT);
+// 			ms->swap_output_redirects = true;
+// 		}
+// 		return (ft_handle_output_redirect(node, ms));
+// 	}
+// 	else if (node->token->type == TOKEN_INPUT_REDIRECT)
+// 	{
+// 		if (ms->swap_input_redirects == false)
+// 		{
+// 			ft_swap_redirects_values(node, TOKEN_INPUT_REDIRECT);
+// 			ms->swap_input_redirects = true;
+// 		}
+// 		return (ft_handle_input_redirect(node, ms));
+// 	}
+//  	else if (node->token->type == TOKEN_HEREDOC)
+// 	{
+// 		if (node->left && node->left->token->type == TOKEN_HEREDOC)
+// 		{
+// 			if (ft_collect_heredocs(node, ms))
+// 				return (1);
+// 			return (ft_handle_multiple_heredocs(node, ms));
+// 		}
+// 		return (ft_handle_heredoc(node, ms));
+// 	}
+//  	else if (node->token->type == TOKEN_OPERATOR)
+// 		return (ft_handle_pipe(node, ms));
+// 	else if (node->token->type == TOKEN_BUILTIN)
+// 		return (ft_execute_command(node, ms));
+// 	else if (node->token->type == TOKEN_COMMAND)
+// 		return (ft_execute_command(node, ms));
+// 	return (0);
+// }
+
 /**
  * @brief  Executes the AST based on the current node type.
  * 
  * @param  node  Pointer to the current AST node.
  * @param  ms    Pointer to the minishell structure.
  * @return int   Execution status.
- **         0 on success.
- **         Non-zero in case of errors or syntax issues.
+ *         0 on success.
+ *         Non-zero in case of errors or syntax issues.
  */
 int	ft_execute_ast(t_node *node, t_minishell *ms)
 {
 	if (!node || !ms->n_args)
 		return (1);
- 	if (node->token->type == TOKEN_EXCEPT)
-	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
-		ft_putstr_fd(node->token->value, STDERR_FILENO);
-		ft_putstr_fd("'\n", STDERR_FILENO);
-		ft_set_exit_code(ms, 2);
-		
-		return (1);
-	}
+	if (node->token->type == TOKEN_EXCEPT)
+		return (ft_handle_syntax_error(node, ms));
 	if (node->token->type == TOKEN_OUTPUT_REDIRECT)
-	{
-		if (ms->swap_output_redirects == false)
-		{
-			ft_swap_redirects_values(node, TOKEN_OUTPUT_REDIRECT);
-			ms->swap_output_redirects = true;
-		}
-		return (ft_handle_output_redirect(node, ms));
-	}
-	else if (node->token->type == TOKEN_INPUT_REDIRECT)
-	{
-		if (ms->swap_input_redirects == false)
-		{
-			ft_swap_redirects_values(node, TOKEN_INPUT_REDIRECT);
-			ms->swap_input_redirects = true;
-		}
-		return (ft_handle_input_redirect(node, ms));
-	}
- 	else if (node->token->type == TOKEN_HEREDOC)
-	{
-		if (node->left && node->left->token->type == TOKEN_HEREDOC)
-		{
-			if (ft_collect_heredocs(node, ms))
-				return (1);
-			return (ft_handle_multiple_heredocs(node, ms));
-		}
-		return (ft_handle_heredoc(node, ms));
-	}
- 	else if (node->token->type == TOKEN_OPERATOR)
+		return (ft_execute_output_redirect(node, ms));
+	if (node->token->type == TOKEN_INPUT_REDIRECT)
+		return (ft_execute_input_redirect(node, ms));
+	if (node->token->type == TOKEN_HEREDOC)
+		return (ft_execute_heredoc(node, ms));
+	if (node->token->type == TOKEN_OPERATOR)
 		return (ft_handle_pipe(node, ms));
-	else if (node->token->type == TOKEN_BUILTIN)
-		return (ft_execute_command(node, ms));
-	else if (node->token->type == TOKEN_COMMAND)
+	if (node->token->type == TOKEN_BUILTIN ||
+		node->token->type == TOKEN_COMMAND)
 		return (ft_execute_command(node, ms));
 	return (0);
 }
+
+/**
+ * @brief  Handles syntax errors related to unexpected tokens.
+ * 
+ * @param  node  Pointer to the AST node with the error.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Always returns 1 to indicate an error.
+ */
+static int	ft_handle_syntax_error(t_node *node, t_minishell *ms)
+{
+	ft_putstr_fd("minishell: syntax error near unexpected token `",
+		STDERR_FILENO);
+	ft_putstr_fd(node->token->value, STDERR_FILENO);
+	ft_putstr_fd("'\n", STDERR_FILENO);
+	ft_set_exit_code(ms, 2);
+	return (1);
+}
+
+/**
+ * @brief  Handles output redirection in the AST execution.
+ * 
+ * @param  node  Pointer to the output redirection node.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Execution status.
+ */
+static int	ft_execute_output_redirect(t_node *node, t_minishell *ms)
+{
+	if (ms->swap_output_redirects == false)
+	{
+		ft_swap_redirects_values(node, TOKEN_OUTPUT_REDIRECT);
+		ms->swap_output_redirects = true;
+	}
+	return (ft_handle_output_redirect(node, ms));
+}
+
+/**
+ * @brief  Handles input redirection in the AST execution.
+ * 
+ * @param  node  Pointer to the input redirection node.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Execution status.
+ */
+static int	ft_execute_input_redirect(t_node *node, t_minishell *ms)
+{
+	if (ms->swap_input_redirects == false)
+	{
+		ft_swap_redirects_values(node, TOKEN_INPUT_REDIRECT);
+		ms->swap_input_redirects = true;
+	}
+	return (ft_handle_input_redirect(node, ms));
+}
+
+/**
+ * @brief  Handles heredoc execution in the AST.
+ * 
+ * @param  node  Pointer to the heredoc node.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Execution status.
+ */
+static int	ft_execute_heredoc(t_node *node, t_minishell *ms)
+{
+	if (node->left && node->left->token->type == TOKEN_HEREDOC)
+	{
+		if (ft_collect_heredocs(node, ms))
+			return (1);
+		return (ft_handle_multiple_heredocs(node, ms));
+	}
+	return (ft_handle_heredoc(node, ms));
+}
+
 
 /**
  * @brief  Swaps the values of redirect nodes to handle nested or reversed cases.
@@ -510,8 +613,13 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 		//ft_set_fork_signals();
 		if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
 			exit(0);
-		if (node->token->type == TOKEN_BUILTIN)
-			exit(ft_exec_builtins_check(node, ms));
+		if (node->token->type == TOKEN_BUILTIN) 
+		{
+			if (ft_strcmp(node->token->value, "echo"))
+				exit(ft_exec_builtins_check(node, ms));
+			else
+				exit(ft_exec_builtins(node, ms));
+		}
 		if (node->cmd_ready[0][0] == '/' || 									// Caminho absoluto ou relativo
 			(node->cmd_ready[0][0] == '.' && node->cmd_ready[0][1] == '/') || 
 			!ft_strncmp(node->cmd_ready[0], "../", 3)) 
@@ -553,7 +661,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 		}
 		else if (ft_exit_code(ms) == 0)
 		{
-			if (node->token->type == TOKEN_BUILTIN)
+			if (node->token->type == TOKEN_BUILTIN && ft_strcmp(node->token->value, "echo"))
 				ft_exec_builtins(node, ms);
 		}
 	}
@@ -594,6 +702,8 @@ void	ft_remove_created_files(t_node *node)
 	{
 		if (unlink(node->right->token->value) == -1)
 			perror("unlink");
+		else
+			node->file = false;
 	}
 	if (node->prev && node->prev->right == node) // Se estivermos em um ramo direito, seguimos para o nó anterior diretamente
 	{
