@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/19 19:25:28 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/22 18:10:40 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,9 @@ int	ft_builtin_cd_check(char **args, t_minishell *ms)
 	if (ret != 0)
 		return (ret);
 	if (chdir(res_p) != 0)
-		return (ft_builtin_error("cd error", errno));
+	{
+		printf("Minishell: cd: %s: No such file or directory\n", args[1]);
+		return (errno);
+	}
 	return (0);
 }
