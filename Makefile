@@ -38,8 +38,11 @@ fclean: clean
 	$(MAKE) -C $(LIBFT_DIR) fclean
 	rm -f $(LIB) $(NAME)
 
+test:
+	cd ./tester && ./tester
+
 # Recompila tudo
 re: fclean all
 
 # Declarando que não são arquivos reais
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re tester
