@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/22 17:23:15 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/23 03:45:55 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,18 @@ static int	ft_execute_output_redirect(t_node *node, t_minishell *ms);
 static int	ft_execute_input_redirect(t_node *node, t_minishell *ms);
 static int	ft_execute_heredoc(t_node *node, t_minishell *ms);
 int	ft_handle_heredoc(t_node *node, t_minishell *ms);
+static int	ft_heredoc_syntax_error(t_minishell *ms);
+static int	ft_handle_heredoc_fork_error(t_minishell *ms);
+static void	ft_heredoc_child_process(t_node *node, t_minishell *ms);
+static char	*ft_update_heredoc_buffer(char *temp, char *input);
+static void	ft_write_heredoc(t_minishell *ms, t_node *node, char *temp);
+static void	ft_restore_stdin(t_minishell *ms);
+static int	ft_handle_exit_status(t_minishell *ms, t_node *node);
+static int	ft_redirect_stdout(t_minishell *ms);
+static void	ft_dup2_error(t_minishell *ms, int tty_fd, int save_stdout);
+static int	ft_open_tty(t_minishell *ms, int save_stdout);
+static int	ft_duplicate_stdout(t_minishell *ms);
+void	ft_restore_stdout(int save_stdout, t_minishell *ms);
 int	ft_handle_output_redirect(t_node *node, t_minishell *ms);
 static int	ft_check_redirect_syntax(t_node *node, t_minishell *ms);
 static int	ft_open_output_file(t_node *node);
@@ -30,7 +42,7 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms);
 static int	ft_redirect_pipe_input(t_minishell *ms);
 static void	ft_execute_pipe_child(t_node *node, t_minishell *ms);
 static int	ft_handle_fork_error(t_minishell *ms);
-static int	ft_create_pipe(t_minishell *ms);
+int	ft_create_pipe(t_minishell *ms);
 static int	ft_check_pipe_syntax(t_node *node, t_minishell *ms);
 static int	ft_pipe_syntax_error(t_minishell *ms, char *token, int code);
 static void	ft_handle_unfinished_pipe(t_minishell *ms, char *input);
@@ -43,9 +55,9 @@ static int	ft_file_error(char *filepath, char *msg, int code);
 void	ft_swap_redirects_values(t_node *node, t_type type);
 void	ft_remove_created_files(t_node *node);
 void	ft_create_files(t_node *node);
+static int ft_has_cat(t_node *node);
 int	ft_collect_heredocs(t_node *node, t_minishell *ms);
 int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
-static int ft_has_cat(t_node *node);
 
 // /**
 //  * @brief  Executes the AST based on the current node type.
@@ -229,6 +241,149 @@ void	ft_swap_redirects_values(t_node *node, t_type type)
 	}
 }
 
+// /**
+//  * @brief  Handles heredoc redirection by reading user input until a delimiter is reached.
+//  * 
+//  * @param  node  Pointer to the heredoc node in the AST.
+//  * @param  ms    Pointer to the minishell structure.
+//  * @return int   Execution status.
+//  **         0 on success.
+//  **         Non-zero in case of errors or syntax issues.
+//  */
+// int	ft_handle_heredoc(t_node *node, t_minishell *ms)
+// {
+// 	char	*input;
+// 	char	*temp;
+// 	int		save_stdout;
+// 	int		tty_fd;
+
+// 	input = NULL;
+// 	temp = NULL;
+// 	save_stdout = -1;
+// 	tty_fd = -1;
+// 	if (!node->right)
+// 	{
+// 		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", STDERR_FILENO);
+// 		ft_set_exit_code(ms, 2);
+// 		return (1);
+// 	}
+// 	if (pipe(ms->pipefd) == -1)
+// 	{
+// 		perror("pipe");
+// 		ft_set_exit_code(ms, 1);
+// 		return (1);
+// 	}
+// 	if (!isatty(STDOUT_FILENO))
+// 	{
+// 		save_stdout = dup(STDOUT_FILENO);
+// 		if (save_stdout == -1)
+// 		{
+// 			perror("dup");
+// 			close(ms->pipefd[0]);
+// 			close(ms->pipefd[1]);
+// 			ft_set_exit_code(ms, 1);
+// 			return (1);
+// 		}
+// 		tty_fd = open("/dev/tty", O_WRONLY);
+// 		if (tty_fd == -1)
+// 		{
+// 			perror("open /dev/tty");
+// 			close(ms->pipefd[0]);
+// 			close(ms->pipefd[1]);
+// 			close(save_stdout);
+// 			ft_set_exit_code(ms, 1);
+// 			return (1);
+// 		}
+// 		if (dup2(ms->save_stdout, STDOUT_FILENO) == -1)
+// 		{
+// 			perror("dup2");
+// 			close(tty_fd);
+// 			close(ms->pipefd[0]);
+// 			close(ms->pipefd[1]);
+// 			close(ms->save_stdout);
+// 			close(save_stdout);
+// 			ft_set_exit_code(ms, 1);
+// 			return (1);
+// 		}
+// 		close(tty_fd);
+// 	}
+// 	ms->pid = fork();
+// 	if (ms->pid == -1)
+// 	{
+// 		perror("fork");
+// 		close(ms->pipefd[0]);
+// 		close(ms->pipefd[1]);
+// 		ft_set_exit_code(ms, 1);
+// 		return (1);
+// 	}
+// 	ft_set_fork_signals();
+// 	if (ms->pid == 0)
+// 	{
+// 		ft_set_heredoc_signals();
+// 		close(ms->pipefd[0]);
+// 		while (1)
+// 		{
+// 			input = readline("> ");
+//  			if (input == NULL) // Ctrl-D ou EOF
+// 			{
+// 				ft_putstr_fd("minishell: warning: here-document delimited by end-of-file (wanted `", STDERR_FILENO);
+// 				ft_putstr_fd(node->right->token->value, STDERR_FILENO);
+// 				write(STDERR_FILENO, "')\n", 3); 
+// 				ft_set_exit_code(ms, 0);
+// 				break; // Contar heredocs, criar variavel para saber qdo tem de fechar exit 130
+// 			} 
+// 			if (!input || ft_strcmp(input, node->right->token->value) == 0)
+// 				break;
+// 			if (temp)
+// 			{
+// 				temp = ft_strjoin_free(temp, input, 1, 0);
+// 				temp = ft_strjoin_free(temp, "\n", 1, 0);
+// 			}
+// 			else
+// 			{
+// 				temp = ft_strdup(input);
+// 				temp = ft_strjoin_free(temp, "\n", 1, 0);
+// 			}
+// 			free(input);
+// 		}
+// 		if (temp)
+// 		{
+// 			if (node->right && node->right->token->old_value[0] != '"' && node->right->token->old_value[0] != '\'')
+// 				ft_revalue_heredock_input(&temp, ms);
+// 			write(ms->pipefd[1], temp, ft_strlen(temp));
+// 		}
+// 		close(ms->pipefd[1]);
+// 		exit(0);
+// 	}
+// 	close(ms->pipefd[1]);
+// 	if (dup2(ms->pipefd[0], STDIN_FILENO) == -1)
+// 	{
+// 		perror("dup2");
+// 		close(ms->pipefd[0]);
+// 		ft_set_exit_code(ms, 1);
+// 		return (1);
+// 	}
+// 	close(ms->pipefd[0]);
+// 	waitpid(ms->pid, &ms->status, 0);
+// 	ft_set_main_signals();
+// 	if (save_stdout != -1)
+// 	{
+// 		if (dup2(save_stdout, STDOUT_FILENO) == -1)
+// 		{
+// 			perror("dup2");
+// 			close(save_stdout);
+// 			ft_set_exit_code(ms, 1);
+// 			return (1);
+// 		}
+// 		close(save_stdout);
+// 	}
+// 	if (WIFEXITED(ms->status))
+// 		ft_set_exit_code(ms, WEXITSTATUS(ms->status));
+// 	else
+// 		ft_set_exit_code(ms, 1);
+// 	return (ft_execute_ast(node->left, ms));
+// }
+
 /**
  * @brief  Handles heredoc redirection by reading user input until a delimiter is reached.
  * 
@@ -240,137 +395,287 @@ void	ft_swap_redirects_values(t_node *node, t_type type)
  */
 int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 {
-	char	*input;
-	char	*temp;
-	int		save_stdout;
-	int		tty_fd;
+	int	save_stdout;
+	int	pipe_status;
 
-	input = NULL;
-	temp = NULL;
 	save_stdout = -1;
-	tty_fd = -1;
 	if (!node->right)
-	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", STDERR_FILENO);
-		ft_set_exit_code(ms, 2);
-		return (1);
-	}
+		return (ft_heredoc_syntax_error(ms));
+	pipe_status = ft_create_pipe(ms);
+	if (pipe_status)
+		return (pipe_status);
+	if (!isatty(STDOUT_FILENO))
+		save_stdout = ft_redirect_stdout(ms);
+	ms->pid = fork();
+	if (ms->pid == -1)
+		return (ft_handle_heredoc_fork_error(ms));
+	ft_set_fork_signals();
+	if (ms->pid == 0)
+		ft_heredoc_child_process(node, ms);
+	close(ms->pipefd[1]);
+	ft_restore_stdin(ms);
+	waitpid(ms->pid, &ms->status, 0);
+	ft_set_main_signals();
+	if (save_stdout != -1)
+		ft_restore_stdout(save_stdout, ms);
+	return (ft_handle_exit_status(ms, node));
+}
+
+/**
+ * @brief  Creates a pipe for heredoc input.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return int  0 on success, 1 on failure.
+ */
+int	ft_create_pipe(t_minishell *ms)
+{
 	if (pipe(ms->pipefd) == -1)
 	{
 		perror("pipe");
 		ft_set_exit_code(ms, 1);
 		return (1);
 	}
-	if (!isatty(STDOUT_FILENO))
-	{
-		save_stdout = dup(STDOUT_FILENO);
-		if (save_stdout == -1)
-		{
-			perror("dup");
-			close(ms->pipefd[0]);
-			close(ms->pipefd[1]);
-			ft_set_exit_code(ms, 1);
-			return (1);
-		}
-		tty_fd = open("/dev/tty", O_WRONLY);
-		if (tty_fd == -1)
-		{
-			perror("open /dev/tty");
-			close(ms->pipefd[0]);
-			close(ms->pipefd[1]);
-			close(save_stdout);
-			ft_set_exit_code(ms, 1);
-			return (1);
-		}
-		if (dup2(ms->save_stdout, STDOUT_FILENO) == -1)
-		{
-			perror("dup2");
-			close(tty_fd);
-			close(ms->pipefd[0]);
-			close(ms->pipefd[1]);
-			close(ms->save_stdout);
-			close(save_stdout);
-			ft_set_exit_code(ms, 1);
-			return (1);
-		}
-		close(tty_fd);
-	}
-	ms->pid = fork();
-	if (ms->pid == -1)
-	{
-		perror("fork");
-		close(ms->pipefd[0]);
-		close(ms->pipefd[1]);
-		ft_set_exit_code(ms, 1);
-		return (1);
-	}
-	ft_set_fork_signals();
-	if (ms->pid == 0)
-	{
-		ft_set_heredoc_signals();
-		close(ms->pipefd[0]);
-		while (1)
-		{
-			input = readline("> ");
- 			if (input == NULL) // Ctrl-D ou EOF
-			{
-				ft_putstr_fd("minishell: warning: here-document delimited by end-of-file (wanted `", STDERR_FILENO);
-				ft_putstr_fd(node->right->token->value, STDERR_FILENO);
-				write(STDERR_FILENO, "')\n", 3); 
-				ft_set_exit_code(ms, 0);
-				break; // Contar heredocs, criar variavel para saber qdo tem de fechar exit 130
-			} 
-			if (!input || ft_strcmp(input, node->right->token->value) == 0)
-				break;
-			if (temp)
-			{
-				temp = ft_strjoin_free(temp, input, 1, 0);
-				temp = ft_strjoin_free(temp, "\n", 1, 0);
-			}
-			else
-			{
-				temp = ft_strdup(input);
-				temp = ft_strjoin_free(temp, "\n", 1, 0);
-			}
-			free(input);
-		}
-		if (temp)
-		{
-			if (node->right && node->right->token->old_value[0] != '"' && node->right->token->old_value[0] != '\'')
-				ft_revalue_heredock_input(&temp, ms);
-			write(ms->pipefd[1], temp, ft_strlen(temp));
-		}
-		close(ms->pipefd[1]);
-		exit(0);
-	}
+	return (0);
+}
+
+/**
+ * @brief  Handles syntax errors in heredoc usage.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return int  Always returns 1 (error).
+ */
+static int	ft_heredoc_syntax_error(t_minishell *ms)
+{
+	ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n",
+		STDERR_FILENO);
+	ft_set_exit_code(ms, 2);
+	return (1);
+}
+
+/**
+ * @brief  Handles a fork error.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return int  Always returns 1 (error).
+ */
+static int	ft_handle_heredoc_fork_error(t_minishell *ms)
+{
+	perror("fork");
+	close(ms->pipefd[0]);
 	close(ms->pipefd[1]);
+	ft_set_exit_code(ms, 1);
+	return (1);
+}
+
+/**
+ * @brief  Handles the child process for heredoc input.
+ * 
+ * @param  node  Pointer to the heredoc node.
+ * @param  ms    Pointer to the minishell structure.
+ */
+static void	ft_heredoc_child_process(t_node *node, t_minishell *ms)
+{
+	char	*temp;
+	char	*input;
+
+	ft_set_heredoc_signals();
+	close(ms->pipefd[0]);
+	temp = NULL;
+	while (1)
+	{
+		input = readline("> ");
+		if (!input)
+			break;
+		if (!ft_strcmp(input, node->right->token->value))
+			break;
+		temp = ft_update_heredoc_buffer(temp, input);
+		free(input);
+	}
+	ft_write_heredoc(ms, node, temp);
+	close(ms->pipefd[1]);
+	exit(0);
+}
+
+/**
+ * @brief  Appends user input to the heredoc buffer.
+ * 
+ * @param  temp  Current buffer.
+ * @param  input User input line.
+ * @return char* Updated buffer.
+ */
+static char	*ft_update_heredoc_buffer(char *temp, char *input)
+{
+	char	*new_temp;
+
+	if (temp)
+	{
+		new_temp = ft_strjoin_free(temp, input, 1, 0);
+		new_temp = ft_strjoin_free(new_temp, "\n", 1, 0);
+	}
+	else
+	{
+		new_temp = ft_strdup(input);
+		new_temp = ft_strjoin_free(new_temp, "\n", 1, 0);
+	}
+	return (new_temp);
+}
+
+/**
+ * @brief  Writes the heredoc content to the pipe.
+ * 
+ * @param  ms    Pointer to the minishell structure.
+ * @param  node  Pointer to the heredoc node.
+ * @param  temp  Buffer containing heredoc content.
+ */
+static void	ft_write_heredoc(t_minishell *ms, t_node *node, char *temp)
+{
+	if (temp)
+	{
+		if (node->right && node->right->token->old_value[0] != '"'
+			&& node->right->token->old_value[0] != '\'')
+			ft_revalue_heredock_input(&temp, ms);
+		write(ms->pipefd[1], temp, ft_strlen(temp));
+		free(temp);
+	}
+}
+
+/**
+ * @brief  Restores stdin from the pipe.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ */
+static void	ft_restore_stdin(t_minishell *ms)
+{
 	if (dup2(ms->pipefd[0], STDIN_FILENO) == -1)
 	{
 		perror("dup2");
 		close(ms->pipefd[0]);
 		ft_set_exit_code(ms, 1);
-		return (1);
 	}
 	close(ms->pipefd[0]);
-	waitpid(ms->pid, &ms->status, 0);
-	ft_set_main_signals();
-	if (save_stdout != -1)
-	{
-		if (dup2(save_stdout, STDOUT_FILENO) == -1)
-		{
-			perror("dup2");
-			close(save_stdout);
-			ft_set_exit_code(ms, 1);
-			return (1);
-		}
-		close(save_stdout);
-	}
+}
+
+/**
+ * @brief  Handles the exit status after the heredoc process.
+ * 
+ * @param  ms    Pointer to the minishell structure.
+ * @param  node  Pointer to the heredoc node.
+ * @return int   Execution status.
+ */
+static int	ft_handle_exit_status(t_minishell *ms, t_node *node)
+{
 	if (WIFEXITED(ms->status))
 		ft_set_exit_code(ms, WEXITSTATUS(ms->status));
 	else
 		ft_set_exit_code(ms, 1);
 	return (ft_execute_ast(node->left, ms));
 }
+
+/**
+ * @brief  Redirects STDOUT to /dev/tty when needed.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return int  File descriptor of saved stdout.
+ */
+static int	ft_redirect_stdout(t_minishell *ms)
+{
+	int	save_stdout;
+	int	tty_fd;
+
+	save_stdout = ft_duplicate_stdout(ms);
+	if (save_stdout == -1)
+		return (-1);
+	tty_fd = ft_open_tty(ms, save_stdout);
+	if (tty_fd == -1)
+		return (-1);
+	if (dup2(ms->save_stdout, STDOUT_FILENO) == -1)
+	{
+		ft_dup2_error(ms, tty_fd, save_stdout);
+		return (-1);
+	}
+	close(tty_fd);
+	return (save_stdout);
+}
+
+/**
+ * @brief  Duplicates STDOUT file descriptor.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return int  Duplicated file descriptor or -1 on error.
+ */
+static int	ft_duplicate_stdout(t_minishell *ms)
+{
+	int	save_stdout;
+
+	save_stdout = dup(STDOUT_FILENO);
+	if (save_stdout == -1)
+	{
+		perror("dup");
+		close(ms->pipefd[0]);
+		close(ms->pipefd[1]);
+		ft_set_exit_code(ms, 1);
+	}
+	return (save_stdout);
+}
+
+/**
+ * @brief  Opens /dev/tty for writing.
+ * 
+ * @param  ms           Pointer to the minishell structure.
+ * @param  save_stdout  Saved stdout file descriptor.
+ * @return int          File descriptor of /dev/tty or -1 on error.
+ */
+static int	ft_open_tty(t_minishell *ms, int save_stdout)
+{
+	int	tty_fd;
+
+	tty_fd = open("/dev/tty", O_WRONLY);
+	if (tty_fd == -1)
+	{
+		perror("open /dev/tty");
+		close(ms->pipefd[0]);
+		close(ms->pipefd[1]);
+		close(save_stdout);
+		ft_set_exit_code(ms, 1);
+	}
+	return (tty_fd);
+}
+
+/**
+ * @brief  Handles dup2 errors and cleans up resources.
+ * 
+ * @param  ms           Pointer to the minishell structure.
+ * @param  tty_fd       File descriptor of /dev/tty.
+ * @param  save_stdout  Saved stdout file descriptor.
+ */
+static void	ft_dup2_error(t_minishell *ms, int tty_fd, int save_stdout)
+{
+	perror("dup2");
+	close(tty_fd);
+	close(ms->pipefd[0]);
+	close(ms->pipefd[1]);
+	close(ms->save_stdout);
+	close(save_stdout);
+	ft_set_exit_code(ms, 1);
+}
+
+
+/**
+ * @brief  Restores the original STDOUT.
+ * 
+ * @param  save_stdout  File descriptor of the saved stdout.
+ */
+void	ft_restore_stdout(int save_stdout, t_minishell *ms)
+{
+	if (dup2(save_stdout, STDOUT_FILENO) == -1)
+	{
+		perror("dup2");
+		close(save_stdout);
+		ft_set_exit_code(ms, 1);
+	}
+	close(save_stdout);
+}
+
 
 // /**
 //  * @brief  Handles output redirection to a file.
@@ -872,24 +1177,6 @@ static void	ft_handle_unfinished_pipe(t_minishell *ms, char *input)
 	ft_free_tokens(ms->tokens);
 	ft_free_ast(ms->ast_root);
 	ms->in_pipe = true;
-}
-
-
-/**
- * @brief  Creates a pipe and handles potential errors.
- * 
- * @param  ms  Pointer to the minishell structure.
- * @return int 1 if an error occurred, 0 otherwise.
- */
-static int	ft_create_pipe(t_minishell *ms)
-{
-	if (pipe(ms->pipefd) == -1)
-	{
-		perror("pipe");
-		ft_set_exit_code(ms, 1);
-		return (1);
-	}
-	return (0);
 }
 
 /**
@@ -1446,6 +1733,7 @@ int ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
         free(temp_node);
     }
     node->left = current;
+	node->left->prev = node;
     g_interrupt = 0;
     return (ft_execute_ast(node->left, ms));
 }
