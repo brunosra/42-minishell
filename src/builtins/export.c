@@ -3,20 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 21:13:47 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/19 18:13:48 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/23 08:55:57 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 extern volatile int	g_interrupt;
-void	ft_dup_envp(char **src, char **dest, int count);
+/* void	ft_dup_envp(char **src, char **dest, int count);
 void	free_dup_envp(char **arr);
 void	ft_swap_env(char **a, char **b);
-void	ft_sort_envp(char **arr, int count);
+void	ft_sort_envp(char **arr, int count); */
 
 /**
  * @brief	Duplicates a given array of environment variables.
@@ -32,23 +32,31 @@ void	ft_sort_envp(char **arr, int count);
  * - Adds a NULL terminator at the end of the destination array.
  * - Exits the program if memory allocation fails.
  */
-void	ft_dup_envp(char **src, char **dest, int count)
+int	ft_dup_envp(char **envp, char ***dupenv, int count)
 {
 	int	i;
 
 	i = 0;
+	*dupenv = malloc((count + 1) * sizeof(char *));
+	if (!(*dupenv))
+		return (-1);
 	while (i < count)
 	{
-		dest[i] = malloc(ft_strlen(src[i]) + 1);
-		if (!dest[i])
+		(*dupenv)[i] = ft_strdup(envp[i]);
+		if (!(*dupenv)[i])
 		{
-			perror("malloc failed");
-			exit(EXIT_FAILURE);
+			while (i > 0)
+			{
+				i--;
+				free((*dupenv)[i]);
+			}
+			free(*dupenv);
+			return (-1);
 		}
-		ft_strcpy(dest[i], src[i]);
 		i++;
 	}
-	dest[i] = NULL;
+	(*dupenv)[count] = NULL;
+	return (0);
 }
 
 /**
@@ -86,7 +94,7 @@ void	free_dup_envp(char **arr)
  * @details
  * - Swaps the values of the two pointers using a temporary variable.
  */
-void	ft_swap_env(char **a, char **b)
+static void	ft_swap(char **a, char **b)
 {
 	char	*temp;
 
@@ -106,23 +114,27 @@ void	ft_swap_env(char **a, char **b)
  * - Swaps adjacent strings if they are out of order.
  * - Uses `ft_strcmp` to compare the strings.
  */
-void	ft_sort_envp(char **arr, int count)
+int	ft_sort_envp(char **dupenv, int count)
 {
+	int	swapped;
 	int	i;
-	int	j;
 
-	i = 0;
-	while (i < count - 1)
+	swapped = 1;
+	while (swapped)
 	{
-		j = 0;
-		while (j < count - i - 1)
+		swapped = 0;
+		i = 0;
+		while (i < count - 1)
 		{
-			if (ft_strcmp(arr[j], arr[j + 1]) > 0)
-				ft_swap_env(&arr[j], &arr[j + 1]);
-			j++;
+			if (ft_strcmp(dupenv[i], dupenv[i + 1]) > 0)
+			{
+				ft_swap(&dupenv[i], &dupenv[i + 1]);
+				swapped = 1;
+			}
+			i++;
 		}
-		i++;
 	}
+	return (0);
 }
 
 /**
@@ -173,28 +185,48 @@ int	ft_builtin_export_check(char **args, t_minishell *ms)
 	return (0);
 }
 
-void	ft_builtin_export(char **args, t_minishell *ms)
+static void	ft_output_export(char **arr, int count)
+{
+	int i;
+
+	i = -1;
+	if (arr == NULL)
+	{
+		printf("[print_str_arr]: NULL / Empty array");
+		return;
+	}
+	else
+		while (++i < count - 1)
+			printf("declare -x %s\n", arr[i]);
+}
+
+static void	ft_print_static_vars(t_minishell *ms)
 {
 	char	**dupenv;
 	int		count;
 
 	count = -1;
-	while (args[++count] != NULL)
+	while (ms->env.envp[++count] != NULL)
 		;
-	if (args[1] == NULL)
+	dupenv = malloc(sizeof(char *) * count);
+	if (dupenv == NULL)
 	{
-		// only 1 arg
-		dupenv = malloc(sizeof(char *) * count);
-		if (dupenv == NULL)
-		{
-			perror("malloc error");
-			return ;
-		}
-		ft_print_str_arr(dupenv);
-		ft_dup_envp(ms->env.envp, dupenv, count);
-		ft_sort_envp(dupenv, count);
-		printf("ms: %s", ms->env.env_paths);
+		perror("malloc error");
+		return ;
 	}
+	ft_dup_envp(ms->env.envp, &dupenv, count);
+	ft_sort_envp(dupenv, count);
+	ft_output_export(dupenv, count);
+	/* printf("ms: %s", ms->env.env_paths); */
+	
+}
+
+void	ft_builtin_export(char **args, t_minishell *ms)
+{
+
+	
+	if (args[1] == NULL)
+		ft_print_static_vars(ms);
 	/* printf("########## envp: #########\n");
 	ft_print_str_arr(ms->env.envp); */
 	/* printf("####### env_paths: #######\n");
