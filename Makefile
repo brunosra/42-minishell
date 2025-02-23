@@ -38,8 +38,8 @@ fclean: clean
 	$(MAKE) -C $(LIBFT_DIR) fclean
 	rm -f $(LIB) $(NAME)
 
-test:
-	cd ./tester && ./tester
+test: $(NAME)
+	clear && cd ./tester && ./tester
 
 # Recompila tudo
 re: fclean all

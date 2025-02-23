@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:47:54 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/22 18:51:01 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/23 07:57:04 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,7 @@ int	ft_builtin_exit(char **args)
 		return (0);
 	else if (i > 2 && ft_atoll(args[1], 0, 0))
 	{
-		ft_putstr_fd(MSG_ERR_EXIT" too many arguments\n", STDERR_FILENO);
+		ft_putstr_fd(" too many arguments\n", STDERR_FILENO);
 		exit (1);
 	}
 	else if (ft_value_is_numeric(args[1]))
