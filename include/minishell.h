@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/19 19:24:23 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/23 09:07:48 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,9 +192,11 @@ void 	ft_builtin_env(char **args, t_minishell *ms);
 void	ft_resolve_rel_p(const char *base_p, const char *rel_p, char *res_p);
 int		ft_builtin_cd_check(char **args, t_minishell *ms);
 void	ft_builtin_cd(char **args, t_minishell *ms);
+void	ft_builtin_unset(char **args, t_minishell *ms);
+/**__EXPORT__**/
+int		ft_dup_envp(char **envp, char ***dupenv, int count);
 int		ft_builtin_export_check(char **args, t_minishell *ms);
 void	ft_builtin_export(char **args, t_minishell *ms);
-void	ft_builtin_unset(char **args, t_minishell *ms);
 
 /**__SIGNAL__**/
 void	ft_signal_handler(int sig);
@@ -234,5 +236,7 @@ int		ft_exit_code(t_minishell *ms);
 
 /**__MISC_UTILS__**/
 void	ft_print_str_arr(char **arr);
+void	ft_swap(char **a, char **b);
+void	ft_free_str_arr(char **arr);
 
 #endif
