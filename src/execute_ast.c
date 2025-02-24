@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/24 18:52:21 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/24 19:49:09 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,8 @@ static void	ft_execute_child_process(t_node *node, t_minishell *ms);
 static int	ft_execute_external(t_node *node, t_minishell *ms);
 static void	ft_execute_builtin(t_node *node, t_minishell *ms);
 int	ft_find_executable(t_minishell *ms, char *cmd);
+static int	ft_build_full_path(t_minishell *ms, char *cmd, int i);
+static int	ft_init_env_paths(t_minishell *ms);
 int	ft_invalid_right_token_value(char *value);
 int	ft_is_valid_file(char *filepath, int mode);
 static int	ft_check_file_access(char *filepath, int mode);
@@ -84,7 +86,7 @@ static int	ft_multiple_heredoc_syntax_error(t_node *current, t_minishell *ms);
 // {
 // 	if (!node || !ms->n_args)
 // 		return (1);
-//  	if (node->token->type == TOKEN_EXCEPT)
+//  	if (node->token->type == TKN_EXCPT)
 // 	{
 // 		ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
 // 		ft_putstr_fd(node->token->value, STDERR_FILENO);
@@ -93,27 +95,27 @@ static int	ft_multiple_heredoc_syntax_error(t_node *current, t_minishell *ms);
 		
 // 		return (1);
 // 	}
-// 	if (node->token->type == TOKEN_OUTPUT_REDIRECT)
+// 	if (node->token->type == TKN_OUT_RD)
 // 	{
 // 		if (ms->swap_output_redirects == false)
 // 		{
-// 			ft_swap_redirects_values(node, TOKEN_OUTPUT_REDIRECT);
+// 			ft_swap_redirects_values(node, TKN_OUT_RD);
 // 			ms->swap_output_redirects = true;
 // 		}
 // 		return (ft_handle_output_redirect(node, ms));
 // 	}
-// 	else if (node->token->type == TOKEN_INPUT_REDIRECT)
+// 	else if (node->token->type == TKN_IN_RD)
 // 	{
 // 		if (ms->swap_input_redirects == false)
 // 		{
-// 			ft_swap_redirects_values(node, TOKEN_INPUT_REDIRECT);
+// 			ft_swap_redirects_values(node, TKN_IN_RD);
 // 			ms->swap_input_redirects = true;
 // 		}
 // 		return (ft_handle_input_redirect(node, ms));
 // 	}
-//  	else if (node->token->type == TOKEN_HEREDOC)
+//  	else if (node->token->type == TKN_HDOC)
 // 	{
-// 		if (node->left && node->left->token->type == TOKEN_HEREDOC)
+// 		if (node->left && node->left->token->type == TKN_HDOC)
 // 		{
 // 			if (ft_collect_heredocs(node, ms))
 // 				return (1);
@@ -121,11 +123,11 @@ static int	ft_multiple_heredoc_syntax_error(t_node *current, t_minishell *ms);
 // 		}
 // 		return (ft_handle_heredoc(node, ms));
 // 	}
-//  	else if (node->token->type == TOKEN_OPERATOR)
+//  	else if (node->token->type == TKN_PIPE)
 // 		return (ft_handle_pipe(node, ms));
-// 	else if (node->token->type == TOKEN_BUILTIN)
+// 	else if (node->token->type == TKN_BLTIN)
 // 		return (ft_execute_command(node, ms));
-// 	else if (node->token->type == TOKEN_COMMAND)
+// 	else if (node->token->type == TKN_CMD)
 // 		return (ft_execute_command(node, ms));
 // 	return (0);
 // }
@@ -143,18 +145,18 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
 {
 	if (!node || !ms->n_args)
 		return (1);
-	if (node->token->type == TOKEN_EXCEPT)
+	if (node->token->type == TKN_EXCPT)
 		return (ft_handle_syntax_error(node, ms));
-	if (node->token->type == TOKEN_OUTPUT_REDIRECT)
+	if (node->token->type == TKN_OUT_RD)
 		return (ft_execute_output_redirect(node, ms));
-	if (node->token->type == TOKEN_INPUT_REDIRECT)
+	if (node->token->type == TKN_IN_RD)
 		return (ft_execute_input_redirect(node, ms));
-	if (node->token->type == TOKEN_HEREDOC)
+	if (node->token->type == TKN_HDOC)
 		return (ft_execute_heredoc(node, ms));
-	if (node->token->type == TOKEN_OPERATOR)
+	if (node->token->type == TKN_PIPE)
 		return (ft_handle_pipe(node, ms));
-	if (node->token->type == TOKEN_BUILTIN ||
-		node->token->type == TOKEN_COMMAND)
+	if (node->token->type == TKN_BLTIN ||
+		node->token->type == TKN_CMD)
 		return (ft_execute_command(node, ms));
 	return (0);
 }
@@ -187,7 +189,7 @@ static int	ft_execute_output_redirect(t_node *node, t_minishell *ms)
 {
 	if (ms->swap_output_redirects == false)
 	{
-		ft_swap_redirects_values(node, TOKEN_OUTPUT_REDIRECT);
+		ft_swap_redirects_values(node, TKN_OUT_RD);
 		ms->swap_output_redirects = true;
 	}
 	return (ft_handle_output_redirect(node, ms));
@@ -204,7 +206,7 @@ static int	ft_execute_input_redirect(t_node *node, t_minishell *ms)
 {
 	if (ms->swap_input_redirects == false)
 	{
-		ft_swap_redirects_values(node, TOKEN_INPUT_REDIRECT);
+		ft_swap_redirects_values(node, TKN_IN_RD);
 		ms->swap_input_redirects = true;
 	}
 	return (ft_handle_input_redirect(node, ms));
@@ -219,7 +221,7 @@ static int	ft_execute_input_redirect(t_node *node, t_minishell *ms)
  */
 static int	ft_execute_heredoc(t_node *node, t_minishell *ms)
 {
-	if (node->left && node->left->token->type == TOKEN_HEREDOC)
+	if (node->left && node->left->token->type == TKN_HDOC)
 	{
 		if (ft_collect_heredocs(node, ms))
 			return (1);
@@ -583,29 +585,17 @@ static void	ft_restore_stdin(t_minishell *ms)
 static int	ft_handle_exit_status(t_minishell *ms, t_node *node)
 {
 	if (WIFEXITED(ms->status))
-	{
 		ft_set_exit_code(ms, WEXITSTATUS(ms->status));
-		// ft_restore_stdin(ms);
-	}
 	if (WIFEXITED(ms->status) && WEXITSTATUS(ms->status) == 130)
     {
-            ft_set_exit_code(ms, 130);
-            // close(ms->pipefd[0]);
-			return (1);
+        ft_set_exit_code(ms, 130); // podemos colocar a funcao a retornar int para a podermos colocar dentro do return se quisermos!
+		return (1);
     }
-	// else if (WIFSIGNALED(ms->status)) // Processo foi terminado por um sinal
-	// {
-	// 	if (ms->status == SIGINT)
-	// 	{
-	// 		ft_set_exit_code(ms, 130);
-	// 		write(STDERR_FILENO, "\n", 1);
-	// 		close(ms->pipefd[0]);
-	// 	}
-	// 	else
-	// 		ft_set_exit_code(ms, WEXITSTATUS(ms->status));
-	// }
 	else
+	{
 		ft_set_exit_code(ms, 1);
+		return(1);
+	}
 	return (ft_execute_ast(node->left, ms));
 }
 
@@ -1032,7 +1022,7 @@ static int ft_has_cat(t_node *node) // FUNCAO DESENRASQUE ALTERAR
 	current = node;
 	if (!current)
 		return (0);
-	if (current->token->type == TOKEN_COMMAND)
+	if (current->token->type == TKN_CMD)
 	{
 		if (!ft_strcmp(current->cmd_ready[0], "cat")
 		|| !ft_strcmp(current->cmd_ready[0], "/bin/cat"))
@@ -1297,7 +1287,7 @@ static int	ft_redirect_pipe_input(t_minishell *ms)
 // 		//ft_set_fork_signals();
 // 		if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
 // 			exit(0);
-// 		if (node->token->type == TOKEN_BUILTIN) 
+// 		if (node->token->type == TKN_BLTIN) 
 // 		{
 // 			if (ft_strcmp(node->token->value, "echo"))
 // 				exit(ft_exec_builtins_check(node, ms));
@@ -1324,9 +1314,9 @@ static int	ft_redirect_pipe_input(t_minishell *ms)
 // 			exit(42);
 // 		}
 // 		if (node->cmd_ready[1] == NULL && 
-// 		!ft_strcmp(node->cmd_ready[0], "cat") && node->prev && node->prev->token->type == TOKEN_OPERATOR
+// 		!ft_strcmp(node->cmd_ready[0], "cat") && node->prev && node->prev->token->type == TKN_PIPE
 // 		&& (node->prev->left == node 
-// 		|| (node->prev->prev && node->prev->prev->token->type == TOKEN_OPERATOR && node->prev->right == node)))
+// 		|| (node->prev->prev && node->prev->prev->token->type == TKN_PIPE && node->prev->right == node)))
 // 			exit(13);
 // 		execve(ms->env.full_path, node->cmd_ready, ms->env.envp); // Executa o executável encontrado
 // 		perror("execve");
@@ -1345,7 +1335,7 @@ static int	ft_redirect_pipe_input(t_minishell *ms)
 // 		}
 // 		else if (ft_exit_code(ms) == 0)
 // 		{
-// 			if (node->token->type == TOKEN_BUILTIN && ft_strcmp(node->token->value, "echo"))
+// 			if (node->token->type == TKN_BLTIN && ft_strcmp(node->token->value, "echo"))
 // 				ft_exec_builtins(node, ms);
 // 		}
 // 	}
@@ -1359,11 +1349,11 @@ static int	ft_redirect_pipe_input(t_minishell *ms)
 // 	else
 // 		ft_set_exit_code(ms, 1);
 // 	ft_set_main_signals();
-// 	if (ft_exit_code(ms) != 0 && node->prev && node->prev->token->type == TOKEN_INPUT_REDIRECT) // Remoção de arquivos criados caso o comando falhe
+// 	if (ft_exit_code(ms) != 0 && node->prev && node->prev->token->type == TKN_IN_RD) // Remoção de arquivos criados caso o comando falhe
 // 	{
 // 		ft_remove_created_files(node->prev);
 // 	}
-// 	if (node->token->type == TOKEN_BUILTIN && !ft_strcmp(node->cmd_ready[0], "exit") && ft_exit_code(ms) != 1) // Finaliza o shell se for exit
+// 	if (node->token->type == TKN_BLTIN && !ft_strcmp(node->cmd_ready[0], "exit") && ft_exit_code(ms) != 1) // Finaliza o shell se for exit
 // 	{
 // 		ft_free_tokens(ms->tokens);
 // 		ft_free_ast(ms->ast_root);
@@ -1414,7 +1404,7 @@ static void	ft_execute_child_process(t_node *node, t_minishell *ms)
 {
 	if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
 		exit(0);
-	if (node->token->type == TOKEN_BUILTIN)
+	if (node->token->type == TKN_BLTIN)
 		ft_execute_builtin(node, ms);
 	if (node->cmd_ready[0][0] == '/' || node->cmd_ready[0][0] == '.' ||
 		!ft_strncmp(node->cmd_ready[0], "../", 3))
@@ -1422,9 +1412,9 @@ static void	ft_execute_child_process(t_node *node, t_minishell *ms)
 	if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
 		exit(42);
 	if (node->cmd_ready[1] == NULL && !ft_strcmp(node->cmd_ready[0], "cat") &&
-		node->prev && node->prev->token->type == TOKEN_OPERATOR &&
+		node->prev && node->prev->token->type == TKN_PIPE &&
 		(node->prev->left == node ||
-			(node->prev->prev && node->prev->prev->token->type == TOKEN_OPERATOR &&
+			(node->prev->prev && node->prev->prev->token->type == TKN_PIPE &&
 				node->prev->right == node)))
 		exit(13);
 	execve(ms->env.full_path, node->cmd_ready, ms->env.envp);
@@ -1451,7 +1441,7 @@ static void	ft_handle_cmd_exit_status(t_node *node, t_minishell *ms)
 			ft_putstr_fd(": command not found\n", STDERR_FILENO);
 			ft_set_exit_code(ms, 127);
 		}
-		else if (ft_exit_code(ms) == 0 && node->token->type == TOKEN_BUILTIN &&
+		else if (ft_exit_code(ms) == 0 && node->token->type == TKN_BLTIN &&
 				 ft_strcmp(node->token->value, "echo"))
 			ft_exec_builtins(node, ms);
 	}
@@ -1485,9 +1475,9 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	ft_handle_cmd_exit_status(node, ms);
 	ft_set_main_signals();
 	if (ft_exit_code(ms) != 0 && node->prev &&
-		node->prev->token->type == TOKEN_INPUT_REDIRECT)
+		node->prev->token->type == TKN_IN_RD)
 		ft_remove_created_files(node->prev);
-	if (node->token->type == TOKEN_BUILTIN &&
+	if (node->token->type == TKN_BLTIN &&
 		!ft_strcmp(node->cmd_ready[0], "exit") &&
 		ft_exit_code(ms) != 1)
 	{
@@ -1509,7 +1499,8 @@ void	ft_remove_created_files(t_node *node)
 {
 	if (!node)
 		return ;
-	if (node->token->type == TOKEN_OUTPUT_REDIRECT && node->right && node->right->token->value && node->file == true) // Se for um OUTPUT_REDIRECT, tenta remover o arquivo associado
+	if (node->token->type == TKN_OUT_RD && node->right
+		&& node->right->token->value && node->file == true) // Se for um OUTPUT_REDIRECT, tenta remover o arquivo associado
 	{
 		if (unlink(node->right->token->value) == -1)
 			perror("unlink");
@@ -1538,18 +1529,21 @@ void	ft_create_files(t_node *node)
 
 	if (!node)
 		return;
-	if (node->token->type == TOKEN_OUTPUT_REDIRECT && node->right && node->right->token->value && node->file == false)
+	if (node->token->type == TKN_OUT_RD && node->right
+		&& node->right->token->value && node->file == false)
 	{
 		if (ft_strcmp(node->token->value, ">>") == 0)
-			fd = open(node->right->token->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			fd = open(node->right->token->value,
+				O_WRONLY | O_CREAT | O_APPEND, 0644);
 		else
-			fd = open(node->right->token->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			fd = open(node->right->token->value,
+				O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd != -1)
 			close(fd);
 		else
 			perror("open");
 	}
-	if (node->left && node->left->token->type == TOKEN_OUTPUT_REDIRECT) // Se o nó à esquerda também for um output redirect, continuar a verificação
+	if (node->left && node->left->token->type == TKN_OUT_RD) // Se o nó à esquerda também for um output redirect, continuar a verificação
 		ft_create_files(node->left);
 }
 
@@ -1562,39 +1556,111 @@ void	ft_create_files(t_node *node)
  **         0 if the executable is found.
  **         127 if not found or if PATH is invalid.
  */
+// int	ft_find_executable(t_minishell *ms, char *cmd)
+// {
+// 	int	i;
+
+// 	i = 0;
+// 	ms->env.env_paths = getenv("PATH");
+// 	if (!ms->env.env_paths)
+// 		return (127); // PATH não encontrado
+// 	ms->env.paths = ft_split(ms->env.env_paths, ':');
+// 	if (!ms->env.paths)
+// 		return (127); // Falha ao dividir o PATH
+// 	while (ms->env.paths[i])
+// 	{
+// 		ms->env.full_path = malloc(ft_strlen(ms->env.paths[i]) + ft_strlen(cmd) + 2);
+// 		if (!ms->env.full_path)
+// 		{
+// 			ft_free_split(ms->env.paths);
+// 			return (127);
+// 		}
+// 		ft_strcpy(ms->env.full_path, ms->env.paths[i]);
+// 		ft_strcat(ms->env.full_path, "/");
+// 		ft_strcat(ms->env.full_path, cmd);
+// 		if (access(ms->env.full_path, X_OK) == 0)
+// 		{
+// 			ft_free_split(ms->env.paths);
+// 			return (0); // Comando encontrado
+// 		}
+// 		free(ms->env.full_path);
+// 		i++;
+// 	}
+// 	ft_free_split(ms->env.paths);
+// 	return (127); // Comando não encontrado
+// }
+
+/**
+ * @brief  Searches for an executable in the system PATH.
+ * 
+ * @param  ms   Pointer to the minishell structure.
+ * @param  cmd  Command to search for.
+ * @return int  Status of the search.
+ **         0 if executable is found.
+ **         127 if PATH is not found or command is not executable.
+ */
 int	ft_find_executable(t_minishell *ms, char *cmd)
 {
 	int	i;
 
+	if (ft_init_env_paths(ms) == 127)
+		return (127);
 	i = 0;
+	while (ms->env.paths[i])
+	{
+		if (ft_build_full_path(ms, cmd, i) == 1)
+			return (0); // Comando encontrado
+		i++;
+	}
+	ft_free_split(ms->env.paths);
+	return (127); // Comando não encontrado
+}
+
+/**
+ * @brief  Initializes the PATH environment variable for command search.
+ * 
+ * @param  ms   Pointer to the minishell structure.
+ * @return int  0 if successful, 127 if PATH is not found or cannot be split.
+ */
+static int	ft_init_env_paths(t_minishell *ms)
+{
 	ms->env.env_paths = getenv("PATH");
 	if (!ms->env.env_paths)
 		return (127); // PATH não encontrado
 	ms->env.paths = ft_split(ms->env.env_paths, ':');
 	if (!ms->env.paths)
 		return (127); // Falha ao dividir o PATH
-	while (ms->env.paths[i])
-	{
-		ms->env.full_path = malloc(ft_strlen(ms->env.paths[i]) + ft_strlen(cmd) + 2);
-		if (!ms->env.full_path)
-		{
-			ft_free_split(ms->env.paths);
-			return (127);
-		}
-		ft_strcpy(ms->env.full_path, ms->env.paths[i]);
-		ft_strcat(ms->env.full_path, "/");
-		ft_strcat(ms->env.full_path, cmd);
-		if (access(ms->env.full_path, X_OK) == 0)
-		{
-			ft_free_split(ms->env.paths);
-			return (0); // Comando encontrado
-		}
-		free(ms->env.full_path);
-		i++;
-	}
-	ft_free_split(ms->env.paths);
-	return (127); // Comando não encontrado
+	return (0);
 }
+
+/**
+ * @brief  Builds the full path for a command and checks if it is executable.
+ * 
+ * @param  ms   Pointer to the minishell structure.
+ * @param  cmd  Command to build path for.
+ * @param  i    Index of the current PATH directory.
+ * @return int  1 if executable is found, 0 otherwise.
+ */
+static int	ft_build_full_path(t_minishell *ms, char *cmd, int i)
+{
+	ms->env.full_path = malloc(ft_strlen(ms->env.paths[i]) + ft_strlen(cmd) + 2);
+	if (!ms->env.full_path)
+	{
+		ft_free_split(ms->env.paths);
+		return (127);
+	}
+	ft_strcpy(ms->env.full_path, ms->env.paths[i]);
+	ft_strcat(ms->env.full_path, "/");
+	ft_strcat(ms->env.full_path, cmd);
+	if (access(ms->env.full_path, X_OK) == 0)
+	{
+		ft_free_split(ms->env.paths);
+		return (1); // Comando encontrado
+	}
+	free(ms->env.full_path);
+	return (0);
+}
+
 
 /**
  * @brief  Checks if the token value on the right side is invalid for redirection or other syntax.
@@ -1749,7 +1815,8 @@ static int	ft_check_file_access(char *filepath, int mode)
 			return (ft_file_error(filepath, "Permission denied", 126));
 		return (0);
 	}
-	if (mode == O_WRONLY || mode == (O_WRONLY | O_CREAT) || mode == (O_WRONLY | O_APPEND))
+	if (mode == O_WRONLY || mode == (O_WRONLY | O_CREAT)
+		|| mode == (O_WRONLY | O_APPEND))
 	{
 		if (access(filepath, W_OK) == -1 && errno != ENOENT)
 			return (ft_file_error(filepath, "Permission denied", 126));
@@ -1881,7 +1948,7 @@ static int	ft_check_file_access(char *filepath, int mode)
 //         close(save_stdout);
 //     }
 //     current = node->left;
-//     while (current && current->token->type == TOKEN_HEREDOC)
+//     while (current && current->token->type == TKN_HDOC)
 //     {
 //         t_node *temp_node = current;
 //         current = current->left;
@@ -1972,7 +2039,7 @@ static void	ft_cleanup_heredocs(t_minishell *ms, int save_stdout, t_node *node)
 	if (save_stdout != -1)
 		ft_restore_stdout(save_stdout, ms);
 	current = node->left;
-	while (current && current->token->type == TOKEN_HEREDOC)
+	while (current && current->token->type == TKN_HDOC)
 	{
 		temp_node = current;
 		current = current->left;
@@ -2078,12 +2145,12 @@ static void	ft_finalize_heredoc(t_minishell *ms, int *i)
 
 // 	i = 0;
 // 	ms->c_multi_heredocs = 0;
-// 	if (!node || node->token->type != TOKEN_HEREDOC)
+// 	if (!node || node->token->type != TKN_HDOC)
 // 		return (0);
 	
 // 	// Contar heredocs consecutivos
 // 	current = node;
-// 	while (current && current->token->type == TOKEN_HEREDOC)
+// 	while (current && current->token->type == TKN_HDOC)
 // 	{
 // 		ms->c_multi_heredocs++;
 // 		current = current->left;
@@ -2174,10 +2241,10 @@ int	ft_collect_heredocs(t_node *node, t_minishell *ms)
 	t_node	*current;
 
 	ms->c_multi_heredocs = 0;
-	if (!node || node->token->type != TOKEN_HEREDOC)
+	if (!node || node->token->type != TKN_HDOC)
 		return (0);
 	current = node;
-	while (current && current->token->type == TOKEN_HEREDOC)
+	while (current && current->token->type == TKN_HDOC)
 	{
 		ms->c_multi_heredocs++;
 		current = current->left;

@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   handle_env.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/18 18:22:59 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/24 19:24:22 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 extern volatile int	g_interrupt;
 
-int		ft_revalue_token_variable(t_minishell *ms);
+int		ft_revalue_TKN_VAR(t_minishell *ms);
 int		ft_check_balanced_quotes(char *str, int idx);
 char	**ft_duplicate_envp(char **envp);
 int		ft_check_if_expand(char *str, char *ptr, int heredoc);
@@ -63,7 +63,7 @@ char	**ft_duplicate_envp(char **envp)
  **         0 on success.
  **         1 on error or if expansion fails.
  */
-int	ft_revalue_token_variable(t_minishell *ms)
+int	ft_revalue_TKN_VAR(t_minishell *ms)
 {
 	int		i;
 	char	*env_value;
@@ -79,7 +79,7 @@ int	ft_revalue_token_variable(t_minishell *ms)
 	while (ms->tokens[++i].value)
 	{
 		// ft_putstr_fd(ms->tokens[i].value, 1);
-		if (ms->tokens[i].type == TOKEN_VARIABLE || ms->tokens[i].type == TOKEN_COMMAND || ms->tokens[i].type == TOKEN_FILENAME || ms->tokens[i].type == TOKEN_ARGUMENT)
+		if (ms->tokens[i].type == TKN_VAR || ms->tokens[i].type == TKN_CMD || ms->tokens[i].type == TKN_FILE || ms->tokens[i].type == TKN_ARG)
 		{
 			ptr = ft_strchr(ms->tokens[i].value, '$');
 			while (ptr != NULL)
@@ -97,8 +97,8 @@ int	ft_revalue_token_variable(t_minishell *ms)
 						perror("");
 						return (1);
 					}
-					// if (ms->tokens[i].value[0] == '\0' && ms->tokens[i].type == TOKEN_COMMAND)
-					// 	ms->tokens[i].type = TOKEN_VARIABLE; // alaterar para TOKEN_EMPTY para ser ignorado no parsing. outra e perceber a quando do tokenixe type se a expansao da var e nula e se assim for passa a TOKEN_EMPTY...
+					// if (ms->tokens[i].value[0] == '\0' && ms->tokens[i].type == TKN_CMD)
+					// 	ms->tokens[i].type = TKN_VAR; // alaterar para TOKEN_EMPTY para ser ignorado no parsing. outra e perceber a quando do tokenixe type se a expansao da var e nula e se assim for passa a TOKEN_EMPTY...
 					ptr = ft_strchr(ms->tokens[i].value, '$');
 					if (!ptr)
 						break ;

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/24 19:17:23 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/24 19:39:19 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ static int		ft_handle_quoted_token(char *str, int *i, t_token *tokens,
 static void		ft_handle_operator_token(char *str, int *i);
 static void		ft_handle_regular_token(char *str, int *i);
 t_type			ft_get_token_type(char *str, t_type prev_type);
-static t_type	ft_check_redirection_and_operator(char *str, t_type prev_type, bool *inverted);
+static t_type	ft_check_redirection_and_operator(char *str, t_type prev_type,
+													bool *inverted);
 static t_type	ft_check_redirection(char *str);
 static t_type	ft_check_operator_or_exception(char *str);
 static t_type	ft_check_variable(char *str);
@@ -60,7 +61,7 @@ t_token	*ft_tokenize_input(char *str, int n_args, int i, int j)
 			break ;
 	}
 	tokens[j].value = NULL;
-	tokens[j].type = TOKEN_NULL;
+	tokens[j].type = TKN_NULL;
 	return (tokens);
 }
 
@@ -102,7 +103,8 @@ static int	ft_handle_quoted_token(char *str, int *i, t_token *tokens, int *j,
 static void	ft_handle_operator_token(char *str, int *i)
 {
 	*i += 1;
-	if (str[*i] == '>' || str[*i] == '<' || str[*i] == '|' || str[*i] == ';' || str[*i] == '&')
+	if (str[*i] == '>' || str[*i] == '<' || str[*i] == '|' || str[*i] == ';'
+		|| str[*i] == '&')
 		*i += 1;
 }
 
@@ -116,7 +118,8 @@ static void	ft_handle_regular_token(char *str, int *i)
 {
 	while (str[*i] && str[*i] != ' ')
 	{
-		if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<' || str[*i] == ';' || str[*i] == '&')
+		if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<'
+			|| str[*i] == ';' || str[*i] == '&')
 			break;
 		*i += 1;
 	}
@@ -140,11 +143,12 @@ int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 	if (*j > 0)
 		prev_type = tokens[*j - 1].type;
 	else
-		prev_type = TOKEN_NULL;
+		prev_type = TKN_NULL;
 	tokens[*j].old_value = NULL;
 	if (str[*i] == '"' || str[*i] == '\'')
 		return (ft_handle_quoted_token(str, i, tokens, j, prev_type));
-	if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<' || str[*i] == ';' || str[*i] == '&')
+	if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<' || str[*i] == ';'
+		|| str[*i] == '&')
 		ft_handle_operator_token(str, i);
 	else
 		ft_handle_regular_token(str, i);
@@ -185,33 +189,35 @@ int ft_check_builtins(char *str)
  * @brief Checks if the token is a redirection operator.
  * 
  * @param str Token value.
- * @return t_type Corresponding token type or TOKEN_COMMAND.
+ * @return t_type Corresponding token type or TKN_CMD.
  */
 static t_type	ft_check_redirection(char *str)
 {
 	if (!ft_strcmp(str, "<"))
-		return (TOKEN_INPUT_REDIRECT);
+		return (TKN_IN_RD);
 	else if (!ft_strcmp(str, ">") || !ft_strcmp(str, ">>")
 			|| !ft_strcmp(str, ">|"))
-		return (TOKEN_OUTPUT_REDIRECT);
+		return (TKN_OUT_RD);
 	else if (!ft_strcmp(str, "<<"))
-		return (TOKEN_HEREDOC);
-	return (TOKEN_COMMAND);
+		return (TKN_HDOC);
+	return (TKN_CMD);
 }
 
 /**
  * @brief Checks if the token is an operator or exception type.
  * 
  * @param str Token value.
- * @return t_type Corresponding token type or TOKEN_COMMAND.
+ * @return t_type Corresponding token type or TKN_CMD.
  */
 static t_type	ft_check_operator_or_exception(char *str)
 {
 	if (!ft_strcmp(str, "|"))
-		return (TOKEN_OPERATOR);
-	else if (!ft_strcmp(str, "||") || !ft_strcmp(str, "&&") || !ft_strcmp(str, ";") || !ft_strcmp(str, "&") || str[0] == ';' || str[0] == '&' || (str[0] == '|' && str[1]))
-		return (TOKEN_EXCEPT);
-	return (TOKEN_COMMAND);
+		return (TKN_PIPE);
+	else if (!ft_strcmp(str, "||") || !ft_strcmp(str, "&&")
+		|| !ft_strcmp(str, ";") || !ft_strcmp(str, "&") 
+		|| str[0] == ';' || str[0] == '&' || (str[0] == '|' && str[1]))
+		return (TKN_EXCPT);
+	return (TKN_CMD);
 }
 
 /**
@@ -219,15 +225,15 @@ static t_type	ft_check_operator_or_exception(char *str)
  * 
  * @param str       Token value.
  * @param prev_type Previous token type.
- * @return t_type Corresponding token type or TOKEN_ARGUMENT.
+ * @return t_type Corresponding token type or TKN_ARG.
  */
 static t_type	ft_check_variable(char *str)
 {
 	if (str[0] == '$')
-		return (TOKEN_VARIABLE);
+		return (TKN_VAR);
 	if (ft_verify_variable_value(str))
-		return (TOKEN_VARIABLE);
-	return (TOKEN_ARGUMENT);
+		return (TKN_VAR);
+	return (TKN_ARG);
 }
 
 /**
@@ -243,37 +249,37 @@ static t_type	ft_check_variable(char *str)
 // 	static bool inverted = false;
 
 // 	type = ft_check_redirection(str);
-// 	if ((type == TOKEN_OUTPUT_REDIRECT || type == TOKEN_HEREDOC) && (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL))
+// 	if ((type == TKN_OUT_RD || type == TKN_HDOC) && (prev_type == TKN_PIPE || prev_type == TKN_NULL))
 // 		inverted = true;
-// 	if (type != TOKEN_COMMAND)
+// 	if (type != TKN_CMD)
 // 		return (type);
-// 	if (prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT
-// 		|| prev_type == TOKEN_HEREDOC)
-// 		return (TOKEN_FILENAME);
+// 	if (prev_type == TKN_OUT_RD || prev_type == TKN_IN_RD
+// 		|| prev_type == TKN_HDOC)
+// 		return (TKN_FILE);
 // 	type = ft_check_operator_or_exception(str);
-// 	if (type == TOKEN_OPERATOR && (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_EXCEPT))
-// 		return (TOKEN_EXCEPT);
-// 	if (prev_type == TOKEN_NULL || prev_type == TOKEN_OPERATOR || (prev_type == TOKEN_FILENAME && inverted == true))
+// 	if (type == TKN_PIPE && (prev_type == TKN_PIPE || prev_type == TKN_EXCPT))
+// 		return (TKN_EXCPT);
+// 	if (prev_type == TKN_NULL || prev_type == TKN_PIPE || (prev_type == TKN_FILE && inverted == true))
 // 	{
 // 		inverted = false;
-// 		if (ft_check_builtins(str) /* && (prev_type != TOKEN_COMMAND || prev_type != TOKEN_EXCEPT) */)
-// 			return (TOKEN_BUILTIN);
-// 		return(TOKEN_COMMAND);
+// 		if (ft_check_builtins(str) /* && (prev_type != TKN_CMD || prev_type != TKN_EXCPT) */)
+// 			return (TKN_BLTIN);
+// 		return(TKN_CMD);
 // 	}
-// 	if (type != TOKEN_COMMAND)
+// 	if (type != TKN_CMD)
 // 		return (type);
 // 	if (str && (str[0] == '$' || ft_strchr(str, '$')))
 // 		return (ft_check_variable(str));
 // 	if ((str[0] == '"' || str[0] == '\'') &&
-// 		(prev_type != TOKEN_COMMAND && prev_type != TOKEN_BUILTIN &&
-// 		 prev_type != TOKEN_VARIABLE && prev_type != TOKEN_OPERATOR &&
-// 		 prev_type != TOKEN_EXCEPT && prev_type != TOKEN_ARGUMENT && prev_type != TOKEN_FILENAME))
-// 		return (TOKEN_FILENAME);
-// 	if (prev_type == TOKEN_COMMAND || prev_type == TOKEN_BUILTIN ||
-// 		prev_type == TOKEN_ARGUMENT || prev_type == TOKEN_VARIABLE ||
-// 		prev_type == TOKEN_FILENAME)
-// 		return (TOKEN_ARGUMENT);
-// 	return (TOKEN_COMMAND);
+// 		(prev_type != TKN_CMD && prev_type != TKN_BLTIN &&
+// 		 prev_type != TKN_VAR && prev_type != TKN_PIPE &&
+// 		 prev_type != TKN_EXCPT && prev_type != TKN_ARG && prev_type != TKN_FILE))
+// 		return (TKN_FILE);
+// 	if (prev_type == TKN_CMD || prev_type == TKN_BLTIN ||
+// 		prev_type == TKN_ARG || prev_type == TKN_VAR ||
+// 		prev_type == TKN_FILE)
+// 		return (TKN_ARG);
+// 	return (TKN_CMD);
 // }
 
 /**
@@ -284,23 +290,23 @@ static t_type	ft_check_variable(char *str)
  * @param  inverted   Pointer to the static boolean flag.
  * @return t_type     Token type.
  */
-static t_type	ft_check_redirection_and_operator(char *str, t_type prev_type, bool *inverted)
+static t_type	ft_check_redirection_and_operator(char *str, t_type prev_type,
+													bool *inverted)
 {
 	t_type	type;
 
 	type = ft_check_redirection(str);
-	if ((type == TOKEN_OUTPUT_REDIRECT || type == TOKEN_HEREDOC) &&
-		(prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL))
+	if ((type == TKN_OUT_RD || type == TKN_HDOC) &&
+		(prev_type == TKN_PIPE || prev_type == TKN_NULL))
 		*inverted = true;
-	if (type != TOKEN_COMMAND)
+	if (type != TKN_CMD)
 		return (type);
-	if (prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT ||
-		prev_type == TOKEN_HEREDOC)
-		return (TOKEN_FILENAME);
+	if (prev_type == TKN_OUT_RD || prev_type == TKN_IN_RD ||
+		prev_type == TKN_HDOC)
+		return (TKN_FILE);
 	type = ft_check_operator_or_exception(str);
-	if (type == TOKEN_OPERATOR &&
-		(prev_type == TOKEN_OPERATOR || prev_type == TOKEN_EXCEPT))
-		return (TOKEN_EXCEPT);
+	if (type == TKN_PIPE &&	(prev_type == TKN_PIPE || prev_type == TKN_EXCPT))
+		return (TKN_EXCPT);
 	return (type);
 }
 
@@ -317,29 +323,27 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 	static bool		inverted = false;
 
 	type = ft_check_redirection_and_operator(str, prev_type, &inverted);
-	if (type != TOKEN_COMMAND)
+	if (type != TKN_CMD)
 		return (type);
-	if (prev_type == TOKEN_NULL || prev_type == TOKEN_OPERATOR ||
-		(prev_type == TOKEN_FILENAME && inverted == true))
+	if (prev_type == TKN_NULL || prev_type == TKN_PIPE ||
+		(prev_type == TKN_FILE && inverted == true))
 	{
 		inverted = false;
 		if (ft_check_builtins(str))
-			return (TOKEN_BUILTIN);
-		return (TOKEN_COMMAND);
+			return (TKN_BLTIN);
+		return (TKN_CMD);
 	}
 	if (str && (str[0] == '$' || ft_strchr(str, '$')))
 		return (ft_check_variable(str));
-	if ((str[0] == '"' || str[0] == '\'') &&
-		(prev_type != TOKEN_COMMAND && prev_type != TOKEN_BUILTIN &&
-		 prev_type != TOKEN_VARIABLE && prev_type != TOKEN_OPERATOR &&
-		 prev_type != TOKEN_EXCEPT && prev_type != TOKEN_ARGUMENT &&
-		 prev_type != TOKEN_FILENAME))
-		return (TOKEN_FILENAME);
-	if (prev_type == TOKEN_COMMAND || prev_type == TOKEN_BUILTIN ||
-		prev_type == TOKEN_ARGUMENT || prev_type == TOKEN_VARIABLE ||
-		prev_type == TOKEN_FILENAME)
-		return (TOKEN_ARGUMENT);
-	return (TOKEN_COMMAND);
+	if ((str[0] == '"' || str[0] == '\'') && (prev_type != TKN_CMD
+		&& prev_type != TKN_BLTIN && prev_type != TKN_VAR 
+		&& prev_type != TKN_PIPE && prev_type != TKN_EXCPT
+		&& prev_type != TKN_ARG && prev_type != TKN_FILE))
+		return (TKN_FILE);
+	if (prev_type == TKN_CMD || prev_type == TKN_BLTIN || prev_type == TKN_ARG
+		|| prev_type == TKN_VAR || prev_type == TKN_FILE)
+		return (TKN_ARG);
+	return (TKN_CMD);
 }
 
 
