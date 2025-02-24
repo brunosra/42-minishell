@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/21 18:29:18 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/24 06:51:59 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -242,10 +242,13 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 	static bool inverted = false;
 
 	type = ft_check_redirection(str);
-	if (type == TOKEN_OUTPUT_REDIRECT && prev_type == TOKEN_OPERATOR)
+	if ((type == TOKEN_OUTPUT_REDIRECT || type == TOKEN_HEREDOC) && (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL))
 		inverted = true;
 	if (type != TOKEN_COMMAND)
-		return (type);
+	return (type);
+	type = ft_check_operator_or_exception(str);
+	if (type == TOKEN_OPERATOR && (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_EXCEPT))
+		return (TOKEN_EXCEPT);
 	if (prev_type == TOKEN_NULL || prev_type == TOKEN_OPERATOR || (prev_type == TOKEN_FILENAME && inverted == true))
 	{
 		inverted = false;
@@ -253,9 +256,6 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 			return (TOKEN_BUILTIN);
 		return(TOKEN_COMMAND);
 	}
-	type = ft_check_operator_or_exception(str);
-	if (type == TOKEN_OPERATOR && (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_EXCEPT))
-		return (TOKEN_EXCEPT);
 	if (type != TOKEN_COMMAND)
 		return (type);
 	if (str && (str[0] == '$' || ft_strchr(str, '$')))

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/23 09:07:48 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/24 02:19:01 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,8 +195,9 @@ void	ft_builtin_cd(char **args, t_minishell *ms);
 void	ft_builtin_unset(char **args, t_minishell *ms);
 /**__EXPORT__**/
 int		ft_dup_envp(char **envp, char ***dupenv, int count);
-int		ft_builtin_export_check(char **args, t_minishell *ms);
+int		ft_builtin_export_check(char **args/* , t_minishell *ms */);
 void	ft_builtin_export(char **args, t_minishell *ms);
+void	ft_export_1_arg(t_minishell *ms);
 
 /**__SIGNAL__**/
 void	ft_signal_handler(int sig);
