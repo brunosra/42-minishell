@@ -6,18 +6,21 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/24 19:24:22 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/24 21:28:10 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 extern volatile int	g_interrupt;
 
-int		ft_revalue_TKN_VAR(t_minishell *ms);
+int		ft_revalue_tkn_var(t_minishell *ms);
 int		ft_check_balanced_quotes(char *str, int idx);
 char	**ft_duplicate_envp(char **envp);
 int		ft_check_if_expand(char *str, char *ptr, int heredoc);
-int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
+int	ft_replace_str(char **value, char *key, char *ptr, char *env_value);
+static int	ft_replace_entire_str(char **value, char *env_value);
+static int	ft_cleanup_replace(char *start, char *end, int error);
+static char	*ft_create_replaced_str(char *start, char *env_value, char *end);
 int		ft_revalue_heredock_input(char **input, t_minishell *ms);
 char	*ft_get_env_value(const char *str, t_minishell *ms, char **key);
 char	*ft_get_env(const char *key, t_minishell *ms);
@@ -63,7 +66,7 @@ char	**ft_duplicate_envp(char **envp)
  **         0 on success.
  **         1 on error or if expansion fails.
  */
-int	ft_revalue_TKN_VAR(t_minishell *ms)
+int	ft_revalue_tkn_var(t_minishell *ms)
 {
 	int		i;
 	char	*env_value;
@@ -167,52 +170,147 @@ char	*ft_get_env_value(const char *str, t_minishell *ms, char **key)
  **         0 on success.
  **         1 on error.
  */
+// int	ft_replace_str(char **value, char *key, char *ptr, char *env_value)
+// {
+// 	char	*new_value;
+// 	char	*start;
+// 	char	*end;
+// 	size_t	new_len;
+
+// 	if (!value || !*value || !key || !ptr || !env_value)
+// 		return (1);
+// 	if (ft_strlen(*value) == ft_strlen(key) + 1)
+// 	{
+// 		new_value = ft_strdup(env_value);
+// 		free(*value);
+// 		*value = new_value;
+// 		return (0);
+// 	}	
+// 	start = ft_substr(*value, 0, ptr - *value);
+// 	if (!start)
+// 		return (1);
+// 	// printf("%lu\n", ft_strlen(key));
+// 	end = ft_strdup(ptr + ft_strlen(key) + 1);
+// 	if (!end)
+// 	{
+// 		free(start);
+// 		return (1);
+// 	}
+// 	// printf("%lu\n", ft_strlen(start));
+// 	// printf("%lu\n", ft_strlen(env_value));
+// 	// printf("%lu\n", ft_strlen(end));
+// 	new_len = ft_strlen(start) + ft_strlen(env_value) + ft_strlen(end) + 1;
+// 	new_value = malloc(new_len);
+// 	if (!new_value)
+// 	{
+// 		free(start);
+// 		free(end);
+// 		return (1);
+// 	}
+// 	ft_strlcpy(new_value, start, new_len);
+// 	ft_strlcat(new_value, env_value, new_len);
+// 	ft_strlcat(new_value, end, new_len);
+// 	free(start);
+// 	free(end);
+// 	free(*value);
+// 	*value = new_value;
+// 	return (0);
+// }
+
+/**
+ * @brief  Replaces a substring in a string with a new value.
+ * 
+ * @param  value      Pointer to the string to modify.
+ * @param  key        Substring (key) to replace.
+ * @param  ptr        Pointer to the position of the key in the string.
+ * @param  env_value  New value to replace the key with.
+ * @return int        Status of the replacement.
+ **         0 on success.
+ **         1 on error.
+ */
 int	ft_replace_str(char **value, char *key, char *ptr, char *env_value)
 {
-	char	*new_value;
 	char	*start;
 	char	*end;
-	size_t	new_len;
+	char	*new_value;
 
 	if (!value || !*value || !key || !ptr || !env_value)
 		return (1);
 	if (ft_strlen(*value) == ft_strlen(key) + 1)
-	{
-		new_value = ft_strdup(env_value);
-		free(*value);
-		*value = new_value;
-		return (0);
-	}	
+		return (ft_replace_entire_str(value, env_value));
 	start = ft_substr(*value, 0, ptr - *value);
-	if (!start)
-		return (1);
-	// printf("%lu\n", ft_strlen(key));
 	end = ft_strdup(ptr + ft_strlen(key) + 1);
-	if (!end)
-	{
-		free(start);
-		return (1);
-	}
-	// printf("%lu\n", ft_strlen(start));
-	// printf("%lu\n", ft_strlen(env_value));
-	// printf("%lu\n", ft_strlen(end));
-	new_len = ft_strlen(start) + ft_strlen(env_value) + ft_strlen(end) + 1;
-	new_value = malloc(new_len);
+	if (!start || !end)
+		return (ft_cleanup_replace(start, end, 1));
+	new_value = ft_create_replaced_str(start, env_value, end);
 	if (!new_value)
-	{
-		free(start);
-		free(end);
 		return (1);
-	}
-	ft_strlcpy(new_value, start, new_len);
-	ft_strlcat(new_value, env_value, new_len);
-	ft_strlcat(new_value, end, new_len);
-	free(start);
-	free(end);
 	free(*value);
 	*value = new_value;
 	return (0);
 }
+
+/**
+ * @brief  Creates a new string replacing the target substring.
+ * 
+ * @param  start      Start part of the string.
+ * @param  env_value  New value to insert.
+ * @param  end        End part of the string.
+ * @return char*      Newly allocated string with replacement.
+ */
+static char	*ft_create_replaced_str(char *start, char *env_value, char *end)
+{
+	char	*new_value;
+	size_t	new_len;
+
+	new_len = ft_strlen(start) + ft_strlen(env_value) + ft_strlen(end) + 1;
+	new_value = malloc(new_len);
+	if (!new_value)
+	{
+		ft_cleanup_replace(start, end, 1);
+		return (NULL);
+	}
+	ft_strlcpy(new_value, start, new_len);
+	ft_strlcat(new_value, env_value, new_len);
+	ft_strlcat(new_value, end, new_len);
+	ft_cleanup_replace(start, end, 0);
+	return (new_value);
+}
+
+/**
+ * @brief  Cleans up allocated memory in case of failure.
+ * 
+ * @param  start  Start part of the string.
+ * @param  end    End part of the string.
+ * @param  error  1 if returning an error, 0 otherwise.
+ * @return int    Always returns the error parameter.
+ */
+static int	ft_cleanup_replace(char *start, char *end, int error)
+{
+	if (start)
+		free(start);
+	if (end)
+		free(end);
+	return (error);
+}
+
+/**
+ * @brief  Replaces the entire string when it's fully equal to the key.
+ * 
+ * @param  value      Pointer to the string to modify.
+ * @param  env_value  New value to replace the key with.
+ * @return int        0 on success.
+ */
+static int	ft_replace_entire_str(char **value, char *env_value)
+{
+	char	*new_value;
+
+	new_value = ft_strdup(env_value);
+	free(*value);
+	*value = new_value;
+	return (0);
+}
+
 
 /**
  * @brief  Checks if the quotes in a string are balanced up to a specific index.
