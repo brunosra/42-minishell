@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 21:13:47 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/23 09:12:51 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/24 02:18:03 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 extern volatile int	g_interrupt;
 
 // TODO: implement
-int	ft_builtin_export_check(char **args, t_minishell *ms)
+int	ft_builtin_export_check(char **args/* , t_minishell *ms */)
 {
 	int		count;
 
@@ -24,7 +24,7 @@ int	ft_builtin_export_check(char **args, t_minishell *ms)
 	{
 		count++;
 	}
-	printf("export check: %s\n", ms->env.envp[0]);
+	// printf("export check: %s\n", ms->env.envp[0]);
 	return (0);
 }
 

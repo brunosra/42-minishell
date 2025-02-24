@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/22 05:20:30 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/24 02:19:21 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ int	ft_exec_builtins_check(t_node *node, t_minishell *ms)
 	else if (!ft_strcmp(node->token->value, "cd"))
 		return (ft_builtin_cd_check(node->cmd_ready, ms));
 	else if (!ft_strcmp(node->token->value, "export"))
-		ft_builtin_export_check(node->cmd_ready, ms);
+		ft_builtin_export_check(node->cmd_ready/* , ms */);
 	return (EX_OK);
 }
 

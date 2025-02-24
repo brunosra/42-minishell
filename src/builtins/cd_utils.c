@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd_utils.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/22 19:51:03 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/24 02:38:45 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,9 @@ int	ft_builtin_cd_check(char **args, t_minishell *ms)
 		return (ret);
 	if (chdir(res_p) != 0)
 	{
-		printf("Minishell: cd: %s: No such file or directory\n", args[1]);
+		ft_putstr_fd("Minishell: cd: ", STDERR_FILENO);
+		ft_putstr_fd(args[1], STDERR_FILENO);
+		ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
 		return (1);
 	}
 	return (0);
