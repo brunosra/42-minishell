@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_signal.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/18 18:22:59 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/24 01:25:44 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,16 +104,29 @@ void	ft_set_heredoc_signals(void)
 
 void	ft_signal_heredoc_handler(int sig)
 {
-/* 	t_minishell	*ms;
+// /* 	t_minishell	*ms;
+
+// 	ms = ft_ms_struct(NULL, 1);
+//  */	if (sig == SIGINT) // Ctrl-C no heredoc
+// 	{
+// 		g_interrupt = 1;
+// 		write(STDOUT_FILENO, "\n", 1);
+// /* 		close(ms->pipefd[0]); // Fecha o arquivo do heredoc
+//  */ 	//	free(ms->input); // Libera recursos
+// 	//	ft_free_ast(ms->ast_root);
+// 		exit(130); // Sai com o código 130
+// 	}
+	t_minishell	*ms;
 
 	ms = ft_ms_struct(NULL, 1);
- */	if (sig == SIGINT) // Ctrl-C no heredoc
+	if (sig == SIGINT) // Ctrl-C
 	{
-		g_interrupt = 1;
-		write(STDOUT_FILENO, "\n", 1);
-/* 		close(ms->pipefd[0]); // Fecha o arquivo do heredoc
- */ 	//	free(ms->input); // Libera recursos
-	//	ft_free_ast(ms->ast_root);
-		exit(130); // Sai com o código 130
+		write(STDERR_FILENO, "\n", 1);
+		// rl_replace_line("", 0);
+		// rl_on_new_line();
+		// rl_redisplay();
+		// close(ms->pipefd[0]);
+		ft_set_exit_code(ms, 130);
+		exit(130); // Código típico para interrupções via Ctrl-C
 	}
 }
