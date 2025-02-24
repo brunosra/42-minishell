@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/24 06:51:59 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/24 19:17:23 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ static int		ft_handle_quoted_token(char *str, int *i, t_token *tokens,
 static void		ft_handle_operator_token(char *str, int *i);
 static void		ft_handle_regular_token(char *str, int *i);
 t_type			ft_get_token_type(char *str, t_type prev_type);
+static t_type	ft_check_redirection_and_operator(char *str, t_type prev_type, bool *inverted);
 static t_type	ft_check_redirection(char *str);
 static t_type	ft_check_operator_or_exception(char *str);
 static t_type	ft_check_variable(char *str);
@@ -236,37 +237,103 @@ static t_type	ft_check_variable(char *str)
  * @param prev_type Previous token type.
  * @return t_type Corresponding token type.
  */
-t_type	ft_get_token_type(char *str, t_type prev_type)
+// t_type	ft_get_token_type(char *str, t_type prev_type)
+// {
+// 	t_type type;
+// 	static bool inverted = false;
+
+// 	type = ft_check_redirection(str);
+// 	if ((type == TOKEN_OUTPUT_REDIRECT || type == TOKEN_HEREDOC) && (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL))
+// 		inverted = true;
+// 	if (type != TOKEN_COMMAND)
+// 		return (type);
+// 	if (prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT
+// 		|| prev_type == TOKEN_HEREDOC)
+// 		return (TOKEN_FILENAME);
+// 	type = ft_check_operator_or_exception(str);
+// 	if (type == TOKEN_OPERATOR && (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_EXCEPT))
+// 		return (TOKEN_EXCEPT);
+// 	if (prev_type == TOKEN_NULL || prev_type == TOKEN_OPERATOR || (prev_type == TOKEN_FILENAME && inverted == true))
+// 	{
+// 		inverted = false;
+// 		if (ft_check_builtins(str) /* && (prev_type != TOKEN_COMMAND || prev_type != TOKEN_EXCEPT) */)
+// 			return (TOKEN_BUILTIN);
+// 		return(TOKEN_COMMAND);
+// 	}
+// 	if (type != TOKEN_COMMAND)
+// 		return (type);
+// 	if (str && (str[0] == '$' || ft_strchr(str, '$')))
+// 		return (ft_check_variable(str));
+// 	if ((str[0] == '"' || str[0] == '\'') &&
+// 		(prev_type != TOKEN_COMMAND && prev_type != TOKEN_BUILTIN &&
+// 		 prev_type != TOKEN_VARIABLE && prev_type != TOKEN_OPERATOR &&
+// 		 prev_type != TOKEN_EXCEPT && prev_type != TOKEN_ARGUMENT && prev_type != TOKEN_FILENAME))
+// 		return (TOKEN_FILENAME);
+// 	if (prev_type == TOKEN_COMMAND || prev_type == TOKEN_BUILTIN ||
+// 		prev_type == TOKEN_ARGUMENT || prev_type == TOKEN_VARIABLE ||
+// 		prev_type == TOKEN_FILENAME)
+// 		return (TOKEN_ARGUMENT);
+// 	return (TOKEN_COMMAND);
+// }
+
+/**
+ * @brief  Handles redirection and operator token types.
+ * 
+ * @param  str        Token value.
+ * @param  prev_type  Previous token type.
+ * @param  inverted   Pointer to the static boolean flag.
+ * @return t_type     Token type.
+ */
+static t_type	ft_check_redirection_and_operator(char *str, t_type prev_type, bool *inverted)
 {
-	t_type type;
-	static bool inverted = false;
+	t_type	type;
 
 	type = ft_check_redirection(str);
-	if ((type == TOKEN_OUTPUT_REDIRECT || type == TOKEN_HEREDOC) && (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL))
-		inverted = true;
-	if (type != TOKEN_COMMAND)
-	return (type);
-	type = ft_check_operator_or_exception(str);
-	if (type == TOKEN_OPERATOR && (prev_type == TOKEN_OPERATOR || prev_type == TOKEN_EXCEPT))
-		return (TOKEN_EXCEPT);
-	if (prev_type == TOKEN_NULL || prev_type == TOKEN_OPERATOR || (prev_type == TOKEN_FILENAME && inverted == true))
-	{
-		inverted = false;
-		if (ft_check_builtins(str) /* && (prev_type != TOKEN_COMMAND || prev_type != TOKEN_EXCEPT) */)
-			return (TOKEN_BUILTIN);
-		return(TOKEN_COMMAND);
-	}
+	if ((type == TOKEN_OUTPUT_REDIRECT || type == TOKEN_HEREDOC) &&
+		(prev_type == TOKEN_OPERATOR || prev_type == TOKEN_NULL))
+		*inverted = true;
 	if (type != TOKEN_COMMAND)
 		return (type);
+	if (prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT ||
+		prev_type == TOKEN_HEREDOC)
+		return (TOKEN_FILENAME);
+	type = ft_check_operator_or_exception(str);
+	if (type == TOKEN_OPERATOR &&
+		(prev_type == TOKEN_OPERATOR || prev_type == TOKEN_EXCEPT))
+		return (TOKEN_EXCEPT);
+	return (type);
+}
+
+/**
+ * @brief  Determines the type of a token based on its value and previous token.
+ * 
+ * @param  str        Token value.
+ * @param  prev_type  Previous token type.
+ * @return t_type     Token type.
+ */
+t_type	ft_get_token_type(char *str, t_type prev_type)
+{
+	t_type			type;
+	static bool		inverted = false;
+
+	type = ft_check_redirection_and_operator(str, prev_type, &inverted);
+	if (type != TOKEN_COMMAND)
+		return (type);
+	if (prev_type == TOKEN_NULL || prev_type == TOKEN_OPERATOR ||
+		(prev_type == TOKEN_FILENAME && inverted == true))
+	{
+		inverted = false;
+		if (ft_check_builtins(str))
+			return (TOKEN_BUILTIN);
+		return (TOKEN_COMMAND);
+	}
 	if (str && (str[0] == '$' || ft_strchr(str, '$')))
 		return (ft_check_variable(str));
-	if (prev_type == TOKEN_OUTPUT_REDIRECT || prev_type == TOKEN_INPUT_REDIRECT
-		|| prev_type == TOKEN_HEREDOC)
-		return (TOKEN_FILENAME);
 	if ((str[0] == '"' || str[0] == '\'') &&
 		(prev_type != TOKEN_COMMAND && prev_type != TOKEN_BUILTIN &&
 		 prev_type != TOKEN_VARIABLE && prev_type != TOKEN_OPERATOR &&
-		 prev_type != TOKEN_EXCEPT && prev_type != TOKEN_ARGUMENT && prev_type != TOKEN_FILENAME))
+		 prev_type != TOKEN_EXCEPT && prev_type != TOKEN_ARGUMENT &&
+		 prev_type != TOKEN_FILENAME))
 		return (TOKEN_FILENAME);
 	if (prev_type == TOKEN_COMMAND || prev_type == TOKEN_BUILTIN ||
 		prev_type == TOKEN_ARGUMENT || prev_type == TOKEN_VARIABLE ||
@@ -274,6 +341,7 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 		return (TOKEN_ARGUMENT);
 	return (TOKEN_COMMAND);
 }
+
 
 /**
  * @brief  Verifies whether a variable within a string should be expanded.

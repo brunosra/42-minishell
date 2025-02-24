@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/24 06:08:17 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/24 18:52:21 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,12 +41,16 @@ static int	ft_validate_input_file(t_node *node, t_minishell *ms);
 int	ft_handle_pipe(t_node *node, t_minishell *ms);
 static int	ft_redirect_pipe_input(t_minishell *ms);
 static void	ft_execute_pipe_child(t_node *node, t_minishell *ms);
-static int	ft_handle_fork_error(t_minishell *ms);
+int	ft_handle_fork_error(t_minishell *ms);
 int	ft_create_pipe(t_minishell *ms);
 static int	ft_check_pipe_syntax(t_node *node, t_minishell *ms);
 static int	ft_pipe_syntax_error(t_minishell *ms, char *token, int code);
 static void	ft_handle_unfinished_pipe(t_minishell *ms, char *input);
 int	ft_execute_command(t_node *node, t_minishell *ms);
+static void	ft_handle_cmd_exit_status(t_node *node, t_minishell *ms);
+static void	ft_execute_child_process(t_node *node, t_minishell *ms);
+static int	ft_execute_external(t_node *node, t_minishell *ms);
+static void	ft_execute_builtin(t_node *node, t_minishell *ms);
 int	ft_find_executable(t_minishell *ms, char *cmd);
 int	ft_invalid_right_token_value(char *value);
 int	ft_is_valid_file(char *filepath, int mode);
@@ -493,7 +497,13 @@ static void	ft_heredoc_child_process(t_node *node, t_minishell *ms)
 	{
 		input = readline("> ");
 		if (!input)
-			break;
+		{
+			ft_putstr_fd("minishell: warning: here-document delimited by EOF"
+				" (wanted `", STDERR_FILENO);
+			ft_putstr_fd(node->right->token->value, STDERR_FILENO);
+			write(STDERR_FILENO, "')\n", 3);
+			break ;
+		}
 		if (!ft_strcmp(input, node->right->token->value))
 			break;
 		temp = ft_update_heredoc_buffer(temp, input);
@@ -1213,7 +1223,7 @@ static void	ft_handle_unfinished_pipe(t_minishell *ms, char *input)
  * @param  ms  Pointer to the minishell structure.
  * @return int Always returns 1.
  */
-static int	ft_handle_fork_error(t_minishell *ms)
+int	ft_handle_fork_error(t_minishell *ms)
 {
 	perror("fork");
 	ft_set_exit_code(ms, 1);
@@ -1268,78 +1278,184 @@ static int	ft_redirect_pipe_input(t_minishell *ms)
  **         0 on success.
  **         Non-zero in case of error or if the command was not found.
  */
-int	ft_execute_command(t_node *node, t_minishell *ms)
+// int	ft_execute_command(t_node *node, t_minishell *ms)
+// {
+// 	int	valid;
+// 	int sig;
+
+// 	valid = -1;
+// 	sig = 0;
+// 	ms->pid = fork();
+// 	if (ms->pid == -1)
+// 	{
+// 		perror("fork");
+// 		ft_set_exit_code(ms, 1); // Código genérico para erro de fork
+// 		return (1);
+// 	}
+// 	if (ms->pid == 0)
+// 	{
+// 		//ft_set_fork_signals();
+// 		if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
+// 			exit(0);
+// 		if (node->token->type == TOKEN_BUILTIN) 
+// 		{
+// 			if (ft_strcmp(node->token->value, "echo"))
+// 				exit(ft_exec_builtins_check(node, ms));
+// 			else
+// 				exit(ft_exec_builtins(node, ms));
+// 		}
+// 		if (node->cmd_ready[0][0] == '/' || 									// Caminho absoluto ou relativo
+// 			(node->cmd_ready[0][0] == '.' && node->cmd_ready[0][1] == '/') || 
+// 			!ft_strncmp(node->cmd_ready[0], "../", 3)) 
+// 		{
+// 			valid = ft_is_valid_file(node->cmd_ready[0], X_OK); // Verifica se o arquivo é válido
+// 			if (valid != 0)
+// 				exit(valid); // Retorna o erro correspondente (127 ou 126)
+// 			execve(node->cmd_ready[0], node->cmd_ready, ms->env.envp); // Executa diretamente se for válido
+// 			// ft_putstr_fd("minishell: ", STDERR_FILENO);
+// 			// ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
+// 			// ft_putstr_fd(": command not found\n", STDERR_FILENO);
+// 			exit(42);
+// 		}
+// 		if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
+// 		{
+// /* 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
+// 			ft_putstr_fd(": command not found\n", STDERR_FILENO); */
+// 			exit(42);
+// 		}
+// 		if (node->cmd_ready[1] == NULL && 
+// 		!ft_strcmp(node->cmd_ready[0], "cat") && node->prev && node->prev->token->type == TOKEN_OPERATOR
+// 		&& (node->prev->left == node 
+// 		|| (node->prev->prev && node->prev->prev->token->type == TOKEN_OPERATOR && node->prev->right == node)))
+// 			exit(13);
+// 		execve(ms->env.full_path, node->cmd_ready, ms->env.envp); // Executa o executável encontrado
+// 		perror("execve");
+// 		exit(127);
+// 	}
+// 	ft_set_fork_signals();
+// 	waitpid(ms->pid, &ms->status, 0);
+// 	if (WIFEXITED(ms->status)) // Processo terminou normalmente
+// 	{
+// 		ft_set_exit_code(ms, WEXITSTATUS(ms->status));
+//  		if (ft_exit_code(ms) == 42 && node->cmd_ready[0])
+// 		{
+// 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
+// 			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
+// 			ft_set_exit_code(ms, 127);
+// 		}
+// 		else if (ft_exit_code(ms) == 0)
+// 		{
+// 			if (node->token->type == TOKEN_BUILTIN && ft_strcmp(node->token->value, "echo"))
+// 				ft_exec_builtins(node, ms);
+// 		}
+// 	}
+// 	else if (WIFSIGNALED(ms->status)) // Processo foi terminado por um sinal
+// 	{
+// 		sig = WTERMSIG(ms->status);
+// 		ft_set_exit_code(ms, 128 + sig);
+// 		if (sig == SIGINT)
+// 			write(STDERR_FILENO, "\n", 1);
+// 	}
+// 	else
+// 		ft_set_exit_code(ms, 1);
+// 	ft_set_main_signals();
+// 	if (ft_exit_code(ms) != 0 && node->prev && node->prev->token->type == TOKEN_INPUT_REDIRECT) // Remoção de arquivos criados caso o comando falhe
+// 	{
+// 		ft_remove_created_files(node->prev);
+// 	}
+// 	if (node->token->type == TOKEN_BUILTIN && !ft_strcmp(node->cmd_ready[0], "exit") && ft_exit_code(ms) != 1) // Finaliza o shell se for exit
+// 	{
+// 		ft_free_tokens(ms->tokens);
+// 		ft_free_ast(ms->ast_root);
+// 		free(ms->input);
+// 		exit(ft_exit_code(ms));
+// 	}
+// 	return (ft_exit_code(ms));
+// }
+
+/**
+ * @brief  Handles the execution of built-in commands.
+ * 
+ * @param  node  Pointer to the AST node containing the command.
+ * @param  ms    Pointer to the minishell structure.
+ */
+static void	ft_execute_builtin(t_node *node, t_minishell *ms)
+{
+	if (ft_strcmp(node->token->value, "echo"))
+		exit(ft_exec_builtins_check(node, ms));
+	exit(ft_exec_builtins(node, ms));
+}
+
+/**
+ * @brief  Checks if the command is a valid executable.
+ * 
+ * @param  node  Pointer to the AST node containing the command.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Returns execution status.
+ */
+static int	ft_execute_external(t_node *node, t_minishell *ms)
 {
 	int	valid;
-	int sig;
 
-	valid = -1;
-	sig = 0;
-	ms->pid = fork();
-	if (ms->pid == -1)
-	{
-		perror("fork");
-		ft_set_exit_code(ms, 1); // Código genérico para erro de fork
-		return (1);
-	}
-	if (ms->pid == 0)
-	{
-		//ft_set_fork_signals();
-		if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
-			exit(0);
-		if (node->token->type == TOKEN_BUILTIN) 
-		{
-			if (ft_strcmp(node->token->value, "echo"))
-				exit(ft_exec_builtins_check(node, ms));
-			else
-				exit(ft_exec_builtins(node, ms));
-		}
-		if (node->cmd_ready[0][0] == '/' || 									// Caminho absoluto ou relativo
-			(node->cmd_ready[0][0] == '.' && node->cmd_ready[0][1] == '/') || 
-			!ft_strncmp(node->cmd_ready[0], "../", 3)) 
-		{
-			valid = ft_is_valid_file(node->cmd_ready[0], X_OK); // Verifica se o arquivo é válido
-			if (valid != 0)
-				exit(valid); // Retorna o erro correspondente (127 ou 126)
-			execve(node->cmd_ready[0], node->cmd_ready, ms->env.envp); // Executa diretamente se for válido
-			// ft_putstr_fd("minishell: ", STDERR_FILENO);
-			// ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
-			// ft_putstr_fd(": command not found\n", STDERR_FILENO);
-			exit(42);
-		}
-		if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
-		{
-/* 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
-			ft_putstr_fd(": command not found\n", STDERR_FILENO); */
-			exit(42);
-		}
-		if (node->cmd_ready[1] == NULL && 
-		!ft_strcmp(node->cmd_ready[0], "cat") && node->prev && node->prev->token->type == TOKEN_OPERATOR
-		&& (node->prev->left == node 
-		|| (node->prev->prev && node->prev->prev->token->type == TOKEN_OPERATOR && node->prev->right == node)))
-			exit(13);
-		execve(ms->env.full_path, node->cmd_ready, ms->env.envp); // Executa o executável encontrado
-		perror("execve");
-		exit(127);
-	}
-	ft_set_fork_signals();
-	waitpid(ms->pid, &ms->status, 0);
-	if (WIFEXITED(ms->status)) // Processo terminou normalmente
+	valid = ft_is_valid_file(node->cmd_ready[0], X_OK);
+	if (valid != 0)
+		exit(valid);
+	execve(node->cmd_ready[0], node->cmd_ready, ms->env.envp);
+	exit(42);
+}
+
+/**
+ * @brief  Executes the command in a child process.
+ * 
+ * @param  node  Pointer to the AST node containing the command.
+ * @param  ms    Pointer to the minishell structure.
+ */
+static void	ft_execute_child_process(t_node *node, t_minishell *ms)
+{
+	if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
+		exit(0);
+	if (node->token->type == TOKEN_BUILTIN)
+		ft_execute_builtin(node, ms);
+	if (node->cmd_ready[0][0] == '/' || node->cmd_ready[0][0] == '.' ||
+		!ft_strncmp(node->cmd_ready[0], "../", 3))
+		ft_execute_external(node, ms);
+	if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
+		exit(42);
+	if (node->cmd_ready[1] == NULL && !ft_strcmp(node->cmd_ready[0], "cat") &&
+		node->prev && node->prev->token->type == TOKEN_OPERATOR &&
+		(node->prev->left == node ||
+			(node->prev->prev && node->prev->prev->token->type == TOKEN_OPERATOR &&
+				node->prev->right == node)))
+		exit(13);
+	execve(ms->env.full_path, node->cmd_ready, ms->env.envp);
+	perror("execve");
+	exit(127);
+}
+
+/**
+ * @brief  Handles the termination of a process and sets the exit code.
+ * 
+ * @param  node  Pointer to the AST node.
+ * @param  ms    Pointer to the minishell structure.
+ */
+static void	ft_handle_cmd_exit_status(t_node *node, t_minishell *ms)
+{
+	int	sig;
+
+	if (WIFEXITED(ms->status))
 	{
 		ft_set_exit_code(ms, WEXITSTATUS(ms->status));
- 		if (ft_exit_code(ms) == 42 && node->cmd_ready[0])
+		if (ft_exit_code(ms) == 42 && node->cmd_ready[0])
 		{
 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
-			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
+			ft_putstr_fd(": command not found\n", STDERR_FILENO);
 			ft_set_exit_code(ms, 127);
 		}
-		else if (ft_exit_code(ms) == 0)
-		{
-			if (node->token->type == TOKEN_BUILTIN && ft_strcmp(node->token->value, "echo"))
-				ft_exec_builtins(node, ms);
-		}
+		else if (ft_exit_code(ms) == 0 && node->token->type == TOKEN_BUILTIN &&
+				 ft_strcmp(node->token->value, "echo"))
+			ft_exec_builtins(node, ms);
 	}
-	else if (WIFSIGNALED(ms->status)) // Processo foi terminado por um sinal
+	else if (WIFSIGNALED(ms->status))
 	{
 		sig = WTERMSIG(ms->status);
 		ft_set_exit_code(ms, 128 + sig);
@@ -1348,12 +1464,32 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	}
 	else
 		ft_set_exit_code(ms, 1);
+}
+
+/**
+ * @brief  Executes a command node in the AST.
+ * 
+ * @param  node  Pointer to the AST node containing the command.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Exit status of the command.
+ */
+int	ft_execute_command(t_node *node, t_minishell *ms)
+{
+	ms->pid = fork();
+	if (ms->pid == -1)
+		return (ft_handle_fork_error(ms));
+	if (ms->pid == 0)
+		ft_execute_child_process(node, ms);
+	ft_set_fork_signals();
+	waitpid(ms->pid, &ms->status, 0);
+	ft_handle_cmd_exit_status(node, ms);
 	ft_set_main_signals();
-	if (ft_exit_code(ms) != 0 && node->prev && node->prev->token->type == TOKEN_INPUT_REDIRECT) // Remoção de arquivos criados caso o comando falhe
-	{
+	if (ft_exit_code(ms) != 0 && node->prev &&
+		node->prev->token->type == TOKEN_INPUT_REDIRECT)
 		ft_remove_created_files(node->prev);
-	}
-	if (node->token->type == TOKEN_BUILTIN && !ft_strcmp(node->cmd_ready[0], "exit") && ft_exit_code(ms) != 1) // Finaliza o shell se for exit
+	if (node->token->type == TOKEN_BUILTIN &&
+		!ft_strcmp(node->cmd_ready[0], "exit") &&
+		ft_exit_code(ms) != 1)
 	{
 		ft_free_tokens(ms->tokens);
 		ft_free_ast(ms->ast_root);
@@ -1362,6 +1498,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	}
 	return (ft_exit_code(ms));
 }
+
 
 /**
  * @brief  Removes files created during the execution of output redirection nodes.
