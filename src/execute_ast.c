@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/24 02:02:22 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/24 06:08:17 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,16 @@ void	ft_swap_redirects_values(t_node *node, t_type type);
 void	ft_remove_created_files(t_node *node);
 void	ft_create_files(t_node *node);
 static int ft_has_cat(t_node *node);
-int	ft_collect_heredocs(t_node *node, t_minishell *ms);
 int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
-static void	ft_multiple_heredoc_child_process(t_node *node, t_minishell *ms, int *i);
+static int	ft_fork_heredoc(t_minishell *ms, t_node *node, int *i);
+static void	ft_cleanup_heredocs(t_minishell *ms, int save_stdout, t_node *node);
+static void	ft_multiple_heredoc_child(t_node *node, t_minishell *ms, int *i);
+static int	ft_process_heredoc_input(t_node *node, t_minishell *ms,
+										char *input, int *i);
+static void	ft_finalize_heredoc(t_minishell *ms, int *i);
+int	ft_collect_heredocs(t_node *node, t_minishell *ms);
+static int	ft_allocate_heredoc_stops(t_node *node, t_minishell *ms);
+static int	ft_multiple_heredoc_syntax_error(t_node *current, t_minishell *ms);
 
 // /**
 //  * @brief  Executes the AST based on the current node type.
@@ -1749,7 +1756,7 @@ static int	ft_check_file_access(char *filepath, int mode)
 // }
 
 /**
- * @brief  Handles multiple heredocs consecutively and passes the data to the next AST node.
+ * @brief  Handles multiple heredocs consecutively and passes the data.
  * 
  * @param  node  Pointer to the AST node containing multiple heredocs.
  * @param  ms    Pointer to the minishell structure.
@@ -1757,110 +1764,263 @@ static int	ft_check_file_access(char *filepath, int mode)
  **         0 on success.
  **         Non-zero in case of errors or interruptions.
  */
-int ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
+int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
 {
-    int save_stdout;
-    t_node *current;
-    int i;
-	int	pipe_status;
+	int		save_stdout;
+	int		i;
+	int		pipe_status;
 
-    save_stdout = -1;
-    ms->temp = NULL;
-    i = 0;
+	save_stdout = -1;
+	ms->temp = NULL;
+	i = 0;
 	if (!node || !node->heredoc_stops)
-        return (1);
+		return (1);
 	if (!node->right)
 		return (ft_heredoc_syntax_error(ms));
 	if (!isatty(STDOUT_FILENO))
-		save_stdout = ft_redirect_stdout(ms);	
-	while (node->heredoc_stops[i]) // Processar todos os heredocs
-    {
-        // if (g_interrupt)
-        // {
-        //     ft_set_exit_code(ms, 130);
-        //     break;
-        // }
+		save_stdout = ft_redirect_stdout(ms);
+	while (node->heredoc_stops[i])
+	{
 		pipe_status = ft_create_pipe(ms);
 		if (pipe_status)
 			return (pipe_status);
-		ms->pid = fork();
-		if (ms->pid == -1)
-			return (ft_handle_heredoc_fork_error(ms));
-        ft_set_fork_signals();
-        if (ms->pid == 0)
-			ft_multiple_heredoc_child_process(node, ms, &i);
-        close(ms->pipefd[1]);
-        waitpid(ms->pid, &ms->status, 0);
-		ft_set_main_signals();
-        if (WIFEXITED(ms->status) && WEXITSTATUS(ms->status) == 130)
-        {
-            // ft_set_exit_code(ms, 130);
-            // close(ms->pipefd[0]);
-            break;
-        }
-        i++;
-    }
-	if (WEXITSTATUS(ms->status) != 130)
-		ft_restore_stdin(ms);
-    close(ms->pipefd[0]);
-    // ft_set_main_signals();
-	if (save_stdout != -1)
-		ft_restore_stdout(save_stdout, ms);
-    current = node->left;
-    while (current && current->token->type == TOKEN_HEREDOC)
-    {
-        t_node *temp_node = current;
-        current = current->left;
-        free(temp_node);
-    }
-    node->left = current;
-	node->left->prev = node;
-    // g_interrupt = 0;
+		if (ft_fork_heredoc(ms, node, &i))
+			break ;
+		i++;
+	}
+	ft_cleanup_heredocs(ms, save_stdout, node);
 	return (ft_handle_exit_status(ms, node));
 }
 
-static void	ft_multiple_heredoc_child_process(t_node *node, t_minishell *ms, int *i)
-{   
-    char *new_temp;
-    char *input;
+/**
+ * @brief  Creates a fork for processing a single heredoc.
+ * 
+ * @param  ms    Pointer to the minishell structure.
+ * @param  node  Pointer to the current AST node.
+ * @param  i     Pointer to heredoc index.
+ * @return int   1 if interrupted, 0 otherwise.
+ */
+static int	ft_fork_heredoc(t_minishell *ms, t_node *node, int *i)
+{
+	ms->pid = fork();
+	if (ms->pid == -1)
+		return (ft_handle_heredoc_fork_error(ms));
+	ft_set_fork_signals();
+	if (ms->pid == 0)
+		ft_multiple_heredoc_child(node, ms, i);
+	close(ms->pipefd[1]);
+	waitpid(ms->pid, &ms->status, 0);
+	ft_set_main_signals();
+	if (WIFEXITED(ms->status) && WEXITSTATUS(ms->status) == 130)
+		return (1);
+	return (0);
+}
 
-    input = NULL;
-    new_temp = NULL;
-    ft_set_heredoc_signals();
-    close(ms->pipefd[0]);
-    ms->temp = NULL;
-    while (!g_interrupt)
-    {
-        input = readline("> ");
-        // if (g_interrupt)
-        //     exit(130);
-        if (!input)
-        {
-            ft_putstr_fd("minishell: warning: here-document delimited by end-of-file (wanted `", STDERR_FILENO);
-            ft_putstr_fd(node->heredoc_stops[*i], STDERR_FILENO);
-            write(STDERR_FILENO, "')\n", 3);
-            break;
-        }
-        if (ft_strcmp(input, node->heredoc_stops[*i]) == 0)
-            break;
-        if (ms->temp == NULL)
-            ms->temp = ft_strdup(input);
-        else
-        {
-            new_temp = ft_strjoin_free(ms->temp, "\n", 1, 0);
-            ms->temp = ft_strjoin_free(new_temp, input, 1, 0);
-        }
-        free(input);
-    }
-    if (ms->temp && ms->c_multi_heredocs == *i + 1)
-    {
-        new_temp = ft_strjoin_free(ms->temp, "\n", 1, 0);
+/**
+ * @brief  Cleans up heredoc-related processes and restores state.
+ * 
+ * @param  ms         Pointer to the minishell structure.
+ * @param  save_stdout Saved stdout descriptor.
+ * @param  node       Pointer to the current AST node.
+ */
+static void	ft_cleanup_heredocs(t_minishell *ms, int save_stdout, t_node *node)
+{
+	t_node	*current;
+	t_node	*temp_node;
+
+	temp_node = NULL;
+	if (WEXITSTATUS(ms->status) != 130)
+		ft_restore_stdin(ms);
+	close(ms->pipefd[0]);
+	if (save_stdout != -1)
+		ft_restore_stdout(save_stdout, ms);
+	current = node->left;
+	while (current && current->token->type == TOKEN_HEREDOC)
+	{
+		temp_node = current;
+		current = current->left;
+		free(temp_node);
+	}
+	node->left = current;
+	node->left->prev = node;
+}
+
+/**
+ * @brief  Handles heredoc input for a child process.
+ * 
+ * @param  node  Pointer to the AST node containing heredoc.
+ * @param  ms    Pointer to the minishell structure.
+ * @param  i     Pointer to heredoc index.
+ */
+static void	ft_multiple_heredoc_child(t_node *node, t_minishell *ms, int *i)
+{
+	char	*input;
+
+	input = NULL;
+	ft_set_heredoc_signals();
+	close(ms->pipefd[0]);
+	while (!g_interrupt)
+	{
+		input = readline("> ");
+		if (!input)
+		{
+			ft_putstr_fd("minishell: warning: here-document delimited by EOF"
+				" (wanted `", STDERR_FILENO);
+			ft_putstr_fd(node->heredoc_stops[*i], STDERR_FILENO);
+			write(STDERR_FILENO, "')\n", 3);
+			break ;
+		}
+		if (ft_process_heredoc_input(node, ms, input, i))
+			break ;
+		free(input);
+	}
+	ft_finalize_heredoc(ms, i);
+}
+
+/**
+ * @brief  Processes heredoc input and checks for termination.
+ * 
+ * @param  node   Pointer to the AST node.
+ * @param  ms     Pointer to the minishell structure.
+ * @param  input  User input from readline.
+ * @param  i      Pointer to heredoc index.
+ * @return int    1 if heredoc should stop, 0 otherwise.
+ */
+static int	ft_process_heredoc_input(t_node *node, t_minishell *ms,
+								char *input, int *i)
+{
+	char	*new_temp;
+
+	if (ft_strcmp(input, node->heredoc_stops[*i]) == 0)
+		return (1);
+	if (ms->temp == NULL)
+		ms->temp = ft_strdup(input);
+	else
+	{
+		new_temp = ft_strjoin_free(ms->temp, "\n", 1, 0);
+		ms->temp = ft_strjoin_free(new_temp, input, 1, 0);
+	}
+	return (0);
+}
+
+/**
+ * @brief  Finalizes heredoc processing and writes to pipe if needed.
+ * 
+ * @param  ms    Pointer to the minishell structure.
+ * @param  node  Pointer to the AST node.
+ * @param  i     Pointer to heredoc index.
+ */
+static void	ft_finalize_heredoc(t_minishell *ms, int *i)
+{
+	char	*new_temp;
+
+	if (ms->temp && ms->c_multi_heredocs == *i + 1)
+	{
+		new_temp = ft_strjoin_free(ms->temp, "\n", 1, 0);
 		ft_revalue_heredock_input(&new_temp, ms);
-        ft_putstr_fd(new_temp, ms->pipefd[1]);
-        free(new_temp);
-    }
-    close(ms->pipefd[1]);
-    exit(0);
+		ft_putstr_fd(new_temp, ms->pipefd[1]);
+		free(new_temp);
+	}
+	close(ms->pipefd[1]);
+	exit(0);
+}
+
+// /**
+//  * @brief  Collects all heredocs from the current node and its left branch.
+//  * 
+//  * @param  node  Pointer to the starting heredoc node in the AST.
+//  * @param  ms    Pointer to the minishell structure.
+//  * @return int   Status of the collection.
+//  **         0 on success.
+//  **         Non-zero in case of syntax errors.
+//  */
+// int	ft_collect_heredocs(t_node *node, t_minishell *ms)
+// {
+// 	t_node	*current;
+// 	int		i;
+
+// 	i = 0;
+// 	ms->c_multi_heredocs = 0;
+// 	if (!node || node->token->type != TOKEN_HEREDOC)
+// 		return (0);
+	
+// 	// Contar heredocs consecutivos
+// 	current = node;
+// 	while (current && current->token->type == TOKEN_HEREDOC)
+// 	{
+// 		ms->c_multi_heredocs++;
+// 		current = current->left;
+// 	}
+
+// 	// Alocar espaço para os stop tokens
+// 	node->heredoc_stops = malloc(sizeof(char *) * (ms->c_multi_heredocs + 1));
+// 	if (!node->heredoc_stops)
+// 		return (0);
+
+// 	// Preencher os stop tokens do último para o primeiro
+// 	current = node;
+// 	i = ms->c_multi_heredocs;
+// 	while (current && --i >= 0)
+// 	{
+// 		if(!current->right)
+// 		{
+// 			ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
+// 			//ft_putstr_fd(current->left->token->value, STDERR_FILENO);
+// 			ft_putchar_fd(current->left->token->value[0], STDERR_FILENO);
+// 			ft_putstr_fd("'\n", STDERR_FILENO);
+// 			ft_set_exit_code(ms, 2);
+// 			return (1);
+// 		}
+// 		node->heredoc_stops[i] = current->right->token->value;
+// 		current = current->left;
+// 	}
+// 	node->heredoc_stops[ms->c_multi_heredocs] = NULL; // Terminar com NULL
+// 	return (0);
+// }
+
+/**
+ * @brief  Handles syntax errors in heredoc collection.
+ * 
+ * @param  current  Pointer to the current node in the AST.
+ * @param  ms       Pointer to the minishell structure.
+ * @return int      Returns 1 to indicate an error.
+ */
+static int	ft_multiple_heredoc_syntax_error(t_node *current, t_minishell *ms)
+{
+	ft_putstr_fd("minishell: syntax error near unexpected token `",
+		STDERR_FILENO);
+	ft_putchar_fd(current->left->token->value[0], STDERR_FILENO);
+	ft_putstr_fd("'\n", STDERR_FILENO);
+	ft_set_exit_code(ms, 2);
+	return (1);
+}
+
+/**
+ * @brief  Allocates and populates heredoc stop tokens.
+ * 
+ * @param  node  Pointer to the starting heredoc node in the AST.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Returns 0 on success, 1 on error.
+ */
+static int	ft_allocate_heredoc_stops(t_node *node, t_minishell *ms)
+{
+	t_node	*current;
+	int		i;
+
+	node->heredoc_stops = malloc(sizeof(char *) * (ms->c_multi_heredocs + 1));
+	if (!node->heredoc_stops)
+		return (0);
+	current = node;
+	i = ms->c_multi_heredocs;
+	while (current && --i >= 0)
+	{
+		if (!current->right)
+			return (ft_multiple_heredoc_syntax_error(current, ms));
+		node->heredoc_stops[i] = current->right->token->value;
+		current = current->left;
+	}
+	node->heredoc_stops[ms->c_multi_heredocs] = NULL;
+	return (0);
 }
 
 /**
@@ -1875,44 +2035,16 @@ static void	ft_multiple_heredoc_child_process(t_node *node, t_minishell *ms, int
 int	ft_collect_heredocs(t_node *node, t_minishell *ms)
 {
 	t_node	*current;
-	int		i;
 
-	i = 0;
 	ms->c_multi_heredocs = 0;
 	if (!node || node->token->type != TOKEN_HEREDOC)
 		return (0);
-	
-	// Contar heredocs consecutivos
 	current = node;
 	while (current && current->token->type == TOKEN_HEREDOC)
 	{
 		ms->c_multi_heredocs++;
 		current = current->left;
 	}
-
-	// Alocar espaço para os stop tokens
-	node->heredoc_stops = malloc(sizeof(char *) * (ms->c_multi_heredocs + 1));
-	if (!node->heredoc_stops)
-		return (0);
-
-	// Preencher os stop tokens do último para o primeiro
-	current = node;
-	i = ms->c_multi_heredocs;
-	while (current && --i >= 0)
-	{
-		if(!current->right)
-		{
-			ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
-			//ft_putstr_fd(current->left->token->value, STDERR_FILENO);
-			ft_putchar_fd(current->left->token->value[0], STDERR_FILENO);
-			ft_putstr_fd("'\n", STDERR_FILENO);
-			ft_set_exit_code(ms, 2);
-			return (1);
-		}
-		node->heredoc_stops[i] = current->right->token->value;
-		current = current->left;
-	}
-	node->heredoc_stops[ms->c_multi_heredocs] = NULL; // Terminar com NULL
-	return (0);
+	return (ft_allocate_heredoc_stops(node, ms));
 }
 
