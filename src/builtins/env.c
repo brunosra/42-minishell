@@ -3,16 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/31 17:28:29 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/18 19:09:18 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/25 16:16:11 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-extern volatile int	g_interrupt;
 void	ft_builtin_env(char **args, t_minishell *ms);
 
 /**

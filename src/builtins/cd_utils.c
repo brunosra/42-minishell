@@ -6,14 +6,28 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/24 02:38:45 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 16:24:08 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-extern volatile int	g_interrupt;
+int	ft_builtin_cd_check(char **args, t_minishell *ms);
+static int	ft_cd_set_resolved_path_check(char **args, char *curpwd,
+	char *res_p, t_minishell *ms);
 
+/**
+ * @brief  Determines and sets the resolved path for the `cd` command.
+ * 
+ * @param  args   Array of arguments passed to `cd`.
+ * @param  curpwd Current working directory.
+ * @param  res_p  Buffer to store the resolved path.
+ * @param  ms     Pointer to the minishell structure.
+ * @return int    Status of the path resolution.
+ **         0 on success.
+ **         1 if `HOME` or `OLDPWD` is not set.
+ **         2 if too many arguments are passed.
+ */
 static int	ft_cd_set_resolved_path_check(char **args, char *curpwd,
 				char *res_p, t_minishell *ms)
 {
@@ -39,6 +53,17 @@ static int	ft_cd_set_resolved_path_check(char **args, char *curpwd,
 	return (0);
 }
 
+/**
+ * @brief  Handles error checking and execution of the `cd` built-in command.
+ * 
+ * @param  args  Array of arguments passed to `cd`.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Status of the `cd` execution.
+ **         0 on success.
+ **         1 if `getcwd` fails or path resolution fails.
+ **         1 if the target directory does not exist.
+ **         Returns specific error codes from `ft_cd_set_resolved_path_check`.
+ */
 int	ft_builtin_cd_check(char **args, t_minishell *ms)
 {
 	char	*curpwd;

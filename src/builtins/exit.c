@@ -3,16 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:47:54 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/23 07:57:04 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/25 16:35:43 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-extern volatile int	g_interrupt;
 static int			ft_value_is_numeric(char *str);
 static long long	ft_atoll(char *str, int i, long long res);
 int					ft_builtin_exit(char **args);
@@ -39,6 +38,12 @@ static int	ft_value_is_numeric(char *str)
 	return (0);
 }
 
+/**
+ * @brief  Prints an exit error message and terminates the shell.
+ * 
+ * @param  str  The invalid argument that caused the exit error.
+ * @return void This function does not return; it calls exit(2).
+ */
 static void	ft_putstr_and_exit(char *str)
 {
 	ft_putstr_fd("exit\nminishell: exit: ", STDERR_FILENO);

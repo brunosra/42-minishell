@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/24 02:19:01 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 09:29:40 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,17 +35,17 @@ typedef struct s_ast_node t_node;
 /**__Lexing__**/
 typedef enum e_token_type
 {
-	TOKEN_COMMAND,
-	TOKEN_ARGUMENT,
-	TOKEN_OPERATOR,
-	TOKEN_FILENAME,
-	TOKEN_VARIABLE,
-	TOKEN_OUTPUT_REDIRECT,
-	TOKEN_INPUT_REDIRECT,
-	TOKEN_HEREDOC,
-	TOKEN_BUILTIN,
-	TOKEN_NULL,
-	TOKEN_EXCEPT,
+	TKN_CMD,
+	TKN_ARG,
+	TKN_PIPE,
+	TKN_FILE,
+	TKN_VAR,
+	TKN_OUT_RD,
+	TKN_IN_RD,
+	TKN_HDOC,
+	TKN_BLTIN,
+	TKN_NULL,
+	TKN_EXCPT,
 }	t_type;
 
 typedef struct s_token
@@ -215,13 +215,13 @@ void	ft_free_split(char **str);
 char	*ft_strjoin_free(char *s1, char *s2, int free_s1, int free_s2);
 
 /**__HANDLE_ENV__ **/
-int		ft_revalue_token_variable(t_minishell *ms);
+int		ft_revalue_tkn_var(t_minishell *ms);
 int		ft_check_balanced_quotes(char *str, int idx);
 char	**ft_duplicate_envp(char **envp);
 int		ft_check_if_expand(char *str, char *ptr, int heredoc);
 int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
-char	*ft_get_env_value(const char *str, t_minishell *ms, char **key);
-int		ft_revalue_heredock_input(char **input, t_minishell *ms);
+char	*ft_get_env_value(const char *str, t_minishell *ms, char **key, bool heredoc);
+int		ft_revalue_heredoc_input(char **input, t_minishell *ms);
 char	*ft_get_env(const char *key, t_minishell *ms);
 int		ft_set_env(const char *key, const char *value, t_minishell *ms);
 int		ft_unset_env(const char *key, t_minishell *ms);

@@ -3,16 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   export_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 12:24:29 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/23 09:14:12 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/25 16:36:59 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-extern volatile int	g_interrupt;
+int	ft_dup_envp(char **envp, char ***dupenv, int count);
+void	ft_output_export_1_arg(char **arr, int count);
+int	ft_sort_envp(char **dupenv, int count);
+void	ft_export_1_arg(t_minishell *ms);
 
 /**
  * @brief	Duplicates a given array of environment variables.

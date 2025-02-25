@@ -6,12 +6,11 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/24 01:25:44 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 17:28:44 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-extern volatile int	g_interrupt;
 
 void		ft_signal_handler(int sig);
 t_minishell	*ft_ms_struct(t_minishell *ms, int flag);
@@ -21,7 +20,6 @@ void		ft_set_heredoc_signals(void);
 void		ft_signal_heredoc_handler(int sig);
 
 // void	ft_check_signals();
-
 
 void	ft_signal_handler(int sig)
 {

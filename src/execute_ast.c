@@ -6,12 +6,11 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/24 06:08:17 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 16:43:34 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-extern volatile int	g_interrupt;
 
 int	ft_execute_ast(t_node *node, t_minishell *ms);
 static int	ft_handle_syntax_error(t_node *node, t_minishell *ms);
@@ -47,6 +46,10 @@ static int	ft_check_pipe_syntax(t_node *node, t_minishell *ms);
 static int	ft_pipe_syntax_error(t_minishell *ms, char *token, int code);
 static void	ft_handle_unfinished_pipe(t_minishell *ms, char *input);
 int	ft_execute_command(t_node *node, t_minishell *ms);
+static void	ft_handle_cmd_exit_status(t_node *node, t_minishell *ms);
+static void	ft_execute_child_process(t_node *node, t_minishell *ms);
+static int	ft_execute_external(t_node *node, t_minishell *ms);
+static void	ft_execute_builtin(t_node *node, t_minishell *ms);
 int	ft_find_executable(t_minishell *ms, char *cmd);
 int	ft_invalid_right_token_value(char *value);
 int	ft_is_valid_file(char *filepath, int mode);
@@ -80,7 +83,7 @@ static int	ft_multiple_heredoc_syntax_error(t_node *current, t_minishell *ms);
 // {
 // 	if (!node || !ms->n_args)
 // 		return (1);
-//  	if (node->token->type == TOKEN_EXCEPT)
+//  	if (node->token->type == TKN_EXCPT)
 // 	{
 // 		ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
 // 		ft_putstr_fd(node->token->value, STDERR_FILENO);
@@ -89,27 +92,27 @@ static int	ft_multiple_heredoc_syntax_error(t_node *current, t_minishell *ms);
 		
 // 		return (1);
 // 	}
-// 	if (node->token->type == TOKEN_OUTPUT_REDIRECT)
+// 	if (node->token->type == TKN_OUT_RD)
 // 	{
 // 		if (ms->swap_output_redirects == false)
 // 		{
-// 			ft_swap_redirects_values(node, TOKEN_OUTPUT_REDIRECT);
+// 			ft_swap_redirects_values(node, TKN_OUT_RD);
 // 			ms->swap_output_redirects = true;
 // 		}
 // 		return (ft_handle_output_redirect(node, ms));
 // 	}
-// 	else if (node->token->type == TOKEN_INPUT_REDIRECT)
+// 	else if (node->token->type == TKN_IN_RD)
 // 	{
 // 		if (ms->swap_input_redirects == false)
 // 		{
-// 			ft_swap_redirects_values(node, TOKEN_INPUT_REDIRECT);
+// 			ft_swap_redirects_values(node, TKN_IN_RD);
 // 			ms->swap_input_redirects = true;
 // 		}
 // 		return (ft_handle_input_redirect(node, ms));
 // 	}
-//  	else if (node->token->type == TOKEN_HEREDOC)
+//  	else if (node->token->type == TKN_HDOC)
 // 	{
-// 		if (node->left && node->left->token->type == TOKEN_HEREDOC)
+// 		if (node->left && node->left->token->type == TKN_HDOC)
 // 		{
 // 			if (ft_collect_heredocs(node, ms))
 // 				return (1);
@@ -117,11 +120,11 @@ static int	ft_multiple_heredoc_syntax_error(t_node *current, t_minishell *ms);
 // 		}
 // 		return (ft_handle_heredoc(node, ms));
 // 	}
-//  	else if (node->token->type == TOKEN_OPERATOR)
+//  	else if (node->token->type == TKN_PIPE)
 // 		return (ft_handle_pipe(node, ms));
-// 	else if (node->token->type == TOKEN_BUILTIN)
+// 	else if (node->token->type == TKN_BLTIN)
 // 		return (ft_execute_command(node, ms));
-// 	else if (node->token->type == TOKEN_COMMAND)
+// 	else if (node->token->type == TKN_CMD)
 // 		return (ft_execute_command(node, ms));
 // 	return (0);
 // }
@@ -139,18 +142,18 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
 {
 	if (!node || !ms->n_args)
 		return (1);
-	if (node->token->type == TOKEN_EXCEPT)
+	if (node->token->type == TKN_EXCPT)
 		return (ft_handle_syntax_error(node, ms));
-	if (node->token->type == TOKEN_OUTPUT_REDIRECT)
+	if (node->token->type == TKN_OUT_RD)
 		return (ft_execute_output_redirect(node, ms));
-	if (node->token->type == TOKEN_INPUT_REDIRECT)
+	if (node->token->type == TKN_IN_RD)
 		return (ft_execute_input_redirect(node, ms));
-	if (node->token->type == TOKEN_HEREDOC)
+	if (node->token->type == TKN_HDOC)
 		return (ft_execute_heredoc(node, ms));
-	if (node->token->type == TOKEN_OPERATOR)
+	if (node->token->type == TKN_PIPE)
 		return (ft_handle_pipe(node, ms));
-	if (node->token->type == TOKEN_BUILTIN ||
-		node->token->type == TOKEN_COMMAND)
+	if (node->token->type == TKN_BLTIN ||
+		node->token->type == TKN_CMD)
 		return (ft_execute_command(node, ms));
 	return (0);
 }
@@ -183,7 +186,7 @@ static int	ft_execute_output_redirect(t_node *node, t_minishell *ms)
 {
 	if (ms->swap_output_redirects == false)
 	{
-		ft_swap_redirects_values(node, TOKEN_OUTPUT_REDIRECT);
+		ft_swap_redirects_values(node, TKN_OUT_RD);
 		ms->swap_output_redirects = true;
 	}
 	return (ft_handle_output_redirect(node, ms));
@@ -200,7 +203,7 @@ static int	ft_execute_input_redirect(t_node *node, t_minishell *ms)
 {
 	if (ms->swap_input_redirects == false)
 	{
-		ft_swap_redirects_values(node, TOKEN_INPUT_REDIRECT);
+		ft_swap_redirects_values(node, TKN_IN_RD);
 		ms->swap_input_redirects = true;
 	}
 	return (ft_handle_input_redirect(node, ms));
@@ -215,7 +218,7 @@ static int	ft_execute_input_redirect(t_node *node, t_minishell *ms)
  */
 static int	ft_execute_heredoc(t_node *node, t_minishell *ms)
 {
-	if (node->left && node->left->token->type == TOKEN_HEREDOC)
+	if (node->left && node->left->token->type == TKN_HDOC)
 	{
 		if (ft_collect_heredocs(node, ms))
 			return (1);
@@ -357,7 +360,7 @@ void	ft_swap_redirects_values(t_node *node, t_type type)
 // 		if (temp)
 // 		{
 // 			if (node->right && node->right->token->old_value[0] != '"' && node->right->token->old_value[0] != '\'')
-// 				ft_revalue_heredock_input(&temp, ms);
+// 				ft_revalue_heredoc_input(&temp, ms);
 // 			write(ms->pipefd[1], temp, ft_strlen(temp));
 // 		}
 // 		close(ms->pipefd[1]);
@@ -493,7 +496,13 @@ static void	ft_heredoc_child_process(t_node *node, t_minishell *ms)
 	{
 		input = readline("> ");
 		if (!input)
-			break;
+		{
+			ft_putstr_fd("minishell: warning: here-document delimited by EOF"
+				" (wanted `", STDERR_FILENO);
+			ft_putstr_fd(node->right->token->value, STDERR_FILENO);
+			write(STDERR_FILENO, "')\n", 3);
+			break ;
+		}
 		if (!ft_strcmp(input, node->right->token->value))
 			break;
 		temp = ft_update_heredoc_buffer(temp, input);
@@ -541,7 +550,7 @@ static void	ft_write_heredoc(t_minishell *ms, t_node *node, char *temp)
 	{
 		if (node->right && node->right->token->old_value[0] != '"'
 			&& node->right->token->old_value[0] != '\'')
-			ft_revalue_heredock_input(&temp, ms);
+			ft_revalue_heredoc_input(&temp, ms);
 		write(ms->pipefd[1], temp, ft_strlen(temp));
 		free(temp);
 	}
@@ -1022,7 +1031,7 @@ static int ft_has_cat(t_node *node) // FUNCAO DESENRASQUE ALTERAR
 	current = node;
 	if (!current)
 		return (0);
-	if (current->token->type == TOKEN_COMMAND)
+	if (current->token->type == TKN_CMD)
 	{
 		if (!ft_strcmp(current->cmd_ready[0], "cat")
 		|| !ft_strcmp(current->cmd_ready[0], "/bin/cat"))
@@ -1268,78 +1277,184 @@ static int	ft_redirect_pipe_input(t_minishell *ms)
  **         0 on success.
  **         Non-zero in case of error or if the command was not found.
  */
-int	ft_execute_command(t_node *node, t_minishell *ms)
+// int	ft_execute_command(t_node *node, t_minishell *ms)
+// {
+// 	int	valid;
+// 	int sig;
+
+// 	valid = -1;
+// 	sig = 0;
+// 	ms->pid = fork();
+// 	if (ms->pid == -1)
+// 	{
+// 		perror("fork");
+// 		ft_set_exit_code(ms, 1); // Código genérico para erro de fork
+// 		return (1);
+// 	}
+// 	if (ms->pid == 0)
+// 	{
+// 		//ft_set_fork_signals();
+// 		if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
+// 			exit(0);
+// 		if (node->token->type == TKN_BLTIN) 
+// 		{
+// 			if (ft_strcmp(node->token->value, "echo"))
+// 				exit(ft_exec_builtins_check(node, ms));
+// 			else
+// 				exit(ft_exec_builtins(node, ms));
+// 		}
+// 		if (node->cmd_ready[0][0] == '/' || 									// Caminho absoluto ou relativo
+// 			(node->cmd_ready[0][0] == '.' && node->cmd_ready[0][1] == '/') || 
+// 			!ft_strncmp(node->cmd_ready[0], "../", 3)) 
+// 		{
+// 			valid = ft_is_valid_file(node->cmd_ready[0], X_OK); // Verifica se o arquivo é válido
+// 			if (valid != 0)
+// 				exit(valid); // Retorna o erro correspondente (127 ou 126)
+// 			execve(node->cmd_ready[0], node->cmd_ready, ms->env.envp); // Executa diretamente se for válido
+// 			// ft_putstr_fd("minishell: ", STDERR_FILENO);
+// 			// ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
+// 			// ft_putstr_fd(": command not found\n", STDERR_FILENO);
+// 			exit(42);
+// 		}
+// 		if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
+// 		{
+// /* 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
+// 			ft_putstr_fd(": command not found\n", STDERR_FILENO); */
+// 			exit(42);
+// 		}
+// 		if (node->cmd_ready[1] == NULL && 
+// 		!ft_strcmp(node->cmd_ready[0], "cat") && node->prev && node->prev->token->type == TKN_PIPE
+// 		&& (node->prev->left == node 
+// 		|| (node->prev->prev && node->prev->prev->token->type == TKN_PIPE && node->prev->right == node)))
+// 			exit(13);
+// 		execve(ms->env.full_path, node->cmd_ready, ms->env.envp); // Executa o executável encontrado
+// 		perror("execve");
+// 		exit(127);
+// 	}
+// 	ft_set_fork_signals();
+// 	waitpid(ms->pid, &ms->status, 0);
+// 	if (WIFEXITED(ms->status)) // Processo terminou normalmente
+// 	{
+// 		ft_set_exit_code(ms, WEXITSTATUS(ms->status));
+//  		if (ft_exit_code(ms) == 42 && node->cmd_ready[0])
+// 		{
+// 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
+// 			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
+// 			ft_set_exit_code(ms, 127);
+// 		}
+// 		else if (ft_exit_code(ms) == 0)
+// 		{
+// 			if (node->token->type == TKN_BLTIN && ft_strcmp(node->token->value, "echo"))
+// 				ft_exec_builtins(node, ms);
+// 		}
+// 	}
+// 	else if (WIFSIGNALED(ms->status)) // Processo foi terminado por um sinal
+// 	{
+// 		sig = WTERMSIG(ms->status);
+// 		ft_set_exit_code(ms, 128 + sig);
+// 		if (sig == SIGINT)
+// 			write(STDERR_FILENO, "\n", 1);
+// 	}
+// 	else
+// 		ft_set_exit_code(ms, 1);
+// 	ft_set_main_signals();
+// 	if (ft_exit_code(ms) != 0 && node->prev && node->prev->token->type == TKN_IN_RD) // Remoção de arquivos criados caso o comando falhe
+// 	{
+// 		ft_remove_created_files(node->prev);
+// 	}
+// 	if (node->token->type == TKN_BLTIN && !ft_strcmp(node->cmd_ready[0], "exit") && ft_exit_code(ms) != 1) // Finaliza o shell se for exit
+// 	{
+// 		ft_free_tokens(ms->tokens);
+// 		ft_free_ast(ms->ast_root);
+// 		free(ms->input);
+// 		exit(ft_exit_code(ms));
+// 	}
+// 	return (ft_exit_code(ms));
+// }
+
+/**
+ * @brief  Handles the execution of built-in commands.
+ * 
+ * @param  node  Pointer to the AST node containing the command.
+ * @param  ms    Pointer to the minishell structure.
+ */
+static void	ft_execute_builtin(t_node *node, t_minishell *ms)
+{
+	if (ft_strcmp(node->token->value, "echo"))
+		exit(ft_exec_builtins_check(node, ms));
+	exit(ft_exec_builtins(node, ms));
+}
+
+/**
+ * @brief  Checks if the command is a valid executable.
+ * 
+ * @param  node  Pointer to the AST node containing the command.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Returns execution status.
+ */
+static int	ft_execute_external(t_node *node, t_minishell *ms)
 {
 	int	valid;
-	int sig;
 
-	valid = -1;
-	sig = 0;
-	ms->pid = fork();
-	if (ms->pid == -1)
-	{
-		perror("fork");
-		ft_set_exit_code(ms, 1); // Código genérico para erro de fork
-		return (1);
-	}
-	if (ms->pid == 0)
-	{
-		//ft_set_fork_signals();
-		if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
-			exit(0);
-		if (node->token->type == TOKEN_BUILTIN) 
-		{
-			if (ft_strcmp(node->token->value, "echo"))
-				exit(ft_exec_builtins_check(node, ms));
-			else
-				exit(ft_exec_builtins(node, ms));
-		}
-		if (node->cmd_ready[0][0] == '/' || 									// Caminho absoluto ou relativo
-			(node->cmd_ready[0][0] == '.' && node->cmd_ready[0][1] == '/') || 
-			!ft_strncmp(node->cmd_ready[0], "../", 3)) 
-		{
-			valid = ft_is_valid_file(node->cmd_ready[0], X_OK); // Verifica se o arquivo é válido
-			if (valid != 0)
-				exit(valid); // Retorna o erro correspondente (127 ou 126)
-			execve(node->cmd_ready[0], node->cmd_ready, ms->env.envp); // Executa diretamente se for válido
-			// ft_putstr_fd("minishell: ", STDERR_FILENO);
-			// ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
-			// ft_putstr_fd(": command not found\n", STDERR_FILENO);
-			exit(42);
-		}
-		if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
-		{
-/* 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
-			ft_putstr_fd(": command not found\n", STDERR_FILENO); */
-			exit(42);
-		}
-		if (node->cmd_ready[1] == NULL && 
-		!ft_strcmp(node->cmd_ready[0], "cat") && node->prev && node->prev->token->type == TOKEN_OPERATOR
-		&& (node->prev->left == node 
-		|| (node->prev->prev && node->prev->prev->token->type == TOKEN_OPERATOR && node->prev->right == node)))
-			exit(13);
-		execve(ms->env.full_path, node->cmd_ready, ms->env.envp); // Executa o executável encontrado
-		perror("execve");
-		exit(127);
-	}
-	ft_set_fork_signals();
-	waitpid(ms->pid, &ms->status, 0);
-	if (WIFEXITED(ms->status)) // Processo terminou normalmente
+	valid = ft_is_valid_file(node->cmd_ready[0], X_OK);
+	if (valid != 0)
+		exit(valid);
+	execve(node->cmd_ready[0], node->cmd_ready, ms->env.envp);
+	exit(42);
+}
+
+/**
+ * @brief  Executes the command in a child process.
+ * 
+ * @param  node  Pointer to the AST node containing the command.
+ * @param  ms    Pointer to the minishell structure.
+ */
+static void	ft_execute_child_process(t_node *node, t_minishell *ms)
+{
+	if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
+		exit(0);
+	if (node->token->type == TKN_BLTIN)
+		ft_execute_builtin(node, ms);
+	if (node->cmd_ready[0][0] == '/' || node->cmd_ready[0][0] == '.' ||
+		!ft_strncmp(node->cmd_ready[0], "../", 3))
+		ft_execute_external(node, ms);
+	if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
+		exit(42);
+	if (node->cmd_ready[1] == NULL && !ft_strcmp(node->cmd_ready[0], "cat") &&
+		node->prev && node->prev->token->type == TKN_PIPE &&
+		(node->prev->left == node ||
+			(node->prev->prev && node->prev->prev->token->type == TKN_PIPE &&
+				node->prev->right == node)))
+		exit(13);
+	execve(ms->env.full_path, node->cmd_ready, ms->env.envp);
+	perror("execve");
+	exit(127);
+}
+
+/**
+ * @brief  Handles the termination of a process and sets the exit code.
+ * 
+ * @param  node  Pointer to the AST node.
+ * @param  ms    Pointer to the minishell structure.
+ */
+static void	ft_handle_cmd_exit_status(t_node *node, t_minishell *ms)
+{
+	int	sig;
+
+	if (WIFEXITED(ms->status))
 	{
 		ft_set_exit_code(ms, WEXITSTATUS(ms->status));
- 		if (ft_exit_code(ms) == 42 && node->cmd_ready[0])
+		if (ft_exit_code(ms) == 42 && node->cmd_ready[0])
 		{
 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
-			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
+			ft_putstr_fd(": command not found\n", STDERR_FILENO);
 			ft_set_exit_code(ms, 127);
 		}
-		else if (ft_exit_code(ms) == 0)
-		{
-			if (node->token->type == TOKEN_BUILTIN && ft_strcmp(node->token->value, "echo"))
-				ft_exec_builtins(node, ms);
-		}
+		else if (ft_exit_code(ms) == 0 && node->token->type == TKN_BLTIN &&
+				 ft_strcmp(node->token->value, "echo"))
+			ft_exec_builtins(node, ms);
 	}
-	else if (WIFSIGNALED(ms->status)) // Processo foi terminado por um sinal
+	else if (WIFSIGNALED(ms->status))
 	{
 		sig = WTERMSIG(ms->status);
 		ft_set_exit_code(ms, 128 + sig);
@@ -1348,12 +1463,32 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	}
 	else
 		ft_set_exit_code(ms, 1);
+}
+
+/**
+ * @brief  Executes a command node in the AST.
+ * 
+ * @param  node  Pointer to the AST node containing the command.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Exit status of the command.
+ */
+int	ft_execute_command(t_node *node, t_minishell *ms)
+{
+	ms->pid = fork();
+	if (ms->pid == -1)
+		return (ft_handle_fork_error(ms));
+	if (ms->pid == 0)
+		ft_execute_child_process(node, ms);
+	ft_set_fork_signals();
+	waitpid(ms->pid, &ms->status, 0);
+	ft_handle_cmd_exit_status(node, ms);
 	ft_set_main_signals();
-	if (ft_exit_code(ms) != 0 && node->prev && node->prev->token->type == TOKEN_INPUT_REDIRECT) // Remoção de arquivos criados caso o comando falhe
-	{
+	if (ft_exit_code(ms) != 0 && node->prev &&
+		node->prev->token->type == TKN_IN_RD)
 		ft_remove_created_files(node->prev);
-	}
-	if (node->token->type == TOKEN_BUILTIN && !ft_strcmp(node->cmd_ready[0], "exit") && ft_exit_code(ms) != 1) // Finaliza o shell se for exit
+	if (node->token->type == TKN_BLTIN &&
+		!ft_strcmp(node->cmd_ready[0], "exit") &&
+		ft_exit_code(ms) != 1)
 	{
 		ft_free_tokens(ms->tokens);
 		ft_free_ast(ms->ast_root);
@@ -1362,6 +1497,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	}
 	return (ft_exit_code(ms));
 }
+
 
 /**
  * @brief  Removes files created during the execution of output redirection nodes.
@@ -1372,7 +1508,7 @@ void	ft_remove_created_files(t_node *node)
 {
 	if (!node)
 		return ;
-	if (node->token->type == TOKEN_OUTPUT_REDIRECT && node->right && node->right->token->value && node->file == true) // Se for um OUTPUT_REDIRECT, tenta remover o arquivo associado
+	if (node->token->type == TKN_OUT_RD && node->right && node->right->token->value && node->file == true) // Se for um OUTPUT_REDIRECT, tenta remover o arquivo associado
 	{
 		if (unlink(node->right->token->value) == -1)
 			perror("unlink");
@@ -1401,7 +1537,7 @@ void	ft_create_files(t_node *node)
 
 	if (!node)
 		return;
-	if (node->token->type == TOKEN_OUTPUT_REDIRECT && node->right && node->right->token->value && node->file == false)
+	if (node->token->type == TKN_OUT_RD && node->right && node->right->token->value && node->file == false)
 	{
 		if (ft_strcmp(node->token->value, ">>") == 0)
 			fd = open(node->right->token->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
@@ -1412,7 +1548,7 @@ void	ft_create_files(t_node *node)
 		else
 			perror("open");
 	}
-	if (node->left && node->left->token->type == TOKEN_OUTPUT_REDIRECT) // Se o nó à esquerda também for um output redirect, continuar a verificação
+	if (node->left && node->left->token->type == TKN_OUT_RD) // Se o nó à esquerda também for um output redirect, continuar a verificação
 		ft_create_files(node->left);
 }
 
@@ -1696,7 +1832,7 @@ static int	ft_check_file_access(char *filepath, int mode)
 //             if (ms->temp && ms->c_multi_heredocs == i + 1)
 //             {
 //                 new_temp = ft_strjoin_free(ms->temp, "\n", 1, 0);
-// 				ft_revalue_heredock_input(&new_temp, ms);
+// 				ft_revalue_heredoc_input(&new_temp, ms);
 //                 ft_putstr_fd(new_temp, ms->pipefd[1]);
 //                 free(new_temp);
 //             }
@@ -1744,7 +1880,7 @@ static int	ft_check_file_access(char *filepath, int mode)
 //         close(save_stdout);
 //     }
 //     current = node->left;
-//     while (current && current->token->type == TOKEN_HEREDOC)
+//     while (current && current->token->type == TKN_HDOC)
 //     {
 //         t_node *temp_node = current;
 //         current = current->left;
@@ -1835,7 +1971,7 @@ static void	ft_cleanup_heredocs(t_minishell *ms, int save_stdout, t_node *node)
 	if (save_stdout != -1)
 		ft_restore_stdout(save_stdout, ms);
 	current = node->left;
-	while (current && current->token->type == TOKEN_HEREDOC)
+	while (current && current->token->type == TKN_HDOC)
 	{
 		temp_node = current;
 		current = current->left;
@@ -1859,7 +1995,7 @@ static void	ft_multiple_heredoc_child(t_node *node, t_minishell *ms, int *i)
 	input = NULL;
 	ft_set_heredoc_signals();
 	close(ms->pipefd[0]);
-	while (!g_interrupt)
+	while (42)
 	{
 		input = readline("> ");
 		if (!input)
@@ -1917,7 +2053,7 @@ static void	ft_finalize_heredoc(t_minishell *ms, int *i)
 	if (ms->temp && ms->c_multi_heredocs == *i + 1)
 	{
 		new_temp = ft_strjoin_free(ms->temp, "\n", 1, 0);
-		ft_revalue_heredock_input(&new_temp, ms);
+		ft_revalue_heredoc_input(&new_temp, ms);
 		ft_putstr_fd(new_temp, ms->pipefd[1]);
 		free(new_temp);
 	}
@@ -1941,12 +2077,12 @@ static void	ft_finalize_heredoc(t_minishell *ms, int *i)
 
 // 	i = 0;
 // 	ms->c_multi_heredocs = 0;
-// 	if (!node || node->token->type != TOKEN_HEREDOC)
+// 	if (!node || node->token->type != TKN_HDOC)
 // 		return (0);
 	
 // 	// Contar heredocs consecutivos
 // 	current = node;
-// 	while (current && current->token->type == TOKEN_HEREDOC)
+// 	while (current && current->token->type == TKN_HDOC)
 // 	{
 // 		ms->c_multi_heredocs++;
 // 		current = current->left;
@@ -2037,10 +2173,10 @@ int	ft_collect_heredocs(t_node *node, t_minishell *ms)
 	t_node	*current;
 
 	ms->c_multi_heredocs = 0;
-	if (!node || node->token->type != TOKEN_HEREDOC)
+	if (!node || node->token->type != TKN_HDOC)
 		return (0);
 	current = node;
-	while (current && current->token->type == TOKEN_HEREDOC)
+	while (current && current->token->type == TKN_HDOC)
 	{
 		ms->c_multi_heredocs++;
 		current = current->left;
