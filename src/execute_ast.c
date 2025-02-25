@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 02:33:09 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 04:37:41 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -497,7 +497,13 @@ static void	ft_heredoc_child_process(t_node *node, t_minishell *ms)
 	{
 		input = readline("> ");
 		if (!input)
-			break;
+		{
+			ft_putstr_fd("minishell: warning: here-document delimited by EOF"
+				" (wanted `", STDERR_FILENO);
+			ft_putstr_fd(node->right->token->value, STDERR_FILENO);
+			write(STDERR_FILENO, "')\n", 3);
+			break ;
+		}
 		if (!ft_strcmp(input, node->right->token->value))
 			break;
 		temp = ft_update_heredoc_buffer(temp, input);

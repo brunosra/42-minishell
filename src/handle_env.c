@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 04:04:19 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 04:52:50 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ static int	ft_replace_entire_str(char **value, char *env_value);
 int	ft_cleanup(char *to_free1, char *to_free2, int error);
 static char	*ft_create_replaced_str(char *start, char *env_value, char *end);
 int		ft_revalue_heredock_input(char **input, t_minishell *ms);
+static int	ft_process_heredoc_expansion(char **input, t_minishell *ms, char **ptr);
 char	*ft_get_env_value(const char *str, t_minishell *ms, char **key);
 char	*ft_get_env(const char *key, t_minishell *ms);
 
@@ -152,7 +153,7 @@ int	ft_revalue_tkn_var(t_minishell *ms)
 	i = -1;
 	while (ms->tokens[++i].value)
 	{
-		if (ft_is_expandable_token(ms->tokens[i].type))
+		if (ft_is_expandable_token(ms->tokens[i].type) && ms->tokens[i - 1].type != TKN_HDOC)
 		{
 			ptr = ft_strchr(ms->tokens[i].value, '$');
 			while (ptr)
@@ -580,62 +581,124 @@ static int	ft_is_invalid_dollar_char(char c)
  **         0 on success.
  **         1 on error.
  */
+// int	ft_revalue_heredock_input(char **input, t_minishell *ms)
+// {
+// 	char	*env_value;
+// 	char	*ptr;
+// 	char	*key;
+
+// 	env_value = NULL;
+// 	key = NULL;
+// 	ptr = NULL;
+// 	if (!ms || !input || !ms->env.envp)
+// 		return (1);
+// 	while (input)
+// 	{
+// 		ptr = ft_strchr(*input, '$');
+// 		while (ptr != NULL)
+// 		{
+// 			if (ft_check_if_expand(*input, ptr, 1) == 1)
+// 			{
+// 				env_value = ft_get_env_value(ptr, ms, &key);
+// 				if (!env_value) 
+//  					env_value = ft_strdup("");
+// 				ft_replace_str(input, key, ptr, env_value);
+// 				if (*key)
+// 					free(key);
+// 				if (!input)
+// 					return (1);
+// 				ptr = ft_strchr(*input, '$');
+// 				if (!ptr)
+// 					break ;
+// 			}
+// 			else if (ft_check_if_expand(*input, ptr, 1) == 2)
+// 			{
+// 				key = ft_strdup("?");
+// 				ft_replace_str(input, key, ptr, ft_itoa(ft_exit_code(ms)));
+// 				free(key);
+// 				ptr = ft_strchr(*input, '$');
+// 				if (!ptr)
+// 					break ;
+// 			}
+// 			else
+// 			{
+// 				ptr++;
+// 				ptr = ft_strchr(ptr, '$');
+// 				if (!ptr)
+// 					break ;
+// 			}
+// 		}
+// 		if (!ptr)
+// 			return (0);
+// 	}
+// 	return (0);
+// }
+
+/**
+ * @brief  Expands environment variables in heredoc input.
+ * 
+ * @param  input  Pointer to the heredoc input string.
+ * @param  ms     Pointer to the minishell structure.
+ * @return int    0 on success, 1 on error.
+ */
 int	ft_revalue_heredock_input(char **input, t_minishell *ms)
 {
-	char	*env_value;
 	char	*ptr;
-	char	*key;
 
-	env_value = NULL;
-	key = NULL;
-	ptr = NULL;
-	if (!ms || !input || !ms->env.envp)
+	if (!ms || !input || !*input || !ms->env.envp)
 		return (1);
-	while (input)
+	while ((ptr = ft_strchr(*input, '$')))
 	{
-		ptr = ft_strchr(*input, '$');
-		while (ptr != NULL)
-		{
-			if (ft_check_if_expand(*input, ptr, 1) == 1)
-			{
-				env_value = ft_get_env_value(ptr, ms, &key);
-				if (!env_value) 
- 					env_value = ft_strdup("");
-				ft_replace_str(input, key, ptr, env_value);
-				if (*key)
-					free(key);
-				if (!input)
-				{
-					perror("");
-					return (1);
-				}
-				ptr = ft_strchr(*input, '$');
-				if (!ptr)
-					break ;
-			}
-			else if (ft_check_if_expand(*input, ptr, 1) == 2)
-			{
-				key = ft_strdup("?");
-				// printf("%lu\n", ft_strlen(ft_itoa(ft_exit_code(ms))));
-				ft_replace_str(input, key, ptr, ft_itoa(ft_exit_code(ms)));
-				free(key);
-				ptr = ft_strchr(*input, '$');
-				if (!ptr)
-					break ;
-			}
-			else
-			{
-				ptr++;
-				ptr = ft_strchr(ptr, '$');
-				if (!ptr)
-					break ;
-			}
-		}
-		if (!ptr)
-			return (0);
+		if (ft_process_heredoc_expansion(input, ms, &ptr))
+			return (1);
 	}
 	return (0);
 }
+
+/**
+ * @brief  Handles the expansion of a single variable inside heredoc input.
+ * 
+ * @param  input  Pointer to the heredoc input string.
+ * @param  ms     Pointer to the minishell structure.
+ * @param  ptr    Pointer to the position of the '$' in the string.
+ * @return int    0 on success, 1 on error.
+ */
+static int	ft_process_heredoc_expansion(char **input, t_minishell *ms, char **ptr)
+{
+	char	*env_value;
+	char	*key;
+	int		expansion_type;
+
+	env_value = NULL;
+	key = NULL;
+	expansion_type = ft_check_if_expand(*input, *ptr, 1);
+	if (expansion_type == 1)
+	{
+		env_value = ft_get_env_value(*ptr, ms, &key);
+		if (!env_value)
+			env_value = ft_strdup("");
+		ft_replace_str(input, key, *ptr, env_value);
+		free(key);
+		if (!*input)
+			return (1);
+		*ptr = ft_strchr(*input, '$');
+		if (!*ptr)
+			return (0);
+	}
+	else if (expansion_type == 2)
+	{
+		key = ft_strdup("?");
+		ft_replace_str(input, key, *ptr, ft_itoa(ft_exit_code(ms)));
+		free(key);
+		*ptr = ft_strchr(*input, '$');
+		if (!*ptr)
+			return (0);
+	}
+	else
+		*ptr = ft_strchr((*ptr) + 1, '$');
+	return (0);
+}
+
 
 /**
  * @brief  Retrieves the value of an environment variable from the environment array.
