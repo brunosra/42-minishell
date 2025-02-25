@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 03:20:49 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 04:04:19 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,12 @@
 extern volatile int	g_interrupt;
 
 int		ft_revalue_tkn_var(t_minishell *ms);
+static char	*ft_process_token_expansion(t_minishell *ms, t_token *token, char *ptr);
+static int	ft_is_expandable_token(t_type type);
 int		ft_check_balanced_quotes(char *str, int idx);
 char	**ft_duplicate_envp(char **envp);
 int	ft_check_if_expand(char *str, char *ptr, int heredoc);
-static int	ft_handle_quotes(char *quote_type, char c);
+static int	ft_verify_quotes(char *quote_type, char c);
 static int	ft_check_expansion_conditions(char *str, int i, int heredoc, char quote_type);
 static int	ft_is_invalid_dollar_char(char c);
 int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
@@ -69,68 +71,142 @@ char	**ft_duplicate_envp(char **envp)
  **         0 on success.
  **         1 on error or if expansion fails.
  */
+// int	ft_revalue_tkn_var(t_minishell *ms)
+// {
+// 	int		i;
+// 	char	*env_value;
+// 	char	*ptr;
+// 	char	*key;
+
+// 	i = -1;
+// 	env_value = NULL;
+// 	key = NULL;
+// 	ptr = NULL;
+// 	if (!ms || !ms->tokens || !ms->env.envp)
+// 		return (1);
+// 	while (ms->tokens[++i].value)
+// 	{
+// 		// ft_putstr_fd(ms->tokens[i].value, 1);
+// 		if (ms->tokens[i].type == TKN_VAR || ms->tokens[i].type == TKN_CMD || ms->tokens[i].type == TKN_FILE || ms->tokens[i].type == TKN_ARG)
+// 		{
+// 			ptr = ft_strchr(ms->tokens[i].value, '$');
+// 			while (ptr != NULL)
+// 			{
+// 				if (ft_check_if_expand(ms->tokens[i].value, ptr, 0) == 1)
+// 				{
+// 					env_value = ft_get_env_value(ptr, ms, &key);
+// 					if (!env_value) 
+//  						env_value = ft_strdup("");
+// 					ft_replace_str(&ms->tokens[i].value, key, ptr, env_value);
+// 					if (*key)
+// 						free(key);
+// 					if (!ms->tokens[i].value)
+// 					{
+// 						perror("");
+// 						return (1);
+// 					}
+// 					// if (ms->tokens[i].value[0] == '\0' && ms->tokens[i].type == TKN_CMD)
+// 					// 	ms->tokens[i].type = TKN_VAR; // alaterar para TOKEN_EMPTY para ser ignorado no parsing. outra e perceber a quando do tokenixe type se a expansao da var e nula e se assim for passa a TOKEN_EMPTY...
+// 					ptr = ft_strchr(ms->tokens[i].value, '$');
+// 					if (!ptr)
+// 						break ;
+// 				}
+// 				else if (ft_check_if_expand(ms->tokens[i].value, ptr, 0) == 2)
+// 				{
+// 					key = ft_strdup("?");
+// 					// printf("%lu\n", ft_strlen(ft_itoa(ft_exit_code(ms))));
+// 					ft_replace_str(&ms->tokens[i].value, key, ptr, ft_itoa(ft_exit_code(ms)));
+// 					free(key);
+// 					ptr = ft_strchr(ms->tokens[i].value, '$');
+// 					if (!ptr)
+// 						break ;
+// 				}
+// 				else
+// 				{
+// 					ptr++;
+// 					ptr = ft_strchr(ptr, '$');
+// 					if (!ptr)
+// 						break ;
+// 				}
+// 			}
+// 		}
+// 	}
+// 	return (0);
+// }
+
+/**
+ * @brief  Expands environment variables in tokens of type VAR, CMD, FILE, or ARG.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return int Status code.
+ **         0 on success.
+ **         1 on error.
+ */
 int	ft_revalue_tkn_var(t_minishell *ms)
 {
-	int		i;
-	char	*env_value;
+	int	i;
 	char	*ptr;
-	char	*key;
 
-	i = -1;
-	env_value = NULL;
-	key = NULL;
-	ptr = NULL;
 	if (!ms || !ms->tokens || !ms->env.envp)
 		return (1);
+	i = -1;
 	while (ms->tokens[++i].value)
 	{
-		// ft_putstr_fd(ms->tokens[i].value, 1);
-		if (ms->tokens[i].type == TKN_VAR || ms->tokens[i].type == TKN_CMD || ms->tokens[i].type == TKN_FILE || ms->tokens[i].type == TKN_ARG)
+		if (ft_is_expandable_token(ms->tokens[i].type))
 		{
 			ptr = ft_strchr(ms->tokens[i].value, '$');
-			while (ptr != NULL)
-			{
-				if (ft_check_if_expand(ms->tokens[i].value, ptr, 0) == 1)
-				{
-					env_value = ft_get_env_value(ptr, ms, &key);
-					if (!env_value) 
- 						env_value = ft_strdup("");
-					ft_replace_str(&ms->tokens[i].value, key, ptr, env_value);
-					if (*key)
-						free(key);
-					if (!ms->tokens[i].value)
-					{
-						perror("");
-						return (1);
-					}
-					// if (ms->tokens[i].value[0] == '\0' && ms->tokens[i].type == TKN_CMD)
-					// 	ms->tokens[i].type = TKN_VAR; // alaterar para TOKEN_EMPTY para ser ignorado no parsing. outra e perceber a quando do tokenixe type se a expansao da var e nula e se assim for passa a TOKEN_EMPTY...
-					ptr = ft_strchr(ms->tokens[i].value, '$');
-					if (!ptr)
-						break ;
-				}
-				else if (ft_check_if_expand(ms->tokens[i].value, ptr, 0) == 2)
-				{
-					key = ft_strdup("?");
-					// printf("%lu\n", ft_strlen(ft_itoa(ft_exit_code(ms))));
-					ft_replace_str(&ms->tokens[i].value, key, ptr, ft_itoa(ft_exit_code(ms)));
-					free(key);
-					ptr = ft_strchr(ms->tokens[i].value, '$');
-					if (!ptr)
-						break ;
-				}
-				else
-				{
-					ptr++;
-					ptr = ft_strchr(ptr, '$');
-					if (!ptr)
-						break ;
-				}
-			}
+			while (ptr)
+				ptr = ft_process_token_expansion(ms, &ms->tokens[i], ptr);
 		}
 	}
 	return (0);
 }
+
+/**
+ * @brief  Checks if a token type is eligible for expansion.
+ * 
+ * @param  type  Token type.
+ * @return int   1 if expandable, 0 otherwise.
+ */
+static int	ft_is_expandable_token(t_type type)
+{
+	return (type == TKN_VAR || type == TKN_CMD || type == TKN_FILE || type == TKN_ARG);
+}
+
+/**
+ * @brief  Expands a `$` variable inside a token.
+ * 
+ * @param  ms     Pointer to the minishell structure.
+ * @param  token  Pointer to the token being processed.
+ * @param  ptr    Pointer to the `$` inside the token value.
+ * @return char*  Pointer to the next `$` to expand, or NULL if none remain.
+ */
+static char	*ft_process_token_expansion(t_minishell *ms, t_token *token, char *ptr)
+{
+	char	*env_value;
+	char	*key;
+
+	env_value = NULL;
+	key = NULL;
+	if (ft_check_if_expand(token->value, ptr, 0) == 1)
+	{
+		env_value = ft_get_env_value(ptr, ms, &key);
+		if (!env_value)
+			env_value = ft_strdup("");
+		ft_replace_str(&token->value, key, ptr, env_value);
+		free(key);
+	}
+	else if (ft_check_if_expand(token->value, ptr, 0) == 2)
+	{
+		key = ft_strdup("?");
+		ft_replace_str(&token->value, key, ptr, ft_itoa(ft_exit_code(ms)));
+		free(key);
+	}
+	else
+		ptr++;
+	return (ft_strchr(ptr, '$'));
+}
+
 
 /**
  * @brief  Extracts the value of an environment variable from a given string.
@@ -423,7 +499,7 @@ int	ft_check_if_expand(char *str, char *ptr, int heredoc)
 	quote_type = '\0';
 	while (str[i])
 	{
-		if (ft_handle_quotes(&quote_type, str[i]))
+		if (ft_verify_quotes(&quote_type, str[i]))
 		{
 			i++;
 			continue;
@@ -442,7 +518,7 @@ int	ft_check_if_expand(char *str, char *ptr, int heredoc)
  * @param  c          The current character in the string.
  * @return int        1 if the character is a quote, 0 otherwise.
  */
-static int	ft_handle_quotes(char *quote_type, char c)
+static int	ft_verify_quotes(char *quote_type, char c)
 {
 	if (c == '"' || c == '\'')
 	{
