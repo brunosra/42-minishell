@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/20 04:30:27 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 02:27:34 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,27 +67,27 @@ void	print_ast(t_node *node, int depth);
 //     cmd_node = NULL;
 //     op_node = NULL;
 	
-// 	while (/* tokens[i].value &&  */tokens[i].type != TOKEN_NULL) 
+// 	while (/* tokens[i].value &&  */tokens[i].type != TKN_NULL) 
 // 	{
 //         // printf("token_value = %s\n", tokens[i].value);
 // 		// printf("token_type = %d\n", tokens[i].type);
-// 		if(!tokens[i].value && tokens[i].type == TOKEN_COMMAND)
+// 		if(!tokens[i].value && tokens[i].type == TKN_CMD)
 // 		{	
 // 			tokens[i].value = ft_strdup("");
 // /* 			ft_putstr_fd(": command not found\n", STDERR_FILENO); // ou Command '' not found
 // 			return (NULL); // Código de erro para "command not found" */
 // 		}
-// 		if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND || tokens[i].type == TOKEN_FILENAME  || tokens[i].type == TOKEN_ARGUMENT /*&& current->token->type != TOKEN_FILENAME && current->token->type != TOKEN_VARIABLE && current->token->type != TOKEN_ARGUMENT) */)
+// 		if (tokens[i].type == TKN_BLTIN || tokens[i].type == TKN_CMD || tokens[i].type == TKN_FILE  || tokens[i].type == TKN_ARG /*&& current->token->type != TKN_FILE && current->token->type != TKN_VAR && current->token->type != TKN_ARG) */)
 // 		{
-// 			if (tokens[i].type == TOKEN_FILENAME)
+// 			if (tokens[i].type == TKN_FILE)
 // 			{
-// 				if (current && current->token->type == TOKEN_HEREDOC)
+// 				if (current && current->token->type == TKN_HDOC)
 // 					tokens[i].old_value = ft_strdup(tokens[i].value);
 // 				tokens[i].value = ft_remove_quotes(tokens[i].value);
 // 			}
-// 			if (tokens[i].type == TOKEN_ARGUMENT && current && current->token->type == TOKEN_FILENAME && current->prev->token->type == TOKEN_HEREDOC)
-// 				tokens[i].type = TOKEN_COMMAND;
-// 			if (tokens[i].type == TOKEN_BUILTIN || tokens[i].type == TOKEN_COMMAND)
+// 			if (tokens[i].type == TKN_ARG && current && current->token->type == TKN_FILE && current->prev->token->type == TKN_HDOC)
+// 				tokens[i].type = TKN_CMD;
+// 			if (tokens[i].type == TKN_BLTIN || tokens[i].type == TKN_CMD)
 // 			{
 // 				cmd_node = ft_group_command_tokens(tokens, &i);
 // /* 				if (cmd_node == NULL)
@@ -104,16 +104,16 @@ void	print_ast(t_node *node, int depth);
 // 			// ft_putnbr_fd(tokens[i].type, 1);
 //             if (!root)
 //                 root = cmd_node;
-// 			else if (current && (current->token->type == TOKEN_OPERATOR || current->token->type == TOKEN_OUTPUT_REDIRECT || current->token->type == TOKEN_INPUT_REDIRECT || current->token->type == TOKEN_HEREDOC || current->token->type == TOKEN_EXCEPT))
+// 			else if (current && (current->token->type == TKN_PIPE || current->token->type == TKN_OUT_RD || current->token->type == TKN_IN_RD || current->token->type == TKN_HDOC || current->token->type == TKN_EXCPT))
 //                 current->right = cmd_node;
-// 			else if (tokens[i].type != TOKEN_ARGUMENT && cmd_node->token->type != TOKEN_ARGUMENT)/* if (current && current->prev->token->type == TOKEN_INPUT_REDIRECT && tokens[i].type == TOKEN_COMMAND && current->token->type == TOKEN_FILENAME && !current->prev->left) */
+// 			else if (tokens[i].type != TKN_ARG && cmd_node->token->type != TKN_ARG)/* if (current && current->prev->token->type == TKN_IN_RD && tokens[i].type == TKN_CMD && current->token->type == TKN_FILE && !current->prev->left) */
 // 			{
 // 				current->prev->left = cmd_node;
 // 			}
 // 			cmd_node->prev = current;
 //             current = cmd_node;
 //         }
-//         else if (tokens[i].type == TOKEN_OPERATOR || tokens[i].type == TOKEN_OUTPUT_REDIRECT || tokens[i].type == TOKEN_INPUT_REDIRECT || tokens[i].type == TOKEN_HEREDOC || tokens[i].type == TOKEN_EXCEPT)
+//         else if (tokens[i].type == TKN_PIPE || tokens[i].type == TKN_OUT_RD || tokens[i].type == TKN_IN_RD || tokens[i].type == TKN_HDOC || tokens[i].type == TKN_EXCPT)
 // 		{
 //             /* if (!ft_strcmp(tokens[i].value, "|"))
 // 			{ */
@@ -125,7 +125,7 @@ void	print_ast(t_node *node, int depth);
 // 				{
 // 					root->prev = op_node;
 // 				}
-// 				if (tokens[i].type == TOKEN_INPUT_REDIRECT && current && current->prev && current->prev->right == current && current->prev->token->type == TOKEN_OPERATOR)
+// 				if (tokens[i].type == TKN_IN_RD && current && current->prev && current->prev->right == current && current->prev->token->type == TKN_PIPE)
 // 				{
 // 					root = current->prev;
 // 					root->right = op_node;
@@ -135,7 +135,7 @@ void	print_ast(t_node *node, int depth);
 // 					current = op_node;
 // 					i++;
 // 				}
-// /* 				else if (tokens[i].type == TOKEN_OPERATOR && current->prev->right == current && current->prev->token->type == TOKEN_INPUT_REDIRECT)
+// /* 				else if (tokens[i].type == TKN_PIPE && current->prev->right == current && current->prev->token->type == TKN_IN_RD)
 // 				{
 // 					root = op_node;
 // 					root->right = current->prev;
@@ -181,7 +181,7 @@ static t_node	*ft_handle_cmd_node(t_token *tokens, int *i, t_node **current,
 {
 	t_node	*cmd_node;
 
-	if (tokens[*i].type == TOKEN_BUILTIN || tokens[*i].type == TOKEN_COMMAND)
+	if (tokens[*i].type == TKN_BLTIN || tokens[*i].type == TKN_CMD)
 		cmd_node = ft_group_command_tokens(tokens, i);
 	else
 	{
@@ -190,14 +190,14 @@ static t_node	*ft_handle_cmd_node(t_token *tokens, int *i, t_node **current,
 	}
 	if (!*root)
 		*root = cmd_node;
-	else if (*current && ((*current)->token->type == TOKEN_OPERATOR
-		|| (*current)->token->type == TOKEN_OUTPUT_REDIRECT
-		|| (*current)->token->type == TOKEN_INPUT_REDIRECT
-		|| (*current)->token->type == TOKEN_HEREDOC
-		|| (*current)->token->type == TOKEN_EXCEPT))
+	else if (*current && ((*current)->token->type == TKN_PIPE
+		|| (*current)->token->type == TKN_OUT_RD
+		|| (*current)->token->type == TKN_IN_RD
+		|| (*current)->token->type == TKN_HDOC
+		|| (*current)->token->type == TKN_EXCPT))
 		(*current)->right = cmd_node;
-	else if (tokens[*i].type != TOKEN_ARGUMENT
-			&& cmd_node->token->type != TOKEN_ARGUMENT)
+	else if (tokens[*i].type != TKN_ARG
+			&& cmd_node->token->type != TKN_ARG)
 		(*current)->prev->left = cmd_node;
 	cmd_node->prev = *current;
 	*current = cmd_node;
@@ -214,10 +214,10 @@ static t_node	*ft_handle_cmd_node(t_token *tokens, int *i, t_node **current,
 static void	ft_adjust_input_redirect(t_token *tokens, int *i,
 				t_ast_helper *ast)
 {
-	if (tokens[*i].type == TOKEN_INPUT_REDIRECT && *(ast->current)
+	if (tokens[*i].type == TKN_IN_RD && *(ast->current)
 		&& (*(ast->current))->prev
 		&& (*(ast->current))->prev->right == *(ast->current)
-		&& (*(ast->current))->prev->token->type == TOKEN_OPERATOR)
+		&& (*(ast->current))->prev->token->type == TKN_PIPE)
 	{
 		*(ast->root) = (*(ast->current))->prev;
 		(*(ast->root))->right = ast->op_node;
@@ -272,23 +272,23 @@ static t_node	*ft_handle_op_node(t_token *tokens, int *i,
 static void	ft_process_token(t_token *tokens, int *i, t_node **current,
 				t_node **root)
 {
-	if (tokens[*i].type == TOKEN_BUILTIN || tokens[*i].type == TOKEN_COMMAND
-		|| tokens[*i].type == TOKEN_FILENAME
-		|| tokens[*i].type == TOKEN_ARGUMENT)
+	if (tokens[*i].type == TKN_BLTIN || tokens[*i].type == TKN_CMD
+		|| tokens[*i].type == TKN_FILE
+		|| tokens[*i].type == TKN_ARG)
 	{
-		if (tokens[*i].type == TOKEN_FILENAME /* && *current
-			&& (*current)->token->type == TOKEN_HEREDOC */)
+		if (tokens[*i].type == TKN_FILE /* && *current
+			&& (*current)->token->type == TKN_HDOC */)
 		{
 			tokens[*i].old_value = ft_strdup(tokens[*i].value);
 			tokens[*i].value = ft_remove_quotes(tokens[*i].value);
 		}
 		ft_handle_cmd_node(tokens, i, current, root);
 	}
-	else if (tokens[*i].type == TOKEN_OPERATOR
-		|| tokens[*i].type == TOKEN_OUTPUT_REDIRECT
-		|| tokens[*i].type == TOKEN_INPUT_REDIRECT
-		|| tokens[*i].type == TOKEN_HEREDOC
-		|| tokens[*i].type == TOKEN_EXCEPT)
+	else if (tokens[*i].type == TKN_PIPE
+		|| tokens[*i].type == TKN_OUT_RD
+		|| tokens[*i].type == TKN_IN_RD
+		|| tokens[*i].type == TKN_HDOC
+		|| tokens[*i].type == TKN_EXCPT)
 		ft_handle_op_node(tokens, i, current, root);
 	else
 		(*i)++;
@@ -309,9 +309,9 @@ t_node	*ft_parse_ast(t_token *tokens)
 	i = 0;
 	root = NULL;
 	current = NULL;
-	while (tokens[i].type != TOKEN_NULL)
+	while (tokens[i].type != TKN_NULL)
 	{
-		if (!tokens[i].value && tokens[i].type == TOKEN_COMMAND)
+		if (!tokens[i].value && tokens[i].type == TKN_CMD)
 			tokens[i].value = ft_strdup("");
 		ft_process_token(tokens, &i, &current, &root);
 	}
@@ -351,7 +351,7 @@ t_node	*ft_parse_ast(t_token *tokens)
 // 	len_value = ft_strlen(cmd_node->token->value);
 // 	n_args_cmd_nd_values = ft_verify_cmd_node_value(cmd_node);
 // 	(*index)++;
-// 	while (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE))
+// 	while (tokens[*index].value && (tokens[*index].type == TKN_ARG || tokens[*index].type == TKN_VAR))
 // 	{
 // 		if (tokens[*index].value[0] == '\0')
 // 		{
@@ -366,19 +366,19 @@ t_node	*ft_parse_ast(t_token *tokens)
 // 		// printf("%i = %s\n", *index, tokens[*index].value);
 // 	}
 // 	stop = *index;
-// 	while (tokens[*index].value && (tokens[*index].type != TOKEN_OPERATOR && tokens[*index].type != TOKEN_EXCEPT && tokens[*index].type != TOKEN_COMMAND))
+// 	while (tokens[*index].value && (tokens[*index].type != TKN_PIPE && tokens[*index].type != TKN_EXCPT && tokens[*index].type != TKN_CMD))
 // 	{
-// 		if (tokens[*index].type == TOKEN_INPUT_REDIRECT || tokens[*index].type == TOKEN_OUTPUT_REDIRECT || tokens[*index].type == TOKEN_HEREDOC || tokens[*index].type == TOKEN_FILENAME)
+// 		if (tokens[*index].type == TKN_IN_RD || tokens[*index].type == TKN_OUT_RD || tokens[*index].type == TKN_HDOC || tokens[*index].type == TKN_FILE)
 // 		{
 // 			c_except++;
 // 			(*index)++;
-// 			if (tokens[*index].type == TOKEN_FILENAME)
+// 			if (tokens[*index].type == TKN_FILE)
 // 			{
 // 				c_except++;
 // 				(*index)++;
 // 			}
 // 		}
-// 		while (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE))
+// 		while (tokens[*index].value && (tokens[*index].type == TKN_ARG || tokens[*index].type == TKN_VAR))
 // 		{
 // 			if (tokens[*index].value[0] == '\0')
 // 			{
@@ -415,7 +415,7 @@ t_node	*ft_parse_ast(t_token *tokens)
 // 		arg_count += n_args_cmd_nd_values;
 // 	while (i < arg_count)
 // 	{
-// 		if (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT || tokens[*index].type == TOKEN_VARIABLE || tokens[*index].type == TOKEN_COMMAND || tokens[*index].type == TOKEN_BUILTIN))
+// 		if (tokens[*index].value && (tokens[*index].type == TKN_ARG || tokens[*index].type == TKN_VAR || tokens[*index].type == TKN_CMD || tokens[*index].type == TKN_BLTIN))
 // 		{
 // 			if (tokens[*index].value[0] == '\0')
 // 			{
@@ -429,7 +429,7 @@ t_node	*ft_parse_ast(t_token *tokens)
 // 			i++;
 // 			(*index)++;
 // 		}
-// 		else if ((tokens[*index].type == TOKEN_INPUT_REDIRECT || tokens[*index].type == TOKEN_OUTPUT_REDIRECT || tokens[*index].type == TOKEN_HEREDOC || tokens[*index].type == TOKEN_FILENAME))
+// 		else if ((tokens[*index].type == TKN_IN_RD || tokens[*index].type == TKN_OUT_RD || tokens[*index].type == TKN_HDOC || tokens[*index].type == TKN_FILE))
 // 			(*index)++;
 // 		else
 // 			break ;
@@ -482,8 +482,8 @@ t_cmd_helper	ft_init_cmd_helper(t_node *cmd_node)
 static void	ft_collect_arguments(t_token *tokens, int *index, t_cmd_helper *h)
 {
 	while (tokens[*index].value && 
-		(tokens[*index].type == TOKEN_ARGUMENT || 
-		tokens[*index].type == TOKEN_VARIABLE))
+		(tokens[*index].type == TKN_ARG || 
+		tokens[*index].type == TKN_VAR))
 	{
 		if (tokens[*index].value[0] == '\0')
 		{
@@ -512,18 +512,18 @@ static void	ft_collect_arguments(t_token *tokens, int *index, t_cmd_helper *h)
 static void	ft_handle_redirects(t_token *tokens, int *index, t_cmd_helper *h)
 {
 	while (tokens[*index].value && 
-		(tokens[*index].type != TOKEN_OPERATOR && 
-		tokens[*index].type != TOKEN_EXCEPT &&
-		tokens[*index].type != TOKEN_COMMAND))
+		(tokens[*index].type != TKN_PIPE && 
+		tokens[*index].type != TKN_EXCPT &&
+		tokens[*index].type != TKN_CMD))
 	{
-		if (tokens[*index].type == TOKEN_INPUT_REDIRECT || 
-			tokens[*index].type == TOKEN_OUTPUT_REDIRECT || 
-			tokens[*index].type == TOKEN_HEREDOC || 
-			tokens[*index].type == TOKEN_FILENAME)
+		if (tokens[*index].type == TKN_IN_RD || 
+			tokens[*index].type == TKN_OUT_RD || 
+			tokens[*index].type == TKN_HDOC || 
+			tokens[*index].type == TKN_FILE)
 		{
 			h->c_except++;
 			(*index)++;
-			if (tokens[*index].type == TOKEN_FILENAME)
+			if (tokens[*index].type == TKN_FILE)
 			{
 				h->c_except++;
 				(*index)++;
@@ -581,17 +581,17 @@ static void	ft_fill_cmd_node(t_token *tokens, int *index, t_node *cmd_node,
 		h->arg_count += h->n_args_cmd_nd_values;
 	while (h->i < h->arg_count)
 	{
-		if (tokens[*index].value && (tokens[*index].type == TOKEN_ARGUMENT
-			|| tokens[*index].type == TOKEN_VARIABLE 
-			|| tokens[*index].type == TOKEN_COMMAND
-			|| tokens[*index].type == TOKEN_BUILTIN))
+		if (tokens[*index].value && (tokens[*index].type == TKN_ARG
+			|| tokens[*index].type == TKN_VAR 
+			|| tokens[*index].type == TKN_CMD
+			|| tokens[*index].type == TKN_BLTIN))
 		{
 			ft_handle_individual_token(tokens, index, cmd_node, h);
 		}
-		else if ((tokens[*index].type == TOKEN_INPUT_REDIRECT
-				|| tokens[*index].type == TOKEN_OUTPUT_REDIRECT
-				|| tokens[*index].type == TOKEN_HEREDOC
-				|| tokens[*index].type == TOKEN_FILENAME))
+		else if ((tokens[*index].type == TKN_IN_RD
+				|| tokens[*index].type == TKN_OUT_RD
+				|| tokens[*index].type == TKN_HDOC
+				|| tokens[*index].type == TKN_FILE))
 			(*index)++;
 		else
 			break;

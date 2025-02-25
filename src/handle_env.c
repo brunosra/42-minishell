@@ -3,21 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   handle_env.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/18 18:22:59 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/25 03:20:49 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 extern volatile int	g_interrupt;
 
-int		ft_revalue_token_variable(t_minishell *ms);
+int		ft_revalue_tkn_var(t_minishell *ms);
 int		ft_check_balanced_quotes(char *str, int idx);
 char	**ft_duplicate_envp(char **envp);
-int		ft_check_if_expand(char *str, char *ptr, int heredoc);
+int	ft_check_if_expand(char *str, char *ptr, int heredoc);
+static int	ft_handle_quotes(char *quote_type, char c);
+static int	ft_check_expansion_conditions(char *str, int i, int heredoc, char quote_type);
+static int	ft_is_invalid_dollar_char(char c);
 int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
+static int	ft_replace_entire_str(char **value, char *env_value);
+int	ft_cleanup(char *to_free1, char *to_free2, int error);
+static char	*ft_create_replaced_str(char *start, char *env_value, char *end);
 int		ft_revalue_heredock_input(char **input, t_minishell *ms);
 char	*ft_get_env_value(const char *str, t_minishell *ms, char **key);
 char	*ft_get_env(const char *key, t_minishell *ms);
@@ -63,7 +69,7 @@ char	**ft_duplicate_envp(char **envp)
  **         0 on success.
  **         1 on error or if expansion fails.
  */
-int	ft_revalue_token_variable(t_minishell *ms)
+int	ft_revalue_tkn_var(t_minishell *ms)
 {
 	int		i;
 	char	*env_value;
@@ -79,7 +85,7 @@ int	ft_revalue_token_variable(t_minishell *ms)
 	while (ms->tokens[++i].value)
 	{
 		// ft_putstr_fd(ms->tokens[i].value, 1);
-		if (ms->tokens[i].type == TOKEN_VARIABLE || ms->tokens[i].type == TOKEN_COMMAND || ms->tokens[i].type == TOKEN_FILENAME || ms->tokens[i].type == TOKEN_ARGUMENT)
+		if (ms->tokens[i].type == TKN_VAR || ms->tokens[i].type == TKN_CMD || ms->tokens[i].type == TKN_FILE || ms->tokens[i].type == TKN_ARG)
 		{
 			ptr = ft_strchr(ms->tokens[i].value, '$');
 			while (ptr != NULL)
@@ -97,8 +103,8 @@ int	ft_revalue_token_variable(t_minishell *ms)
 						perror("");
 						return (1);
 					}
-					// if (ms->tokens[i].value[0] == '\0' && ms->tokens[i].type == TOKEN_COMMAND)
-					// 	ms->tokens[i].type = TOKEN_VARIABLE; // alaterar para TOKEN_EMPTY para ser ignorado no parsing. outra e perceber a quando do tokenixe type se a expansao da var e nula e se assim for passa a TOKEN_EMPTY...
+					// if (ms->tokens[i].value[0] == '\0' && ms->tokens[i].type == TKN_CMD)
+					// 	ms->tokens[i].type = TKN_VAR; // alaterar para TOKEN_EMPTY para ser ignorado no parsing. outra e perceber a quando do tokenixe type se a expansao da var e nula e se assim for passa a TOKEN_EMPTY...
 					ptr = ft_strchr(ms->tokens[i].value, '$');
 					if (!ptr)
 						break ;
@@ -156,6 +162,64 @@ char	*ft_get_env_value(const char *str, t_minishell *ms, char **key)
 	return (value);
 }
 
+// /**
+//  * @brief  Replaces a substring in a string with a new value.
+//  * 
+//  * @param  value      Pointer to the string to modify.
+//  * @param  key        Substring (key) to replace.
+//  * @param  ptr        Pointer to the position of the key in the string.
+//  * @param  env_value  New value to replace the key with.
+//  * @return int        Status of the replacement.
+//  **         0 on success.
+//  **         1 on error.
+//  */
+// int	ft_replace_str(char **value, char *key, char *ptr, char *env_value)
+// {
+// 	char	*new_value;
+// 	char	*start;
+// 	char	*end;
+// 	size_t	new_len;
+
+// 	if (!value || !*value || !key || !ptr || !env_value)
+// 		return (1);
+// 	if (ft_strlen(*value) == ft_strlen(key) + 1)
+// 	{
+// 		new_value = ft_strdup(env_value);
+// 		free(*value);
+// 		*value = new_value;
+// 		return (0);
+// 	}	
+// 	start = ft_substr(*value, 0, ptr - *value);
+// 	if (!start)
+// 		return (1);
+// 	// printf("%lu\n", ft_strlen(key));
+// 	end = ft_strdup(ptr + ft_strlen(key) + 1);
+// 	if (!end)
+// 	{
+// 		free(start);
+// 		return (1);
+// 	}
+// 	// printf("%lu\n", ft_strlen(start));
+// 	// printf("%lu\n", ft_strlen(env_value));
+// 	// printf("%lu\n", ft_strlen(end));
+// 	new_len = ft_strlen(start) + ft_strlen(env_value) + ft_strlen(end) + 1;
+// 	new_value = malloc(new_len);
+// 	if (!new_value)
+// 	{
+// 		free(start);
+// 		free(end);
+// 		return (1);
+// 	}
+// 	ft_strlcpy(new_value, start, new_len);
+// 	ft_strlcat(new_value, env_value, new_len);
+// 	ft_strlcat(new_value, end, new_len);
+// 	free(start);
+// 	free(end);
+// 	free(*value);
+// 	*value = new_value;
+// 	return (0);
+// }
+
 /**
  * @brief  Replaces a substring in a string with a new value.
  * 
@@ -169,50 +233,87 @@ char	*ft_get_env_value(const char *str, t_minishell *ms, char **key)
  */
 int	ft_replace_str(char **value, char *key, char *ptr, char *env_value)
 {
-	char	*new_value;
 	char	*start;
 	char	*end;
-	size_t	new_len;
+	char	*new_value;
 
 	if (!value || !*value || !key || !ptr || !env_value)
 		return (1);
 	if (ft_strlen(*value) == ft_strlen(key) + 1)
-	{
-		new_value = ft_strdup(env_value);
-		free(*value);
-		*value = new_value;
-		return (0);
-	}	
+		return (ft_replace_entire_str(value, env_value));
 	start = ft_substr(*value, 0, ptr - *value);
-	if (!start)
-		return (1);
-	// printf("%lu\n", ft_strlen(key));
 	end = ft_strdup(ptr + ft_strlen(key) + 1);
-	if (!end)
-	{
-		free(start);
-		return (1);
-	}
-	// printf("%lu\n", ft_strlen(start));
-	// printf("%lu\n", ft_strlen(env_value));
-	// printf("%lu\n", ft_strlen(end));
-	new_len = ft_strlen(start) + ft_strlen(env_value) + ft_strlen(end) + 1;
-	new_value = malloc(new_len);
+	if (!start || !end)
+		return (ft_cleanup(start, end, 1));
+	new_value = ft_create_replaced_str(start, env_value, end);
 	if (!new_value)
-	{
-		free(start);
-		free(end);
 		return (1);
-	}
-	ft_strlcpy(new_value, start, new_len);
-	ft_strlcat(new_value, env_value, new_len);
-	ft_strlcat(new_value, end, new_len);
-	free(start);
-	free(end);
 	free(*value);
 	*value = new_value;
 	return (0);
 }
+
+/**
+ * @brief  Creates a new string replacing the target substring.
+ * 
+ * @param  start      Start part of the string.
+ * @param  env_value  New value to insert.
+ * @param  end        End part of the string.
+ * @return char*      Newly allocated string with replacement.
+ */
+static char	*ft_create_replaced_str(char *start, char *env_value, char *end)
+{
+	char	*new_value;
+	size_t	new_len;
+
+	new_len = ft_strlen(start) + ft_strlen(env_value) + ft_strlen(end) + 1;
+	new_value = malloc(new_len);
+	if (!new_value)
+	{
+		ft_cleanup(start, end, 1);
+		return (NULL);
+	}
+	ft_strlcpy(new_value, start, new_len);
+	ft_strlcat(new_value, env_value, new_len);
+	ft_strlcat(new_value, end, new_len);
+	ft_cleanup(start, end, 0);
+	return (new_value);
+}
+
+/**
+ * @brief  Cleans up allocated memory in case of failure.
+ * 
+ * @param  start  Start part of the string.
+ * @param  end    End part of the string.
+ * @param  error  1 if returning an error, 0 otherwise.
+ * @return int    Always returns the error parameter.
+ */
+int	ft_cleanup(char *to_free1, char *to_free2, int error)
+{
+	if (to_free1)
+		free(to_free1);
+	if (to_free2)
+		free(to_free2);
+	return (error);
+}
+
+/**
+ * @brief  Replaces the entire string when it's fully equal to the key.
+ * 
+ * @param  value      Pointer to the string to modify.
+ * @param  env_value  New value to replace the key with.
+ * @return int        0 on success.
+ */
+static int	ft_replace_entire_str(char **value, char *env_value)
+{
+	char	*new_value;
+
+	new_value = ft_strdup(env_value);
+	free(*value);
+	*value = new_value;
+	return (0);
+}
+
 
 /**
  * @brief  Checks if the quotes in a string are balanced up to a specific index.
@@ -259,6 +360,60 @@ int	ft_check_balanced_quotes(char *str, int idx)
  **         2 for special case `$?`.
  **         0 if no expansion should occur.
  */
+// int	ft_check_if_expand(char *str, char *ptr, int heredoc)
+// {
+// 	int		i;
+// 	char	quote_type;
+
+// 	i = 0;
+// 	quote_type = '\0';
+// 	while (str[i])
+// 	{
+// 		if (str[i] == '"' || str[i] == '\'')
+// 		{
+// 			if (quote_type == str[i])
+// 				quote_type = '\0'; // Fecha aspas
+// 			else if (quote_type == '\0')
+// 				quote_type = str[i]; // Abre aspas
+// 			i++;
+// 			continue;
+// 		}
+// 		if (&str[i] == ptr) // Verifica se é o ponteiro para $
+// 		{
+// 			if (str[i + 1] == '\'' || str[i + 1] == '"')
+// 			{
+// 				if (ft_check_balanced_quotes(str, i))
+// 					return (1); // Expande para string vazia
+// 				return (0); // Aspas pertencem a pares separados
+// 			}
+// 			if (quote_type == '\'' && !heredoc) // Aspas simples: não expande
+// 				return (0);
+// 			if (str[i + 1] == '?') // Trata caso especial do $?
+// 				return (2);
+// 			if (!str[i + 1] || str[i + 1] == ' ' || str[i + 1] == '$' ||
+// 				str[i + 1] == '.' || str[i + 1] == ',' || str[i + 1] == '!' ||
+// 				str[i + 1] == '?' || str[i + 1] == ';' || str[i + 1] == ':' ||
+// 				str[i + 1] == '~' || str[i + 1] == '^' || str[i + 1] == '-' ||
+// 				str[i + 1] == '+' || str[i + 1] == '*' || str[i + 1] == '/') // Verifica caracteres que invalidam a expansão
+// 				return (0); // Retorna 0 para indicar que $ é literal
+// 			return (1);
+// 		}
+// 		i++;
+// 	}
+// 	return (0); // Retorna 0 se não encontrar $ para expandir
+// }
+
+/**
+ * @brief  Determines if a `$` should be expanded in a given string.
+ * 
+ * @param  str      The input string containing `$`.
+ * @param  ptr      Pointer to the `$` character in the string.
+ * @param  heredoc  Indicates if the function is being called inside a heredoc.
+ * @return int      Expansion status.
+ **         0 if the `$` should not be expanded.
+ **         1 if it should be replaced with an environment variable.
+ **         2 if it represents `$?` (exit status).
+ */
 int	ft_check_if_expand(char *str, char *ptr, int heredoc)
 {
 	int		i;
@@ -268,39 +423,77 @@ int	ft_check_if_expand(char *str, char *ptr, int heredoc)
 	quote_type = '\0';
 	while (str[i])
 	{
-		if (str[i] == '"' || str[i] == '\'')
+		if (ft_handle_quotes(&quote_type, str[i]))
 		{
-			if (quote_type == str[i])
-				quote_type = '\0'; // Fecha aspas
-			else if (quote_type == '\0')
-				quote_type = str[i]; // Abre aspas
 			i++;
 			continue;
 		}
-		if (&str[i] == ptr) // Verifica se é o ponteiro para $
-		{
-			if (str[i + 1] == '\'' || str[i + 1] == '"')
-			{
-				if (ft_check_balanced_quotes(str, i))
-					return (1); // Expande para string vazia
-				return (0); // Aspas pertencem a pares separados
-			}
-			if (quote_type == '\'' && !heredoc) // Aspas simples: não expande
-				return (0);
-			if (str[i + 1] == '?') // Trata caso especial do $?
-				return (2);
-			if (!str[i + 1] || str[i + 1] == ' ' || str[i + 1] == '$' ||
-				str[i + 1] == '.' || str[i + 1] == ',' || str[i + 1] == '!' ||
-				str[i + 1] == '?' || str[i + 1] == ';' || str[i + 1] == ':' ||
-				str[i + 1] == '~' || str[i + 1] == '^' || str[i + 1] == '-' ||
-				str[i + 1] == '+' || str[i + 1] == '*' || str[i + 1] == '/') // Verifica caracteres que invalidam a expansão
-				return (0); // Retorna 0 para indicar que $ é literal
-			return (1);
-		}
+		if (&str[i] == ptr)
+			return (ft_check_expansion_conditions(str, i, heredoc, quote_type));
 		i++;
 	}
-	return (0); // Retorna 0 se não encontrar $ para expandir
+	return (0);
 }
+
+/**
+ * @brief  Handles quote state changes in the input string.
+ * 
+ * @param  quote_type  Pointer to the current active quote type.
+ * @param  c          The current character in the string.
+ * @return int        1 if the character is a quote, 0 otherwise.
+ */
+static int	ft_handle_quotes(char *quote_type, char c)
+{
+	if (c == '"' || c == '\'')
+	{
+		if (*quote_type == c)
+			*quote_type = '\0'; // Fecha aspas
+		else if (*quote_type == '\0')
+			*quote_type = c; // Abre aspas
+		return (1);
+	}
+	return (0);
+}
+
+/**
+ * @brief  Determines whether a `$` should be expanded based on context.
+ * 
+ * @param  str        The input string.
+ * @param  i          Index of the `$` character.
+ * @param  heredoc    Whether the function is being called inside a heredoc.
+ * @param  quote_type Current active quote type.
+ * @return int        Expansion status.
+ */
+static int	ft_check_expansion_conditions(char *str, int i, int heredoc, char quote_type)
+{
+	if (str[i + 1] == '\'' || str[i + 1] == '"')
+	{
+		if (ft_check_balanced_quotes(str, i))
+			return (1);
+		return (0);
+	}
+	if (quote_type == '\'' && !heredoc) // Aspas simples: não expande
+		return (0);
+	if (str[i + 1] == '?') // Trata caso especial do `$?`
+		return (2);
+	if (ft_is_invalid_dollar_char(str[i + 1]))
+		return (0);
+	return (1);
+}
+
+/**
+ * @brief  Checks if the character after `$` is an invalid expansion character.
+ * 
+ * @param  c  The character after `$`.
+ * @return int  1 if the character is invalid for expansion, 0 otherwise.
+ */
+static int	ft_is_invalid_dollar_char(char c)
+{
+	return (!c || c == ' ' || c == '$' || c == '.' || c == ',' || c == '!' ||
+			c == '?' || c == ';' || c == ':' || c == '~' || c == '^' || c == '-' ||
+			c == '+' || c == '*' || c == '/');
+}
+
 
 /**
  * @brief  Replaces variables in heredoc input with their corresponding environment values.
@@ -415,13 +608,8 @@ int	ft_set_env(const char *key, const char *value, t_minishell *ms)
 	i = 0;
 	len = ft_strlen(key);
 	new_var = ft_strjoin(ft_strjoin(key, "="), value);
-	if (!key || !value || !ms || !ms->env.envp)
+	if (!key || !value || !ms || !ms->env.envp || !new_var)
 		return (1);
-	if (!new_var)
-	{
-		perror("ft_set_env: ft_strjoin");
-		return (1);
-	}
 	while (ms->env.envp[i])
 	{
 		if (!ft_strncmp(ms->env.envp[i], key, len) && ms->env.envp[i][len] == '=')

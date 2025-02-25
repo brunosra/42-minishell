@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/21 02:40:16 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 02:52:35 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -187,7 +187,7 @@ int	ft_handle_and_tokenize_input(t_minishell *ms)
 	if (ms->n_args == -1)
 		return (1);
 	ms->tokens = ft_tokenize_input(ms->input, ms->n_args, 0, 0);
-	ft_revalue_token_variable(ms);
+	ft_revalue_tkn_var(ms);
 	return (0);
 }
 
@@ -269,14 +269,14 @@ void ft_find_stuck_cats(t_minishell *ms, t_node *node)
 	current = node;
 	if (!current)
 		return;
-	if (current->token->type == TOKEN_COMMAND)
+	if (current->token->type == TKN_CMD)
 	{
 		if (current->cmd_ready[1] == NULL
 		&& (!ft_strcmp(current->cmd_ready[0], "cat")
 		|| !ft_strcmp(current->cmd_ready[0], "/bin/cat"))
-		&& current->prev && current->prev->token->type == TOKEN_OPERATOR 
+		&& current->prev && current->prev->token->type == TKN_PIPE 
 		&& (current->prev->left == current || (current->prev->prev
-		&& current->prev->prev->token->type == TOKEN_OPERATOR
+		&& current->prev->prev->token->type == TKN_PIPE
 		&& current->prev->right == current)))
 			ms->c_stuck_cats++;
 	}
