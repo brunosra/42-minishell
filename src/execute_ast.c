@@ -6,12 +6,11 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 09:31:37 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 16:43:34 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-extern volatile int	g_interrupt;
 
 int	ft_execute_ast(t_node *node, t_minishell *ms);
 static int	ft_handle_syntax_error(t_node *node, t_minishell *ms);
@@ -1996,7 +1995,7 @@ static void	ft_multiple_heredoc_child(t_node *node, t_minishell *ms, int *i)
 	input = NULL;
 	ft_set_heredoc_signals();
 	close(ms->pipefd[0]);
-	while (!g_interrupt)
+	while (42)
 	{
 		input = readline("> ");
 		if (!input)

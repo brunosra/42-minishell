@@ -6,12 +6,11 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:39:44 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/19 16:59:38 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 16:13:47 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-extern volatile int	g_interrupt;
 
 int			ft_count_args(char *str);
 int			ft_skip_operator(const char *str, int i);

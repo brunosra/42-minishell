@@ -3,17 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   misc_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/27 11:32:18 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/23 09:07:09 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/25 16:42:11 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 // TODO: Decide if we want to delete or not this file afterwards
 
 #include "../include/minishell.h"
-extern volatile int	g_interrupt;
+
+void	ft_print_str_arr(char **arr);
+void	ft_swap(char **a, char **b);
+void	ft_free_str_arr(char **arr);
 
 /**
  * @brief 		Prints an array of Strings

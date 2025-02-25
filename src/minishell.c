@@ -6,14 +6,14 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:31:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 02:52:35 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 17:27:04 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+
 // TODO: nao podemos usar esta variavel global para ter os sinais.
 // TODO: Somente podemos usar um int para receber. nao podemos usar sig_atomic_t
-volatile int	g_interrupt;
 
 int	main(int argc, char **argv, char **envp);
 void ft_init_ms(t_minishell *ms);
@@ -24,6 +24,7 @@ int	ft_handle_and_tokenize_input(t_minishell *ms);
 int	ft_process_input_and_execute(t_minishell *ms);
 void ft_clean_stuck_cats(t_minishell *ms);
 void ft_find_stuck_cats(t_minishell *ms, t_node *node);
+void ft_create_prompt(t_minishell *ms);
 
 /**
  * @brief  Initialize the minishell structure with default values.
@@ -118,13 +119,13 @@ void ft_create_prompt(t_minishell *ms)
  */
 int	ft_readline(t_minishell *ms)
 {
-	// ft_create_prompt(ms);
+	ft_create_prompt(ms);
 	ms->swap_output_redirects = false;
 	ms->swap_input_redirects = false;
 	ms->input = readline(ms->prompt);
 	if (ms->input == NULL)
 	{
-		// write(STDOUT_FILENO, "exit\n", 5);
+		write(STDOUT_FILENO, "exit\n", 5);
 		return (1) ;
 	}
 	if (ms->input)

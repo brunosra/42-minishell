@@ -6,12 +6,11 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 02:43:21 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 16:40:37 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-extern volatile int	g_interrupt;
 
 t_token			*ft_tokenize_input(char *str, int n_args, int i, int j);
 int				ft_tokenize(char *str, int *i, t_token *tokens, int *j);

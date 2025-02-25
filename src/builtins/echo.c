@@ -3,16 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/31 17:18:39 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/18 21:12:14 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/25 16:15:55 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-extern volatile int	g_interrupt;
 static int	ft_check_valid_echo_opt(char *opt);
 void		ft_builtin_echo(char **args, t_minishell *ms);
 

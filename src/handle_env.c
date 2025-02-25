@@ -6,12 +6,11 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 18:50:15 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 09:36:04 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 16:13:44 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-extern volatile int	g_interrupt;
 
 int		ft_revalue_tkn_var(t_minishell *ms);
 static char	*ft_process_token_expansion(t_minishell *ms, t_token *token, char *ptr);

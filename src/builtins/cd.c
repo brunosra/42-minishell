@@ -3,25 +3,29 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/22 18:13:43 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/25 16:31:45 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-extern volatile int	g_interrupt;
+void	ft_builtin_cd(char **args, t_minishell *ms);
+static void	ft_cd_set_resolved_path(char **args, char *curpwd, char *res_p,
+	t_minishell *ms);
+void	ft_resolve_rel_p(const char *base_p, const char *rel_p, char *res_p);
+static void	ft_resolve_tilde(const char *rel_p, char *tmp_p);
+static char	*ft_norm_pth(char *tmp_p, char *norm_p);
 
 /**
  * @brief 			Normatizes path
  * 
- * @param tmp_p		temporary path from main function
- * @param norm_p 	normatized path pointer from main function
- * @return char* 	pointer to the normatized path
+ * @param tmp_p		Temporary path from main function.
+ * @param norm_p 	Normatized path pointer from main function.
+ * @return char* 	Pointer to the normatized path.
  */
-
 static char	*ft_norm_pth(char *tmp_p, char *norm_p)
 {
 	char		*token;
@@ -51,6 +55,13 @@ static char	*ft_norm_pth(char *tmp_p, char *norm_p)
 	return (norm_p);
 }
 
+/**
+ * @brief  Resolves the tilde (`~`) expansion in a relative path.
+ * 
+ * @param  rel_p  The relative path containing `~` at the beginning.
+ * @param  tmp_p  Buffer to store the expanded path.
+ * @return void   Modifies `tmp_p` in place with the resolved path.
+ */
 static void	ft_resolve_tilde(const char *rel_p, char *tmp_p)
 {
 	if (rel_p[1] == '\0')
@@ -93,6 +104,15 @@ void	ft_resolve_rel_p(const char *base_p, const char *rel_p, char *res_p)
 	res_p[PATH_MAX - 1] = '\0';
 }
 
+/**
+ * @brief  Resolves the target path for the `cd` command based on arguments.
+ * 
+ * @param  args    Command arguments.
+ * @param  curpwd  Current working directory.
+ * @param  res_p   Buffer to store the resolved path.
+ * @param  ms      Pointer to the minishell structure.
+ * @return void    Updates `res_p` with the resolved path.
+ */
 static void	ft_cd_set_resolved_path(char **args, char *curpwd, char *res_p,
 				t_minishell *ms)
 {
@@ -116,6 +136,13 @@ static void	ft_cd_set_resolved_path(char **args, char *curpwd, char *res_p,
 	}
 }
 
+/**
+ * @brief  Implements the `cd` built-in command, updating environment variables.
+ * 
+ * @param  args  Command arguments.
+ * @param  ms    Pointer to the minishell structure.
+ * @return void  Changes the directory and updates environment variables.
+ */
 void	ft_builtin_cd(char **args, t_minishell *ms)
 {
 	char	*curpwd;

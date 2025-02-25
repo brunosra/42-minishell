@@ -3,16 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/18 19:05:50 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/25 16:11:54 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-extern volatile int	g_interrupt;
 static int	ft_check_valid_varname(char *arg);
 static int	ft_check_option(char *arg);
 void		ft_builtin_unset(char **args, t_minishell *ms);

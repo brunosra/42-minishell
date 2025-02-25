@@ -6,12 +6,11 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:58:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 02:27:34 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 16:14:30 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-extern volatile int	g_interrupt;
 
 t_node	*ft_parse_ast(t_token *tokens);
 static void	ft_process_token(t_token *tokens, int *i, t_node **current,
