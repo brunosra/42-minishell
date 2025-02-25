@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 17:28:44 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 22:52:14 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,16 +29,13 @@ void	ft_signal_handler(int sig)
 	if (sig == SIGINT) // Ctrl-C
 	{
 		write(STDERR_FILENO, "\n", 1);
+		ft_set_exit_code(ms, 130); // Atualiza o exit_code antes de recriar o prompt
+		// ft_create_prompt(ms); // Atualiza o prompt com o novo exit_code / nao funcioma! nao atualiza novo prompt para 130!
 		rl_replace_line("", 0);
 		rl_on_new_line();
-		rl_redisplay();
-		ft_set_exit_code(ms, 130); // Código típico para interrupções via Ctrl-C
+		rl_redisplay(); // Agora reflete o novo prompt atualizado
 	}
-/* 	else if (sig == SIGQUIT) // Ctrl-'\'
-	{
-		write(STDOUT_FILENO, "\b\b  \b\b", 6); // Remove o visual `^\`
-	}
- */}
+}
 
 t_minishell	*ft_ms_struct(t_minishell *ms, int flag)
 {
@@ -102,28 +99,12 @@ void	ft_set_heredoc_signals(void)
 
 void	ft_signal_heredoc_handler(int sig)
 {
-// /* 	t_minishell	*ms;
-
-// 	ms = ft_ms_struct(NULL, 1);
-//  */	if (sig == SIGINT) // Ctrl-C no heredoc
-// 	{
-// 		g_interrupt = 1;
-// 		write(STDOUT_FILENO, "\n", 1);
-// /* 		close(ms->pipefd[0]); // Fecha o arquivo do heredoc
-//  */ 	//	free(ms->input); // Libera recursos
-// 	//	ft_free_ast(ms->ast_root);
-// 		exit(130); // Sai com o código 130
-// 	}
 	t_minishell	*ms;
 
 	ms = ft_ms_struct(NULL, 1);
 	if (sig == SIGINT) // Ctrl-C
 	{
 		write(STDERR_FILENO, "\n", 1);
-		// rl_replace_line("", 0);
-		// rl_on_new_line();
-		// rl_redisplay();
-		// close(ms->pipefd[0]);
 		ft_set_exit_code(ms, 130);
 		exit(130); // Código típico para interrupções via Ctrl-C
 	}

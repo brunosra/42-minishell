@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 09:29:40 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 22:42:22 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,6 +130,7 @@ typedef struct s_cmd_helper
 void ft_init_ms(t_minishell *ms);
 int ft_save_stdin_stdout(t_minishell *ms);
 int	ft_readline(t_minishell *ms);
+void ft_create_prompt(t_minishell *ms);
 void ft_close_stdin_stdout(t_minishell *ms);
 int	ft_process_input_and_execute(t_minishell *ms);
 int	ft_handle_and_tokenize_input(t_minishell *ms);
