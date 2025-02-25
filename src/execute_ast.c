@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 04:37:41 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 09:31:37 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -361,7 +361,7 @@ void	ft_swap_redirects_values(t_node *node, t_type type)
 // 		if (temp)
 // 		{
 // 			if (node->right && node->right->token->old_value[0] != '"' && node->right->token->old_value[0] != '\'')
-// 				ft_revalue_heredock_input(&temp, ms);
+// 				ft_revalue_heredoc_input(&temp, ms);
 // 			write(ms->pipefd[1], temp, ft_strlen(temp));
 // 		}
 // 		close(ms->pipefd[1]);
@@ -551,7 +551,7 @@ static void	ft_write_heredoc(t_minishell *ms, t_node *node, char *temp)
 	{
 		if (node->right && node->right->token->old_value[0] != '"'
 			&& node->right->token->old_value[0] != '\'')
-			ft_revalue_heredock_input(&temp, ms);
+			ft_revalue_heredoc_input(&temp, ms);
 		write(ms->pipefd[1], temp, ft_strlen(temp));
 		free(temp);
 	}
@@ -1833,7 +1833,7 @@ static int	ft_check_file_access(char *filepath, int mode)
 //             if (ms->temp && ms->c_multi_heredocs == i + 1)
 //             {
 //                 new_temp = ft_strjoin_free(ms->temp, "\n", 1, 0);
-// 				ft_revalue_heredock_input(&new_temp, ms);
+// 				ft_revalue_heredoc_input(&new_temp, ms);
 //                 ft_putstr_fd(new_temp, ms->pipefd[1]);
 //                 free(new_temp);
 //             }
@@ -2054,7 +2054,7 @@ static void	ft_finalize_heredoc(t_minishell *ms, int *i)
 	if (ms->temp && ms->c_multi_heredocs == *i + 1)
 	{
 		new_temp = ft_strjoin_free(ms->temp, "\n", 1, 0);
-		ft_revalue_heredock_input(&new_temp, ms);
+		ft_revalue_heredoc_input(&new_temp, ms);
 		ft_putstr_fd(new_temp, ms->pipefd[1]);
 		free(new_temp);
 	}

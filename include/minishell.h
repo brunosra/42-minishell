@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 02:52:35 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/25 09:29:40 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,8 +220,8 @@ int		ft_check_balanced_quotes(char *str, int idx);
 char	**ft_duplicate_envp(char **envp);
 int		ft_check_if_expand(char *str, char *ptr, int heredoc);
 int		ft_replace_str(char **value, char *key, char *ptr, char *env_value);
-char	*ft_get_env_value(const char *str, t_minishell *ms, char **key);
-int		ft_revalue_heredock_input(char **input, t_minishell *ms);
+char	*ft_get_env_value(const char *str, t_minishell *ms, char **key, bool heredoc);
+int		ft_revalue_heredoc_input(char **input, t_minishell *ms);
 char	*ft_get_env(const char *key, t_minishell *ms);
 int		ft_set_env(const char *key, const char *value, t_minishell *ms);
 int		ft_unset_env(const char *key, t_minishell *ms);
