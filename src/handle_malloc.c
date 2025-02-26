@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 22:18:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 16:13:50 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/26 04:19:55 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 void	ft_free_tokens(t_token *tokens);
 void	ft_free_ast(t_node *root);
 void	ft_free_split(char **str);
-char	*ft_strjoin_free(char *s1, char *s2, int free_s1, int free_s2); // mover para utils ou libft
 /* void	ft_free_env(t_env *env); */
 
 /**
@@ -98,36 +97,37 @@ void ft_free_split(char **str)
  * @return char*     Pointer to the newly allocated joined string.
  **         NULL if memory allocation fails.
  */
-char	*ft_strjoin_free(char *s1, char *s2, int free_s1, int free_s2) // mover para utils ou libft
-{
-	char	*joined;
-	size_t	len1;
-	size_t	len2;
+// char	*ft_strjoin_free(char *s1, char *s2, int free_s1, int free_s2) // mover para utils ou libft
+// {
+// 	char	*joined;
+// 	size_t	len1;
+// 	size_t	len2;
 
-	len1 = 0;
-	len2 = 0;
-	if (!s1 && !s2)
-		return (NULL);
-	if (s1)
-		len1 = ft_strlen(s1);
-	if (s2)
-		len2 = ft_strlen(s2);
-	joined = malloc(len1 + len2 + 1);
-	if (!joined)
-	{
-		if (free_s1 && s1)
-			free(s1);
-		if (free_s2 && s2)
-			free(s2);
-		return (NULL);
-	}
-	if (s1)
-		ft_strlcpy(joined, s1, len1 + 1);
-	if (s2)
-		ft_strlcat(joined, s2, len1 + len2 + 1);
-	if (free_s1 && s1)
-		free(s1);
-	if (free_s2 && s2)
-		free(s2);
-	return (joined);
-}
+// 	len1 = 0;
+// 	len2 = 0;
+// 	if (!s1 && !s2)
+// 		return (NULL);
+// 	if (s1)
+// 		len1 = ft_strlen(s1);
+// 	if (s2)
+// 		len2 = ft_strlen(s2);
+// 	joined = malloc(len1 + len2 + 1);
+// 	if (!joined)
+// 	{
+// 		if (free_s1 && s1)
+// 			free(s1);
+// 		if (free_s2 && s2)
+// 			free(s2);
+// 		return (NULL);
+// 	}
+// 	if (s1)
+// 		ft_strlcpy(joined, s1, len1 + 1);
+// 	if (s2)
+// 		ft_strlcat(joined, s2, len1 + len2 + 1);
+// 	if (free_s1 && s1)
+// 		free(s1);
+// 	if (free_s2 && s2)
+// 		free(s2);
+// 	return (joined);
+// }
+
