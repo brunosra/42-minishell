@@ -3,22 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   errors.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 22:18:23 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/18 21:05:46 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/26 08:07:16 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /**
  * @brief Error Codes:
- * C error codes: https://manpages.ubuntu.com/manpages/noble/man3/sysexits.h.3head.html
+ * C error codes:
+ * https://manpages.ubuntu.com/manpages/noble/man3/sysexits.h.3head.html
  * Bash Standard Errors: https://tldp.org/LDP/abs/html/exitcodes.html
  */
 
-# include <sysexits.h>
+#include <sysexits.h>
 
-#ifndef	 ERRORS_MS_H
+#ifndef ERRORS_MS_H
 # define ERRORS_MS_H
 
 // Bash Standard Errors
