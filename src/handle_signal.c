@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 22:52:14 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/26 04:48:05 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,14 @@ void		ft_signal_heredoc_handler(int sig);
 
 // void	ft_check_signals();
 
+/**
+ * @brief Handles the reception of system signals (SIGINT).
+ * 
+ * This function updates the shell's exit code upon receiving Ctrl-C (SIGINT),
+ * clears the input line, and redisplays the prompt.
+ * 
+ * @param sig  The received signal (expected SIGINT).
+ */
 void	ft_signal_handler(int sig)
 {
 	t_minishell	*ms;
@@ -37,6 +45,16 @@ void	ft_signal_handler(int sig)
 	}
 }
 
+/**
+ * @brief Manages the global minishell structure.
+ * 
+ * If the flag is set, it returns the stored pointer. Otherwise, it updates
+ * the stored pointer to the given minishell structure.
+ * 
+ * @param ms    Pointer to the minishell structure (if updating).
+ * @param flag  If nonzero, retrieves the stored pointer.
+ * @return t_minishell*  The global minishell structure pointer.
+ */
 t_minishell	*ft_ms_struct(t_minishell *ms, int flag)
 {
 	static t_minishell	*ptr;
