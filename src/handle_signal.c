@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 04:48:05 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/26 04:51:44 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,12 @@ t_minishell	*ft_ms_struct(t_minishell *ms, int flag)
 }
  */
 
+ /**
+ * @brief Configures signal handling for the main minishell process.
+ * 
+ * This function ensures SIGINT is properly handled to update the prompt,
+ * while ignoring SIGQUIT.
+ */
 void	ft_set_main_signals(void)
 {
 	struct sigaction sa;
@@ -103,18 +109,37 @@ void	ft_set_main_signals(void)
 	signal(SIGQUIT, SIG_IGN);
 }
 
+/**
+ * @brief Configures signal handling for child processes.
+ * 
+ * In a forked process, SIGINT and SIGQUIT are ignored to prevent interruption
+ * unless explicitly handled in execution.
+ */
 void	ft_set_fork_signals(void)
 {
 	signal(SIGINT, SIG_IGN); 
 	signal(SIGQUIT, SIG_IGN); // Se for para executar alterar para SIG_DFL
 } 
 
+/**
+ * @brief Configures signal handling for heredoc input mode.
+ * 
+ * Ensures SIGINT interrupts the heredoc properly, while SIGQUIT is ignored.
+ */
 void	ft_set_heredoc_signals(void)
 {
 	signal(SIGINT, ft_signal_heredoc_handler);
 	signal(SIGQUIT, SIG_IGN); // Ignora Ctrl-'\'
 }
 
+/**
+ * @brief Handles SIGINT inside a heredoc.
+ * 
+ * When Ctrl-C is pressed during a heredoc input, this function interrupts
+ * input capture and exits with code 130.
+ * 
+ * @param sig  The received signal (expected SIGINT).
+ */
 void	ft_signal_heredoc_handler(int sig)
 {
 	t_minishell	*ms;
