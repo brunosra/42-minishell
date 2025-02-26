@@ -6,36 +6,17 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:39:44 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 16:13:47 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/26 01:12:42 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
 int			ft_count_args(char *str);
-int			ft_skip_operator(const char *str, int i);
 int			ft_check_quotes(char *str);
 int			ft_handle_quotes(char *str, int i, int *start, int *end);
 static int	ft_skip_and_process(char *str, int i, char quote_type);
 int			ft_handle_argument(char *str, int i);
-
-/**
- * @brief  Skip an operator in the input string, advancing the index.
- * 
- * @param  str  Input string.
- * @param  i    Current index in the string.
- * @return int  Updated index after skipping the operator.
- */
-int	ft_skip_operator(const char *str, int i)
-{
-	if (str[i] == '|' || str[i] == '<' || str[i] == '>' || str[i] == ';' || str[i] == '&')
-	{
-		i++;
-		if (str[i + 1] && (str[i] == '<' || str[i] == '>' || str[i] == '&'))
-			i++;
-	}
-	return (i);
-}
 
 /**
  * @brief  Count the number of arguments in the input string.

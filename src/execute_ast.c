@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 18:54:54 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 16:43:34 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/26 03:13:04 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,9 @@ static void	ft_handle_cmd_exit_status(t_node *node, t_minishell *ms);
 static void	ft_execute_child_process(t_node *node, t_minishell *ms);
 static int	ft_execute_external(t_node *node, t_minishell *ms);
 static void	ft_execute_builtin(t_node *node, t_minishell *ms);
-int	ft_find_executable(t_minishell *ms, char *cmd);
+int			ft_find_executable(t_minishell *ms, char *cmd);
+static char	**ft_get_path_dirs(t_minishell *ms);
+static int	ft_build_executable_path(t_minishell *ms, char *dir, char *cmd);
 int	ft_invalid_right_token_value(char *value);
 int	ft_is_valid_file(char *filepath, int mode);
 static int	ft_check_file_access(char *filepath, int mode);
@@ -1552,47 +1554,122 @@ void	ft_create_files(t_node *node)
 		ft_create_files(node->left);
 }
 
+// /**
+//  * @brief  Searches for an executable file in the system PATH.
+//  * 
+//  * @param  ms   Pointer to the minishell structure containing environment variables.
+//  * @param  cmd  Command to search for in the PATH.
+//  * @return int  Status of the search.
+//  **         0 if the executable is found.
+//  **         127 if not found or if PATH is invalid.
+//  */
+// int	ft_find_executable(t_minishell *ms, char *cmd)
+// {
+// 	int	i;
+
+// 	i = 0;
+// 	ms->env.env_paths = getenv("PATH");
+// 	if (!ms->env.env_paths)
+// 		return (127); // PATH não encontrado
+// 	ms->env.paths = ft_split(ms->env.env_paths, ':');
+// 	if (!ms->env.paths)
+// 		return (127); // Falha ao dividir o PATH
+// 	while (ms->env.paths[i])
+// 	{
+// 		ms->env.full_path = malloc(ft_strlen(ms->env.paths[i]) + ft_strlen(cmd) + 2);
+// 		if (!ms->env.full_path)
+// 		{
+// 			ft_free_split(ms->env.paths);
+// 			return (127);
+// 		}
+// 		ft_strcpy(ms->env.full_path, ms->env.paths[i]);
+// 		ft_strcat(ms->env.full_path, "/");
+// 		ft_strcat(ms->env.full_path, cmd);
+// 		if (access(ms->env.full_path, X_OK) == 0)
+// 		{
+// 			ft_free_split(ms->env.paths);
+// 			return (0); // Comando encontrado
+// 		}
+// 		free(ms->env.full_path);
+// 		i++;
+// 	}
+// 	ft_free_split(ms->env.paths);
+// 	return (127); // Comando não encontrado
+// }
+
 /**
  * @brief  Searches for an executable file in the system PATH.
+ * 
+ * This function retrieves the system's PATH environment variable, splits it 
+ * into directories, and iterates through them to check if the given command 
+ * exists and is executable. If found, it updates the `full_path` in `ms->env`.
  * 
  * @param  ms   Pointer to the minishell structure containing environment variables.
  * @param  cmd  Command to search for in the PATH.
  * @return int  Status of the search.
- **         0 if the executable is found.
- **         127 if not found or if PATH is invalid.
+ **         0 if the executable is found and updated in `ms->env.full_path`.
+ **         127 if not found or if the PATH is invalid.
  */
 int	ft_find_executable(t_minishell *ms, char *cmd)
 {
 	int	i;
+	int	result;
 
-	i = 0;
-	ms->env.env_paths = getenv("PATH");
-	if (!ms->env.env_paths)
-		return (127); // PATH não encontrado
-	ms->env.paths = ft_split(ms->env.env_paths, ':');
+	ms->env.paths = ft_get_path_dirs(ms);
 	if (!ms->env.paths)
-		return (127); // Falha ao dividir o PATH
+		return (127);
+	i = 0;
 	while (ms->env.paths[i])
 	{
-		ms->env.full_path = malloc(ft_strlen(ms->env.paths[i]) + ft_strlen(cmd) + 2);
-		if (!ms->env.full_path)
-		{
-			ft_free_split(ms->env.paths);
-			return (127);
-		}
-		ft_strcpy(ms->env.full_path, ms->env.paths[i]);
-		ft_strcat(ms->env.full_path, "/");
-		ft_strcat(ms->env.full_path, cmd);
-		if (access(ms->env.full_path, X_OK) == 0)
-		{
-			ft_free_split(ms->env.paths);
-			return (0); // Comando encontrado
-		}
-		free(ms->env.full_path);
+		result = ft_build_executable_path(ms, ms->env.paths[i], cmd);
+		if (result == 0)
+			return (0);
 		i++;
 	}
 	ft_free_split(ms->env.paths);
-	return (127); // Comando não encontrado
+	return (127);
+}
+
+/**
+ * @brief  Retrieves and splits the system PATH into directories.
+ * 
+ * @param  ms   Pointer to the minishell structure.
+ * @return char** Array of directories in PATH or NULL if not found.
+ */
+static char	**ft_get_path_dirs(t_minishell *ms)
+{
+	ms->env.env_paths = getenv("PATH");
+	if (!ms->env.env_paths)
+		return (NULL);
+	return (ft_split(ms->env.env_paths, ':'));
+}
+
+/**
+ * @brief  Constructs the full path for an executable and checks if it exists.
+ * 
+ * @param  ms   Pointer to the minishell structure.
+ * @param  dir  Directory from PATH to check.
+ * @param  cmd  Command name to append to the directory.
+ * @return int  0 if the executable is found, 127 otherwise.
+ */
+static int	ft_build_executable_path(t_minishell *ms, char *dir, char *cmd)
+{
+	ms->env.full_path = malloc(ft_strlen(dir) + ft_strlen(cmd) + 2);
+	if (!ms->env.full_path)
+	{
+		ft_free_split(ms->env.paths);
+		return (127);
+	}
+	ft_strcpy(ms->env.full_path, dir);
+	ft_strcat(ms->env.full_path, "/");
+	ft_strcat(ms->env.full_path, cmd);
+	if (access(ms->env.full_path, X_OK) == 0)
+	{
+		ft_free_split(ms->env.paths);
+		return (0);
+	}
+	free(ms->env.full_path);
+	return (127);
 }
 
 /**
