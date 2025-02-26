@@ -1,0 +1,45 @@
+# Nome do executável
+NAME = minishell
+
+# Diretórios
+SRC_DIR = src
+OBJ_DIR = obj
+INC_DIR = include
+LIBFT_DIR = libft
+
+# Nome da biblioteca
+LIBFT = $(LIBFT_DIR)/libft.a
+
+# Compilador e flags
+CC = gcc
+CFLAGS = -g -Wall -Wextra -Werror -I $(INC_DIR)
+LDFLAGS = -L$(LIBFT_DIR) -lft -L. -lreadline
+
+# Buscar todos os arquivos .c dentro de src e seus subdiretórios
+SRCS = $(shell find $(SRC_DIR) -type f -name "*.c")
+
+# Regra principal
+all: $(LIBFT) $(NAME)
+
+# Criação do executável principal
+$(NAME): $(LIBFT) $(SRCS)
+	$(CC) $(CFLAGS) $(SRCS) $(LIBFT) $(LDFLAGS) -o $(NAME)
+
+# Compilação da biblioteca libft
+$(LIBFT):
+	$(MAKE) -C $(LIBFT_DIR)
+
+# Limpeza de arquivos objetos
+clean:
+	$(MAKE) -C $(LIBFT_DIR) clean
+
+# Limpeza total (inclui biblioteca e executável)
+fclean: clean
+	$(MAKE) -C $(LIBFT_DIR) fclean
+	rm -f $(NAME)
+
+# Recompilar tudo
+re: fclean all
+
+# Declarando que não são arquivos reais
+.PHONY: all clean fclean re

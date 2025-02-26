@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:49:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 16:40:37 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/26 07:22:36 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static t_type	ft_check_redirection_and_operator(char *str, t_type prev_type,
 static t_type	ft_check_redirection(char *str);
 static t_type	ft_check_operator_or_exception(char *str);
 static t_type	ft_check_variable(char *str);
-int				ft_verify_variable_value(char *str);
+int				ft_verify_variable_value(char *str, int i);
 char			*ft_revalue_quoted_value(char *value);
 static char		*ft_process_quoted_segment(char *value, int *i);
 static char		*ft_process_unquoted_segment(char *value, int *i);
@@ -225,7 +225,7 @@ static t_type	ft_check_variable(char *str)
 {
 	if (str[0] == '$')
 		return (TKN_VAR);
-	if (ft_verify_variable_value(str))
+	if (ft_verify_variable_value(str, 0))
 		return (TKN_VAR);
 	return (TKN_ARG);
 }
@@ -345,17 +345,16 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
  * @brief  Verifies whether a variable within a string should be expanded.
  * 
  * @param  str  Input string.
+ * @param  i  Index.
  * @return int
  **        1 if the variable should be expanded.
  **        0 otherwise.
  */
-int	ft_verify_variable_value(char *str)
+int	ft_verify_variable_value(char *str, int i)
 {
-	int		i;
 	char	quote_type;
 	int		expand;
 
-	i = 0;
 	quote_type = '\0';
 	expand = 0;
 	while (str[i])

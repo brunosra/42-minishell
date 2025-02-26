@@ -6,20 +6,17 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 04:51:44 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
-void		ft_signal_handler(int sig);
-t_minishell	*ft_ms_struct(t_minishell *ms, int flag);
-void		ft_set_main_signals(void);
-void		ft_set_fork_signals(void);
-void		ft_set_heredoc_signals(void);
-void		ft_signal_heredoc_handler(int sig);
-
-// void	ft_check_signals();
+void	ft_signal_handler(int sig);
+void	ft_set_main_signals(void);
+void	ft_set_fork_signals(void);
+void	ft_set_heredoc_signals(void);
+void	ft_signal_heredoc_handler(int sig);
 
 /**
  * @brief Handles the reception of system signals (SIGINT).
@@ -34,63 +31,16 @@ void	ft_signal_handler(int sig)
 	t_minishell	*ms;
 
 	ms = ft_ms_struct(NULL, 1);
-	if (sig == SIGINT) // Ctrl-C
+	if (sig == SIGINT)
 	{
 		write(STDERR_FILENO, "\n", 1);
 		ft_set_exit_code(ms, 130); // Atualiza o exit_code antes de recriar o prompt
-		// ft_create_prompt(ms); // Atualiza o prompt com o novo exit_code / nao funcioma! nao atualiza novo prompt para 130!
+		// ft_create_prompt(ms); // nao funcioma! nao atualiza novo prompt para 130!
 		rl_replace_line("", 0);
 		rl_on_new_line();
-		rl_redisplay(); // Agora reflete o novo prompt atualizado
+		rl_redisplay(); 
 	}
 }
-
-/**
- * @brief Manages the global minishell structure.
- * 
- * If the flag is set, it returns the stored pointer. Otherwise, it updates
- * the stored pointer to the given minishell structure.
- * 
- * @param ms    Pointer to the minishell structure (if updating).
- * @param flag  If nonzero, retrieves the stored pointer.
- * @return t_minishell*  The global minishell structure pointer.
- */
-t_minishell	*ft_ms_struct(t_minishell *ms, int flag)
-{
-	static t_minishell	*ptr;
-
-	if (flag)
-		return (ptr); // Retorna o ponteiro armazenado
-	ptr = ms; // Atualiza o ponteiro
-	return (ptr);
-}
-
-/* void	ft_check_signals()
-{
-	if (g_sig_received == 1) // Ctrl-C
-	{
-		write(2, "\n", 1);
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		rl_redisplay();
-		g_sig_received = 0; // Reseta o estado
-		// ms->exit_code = 130);
-		exit(139);             // Reexibe o prompt
-	}
-	else if (g_sig_received == 2) // Ctrl-D
-	{
-		write(STDOUT_FILENO, "exit\n", 5);
-		exit(0); // Sai do shell
-	}
-	else if (g_sig_received == 0)
-	{
-		g_sig_received = 0; // Não faz nada, mas reseta o estado
-		write(STDOUT_FILENO, "\b\b  \b\b", 6); // Remove o `^\` visual
-
-	}
-	// Caso SIGQUIT (Ctrl-\), g_sig_received será 0, e não há ação.
-}
- */
 
  /**
  * @brief Configures signal handling for the main minishell process.
@@ -145,10 +95,10 @@ void	ft_signal_heredoc_handler(int sig)
 	t_minishell	*ms;
 
 	ms = ft_ms_struct(NULL, 1);
-	if (sig == SIGINT) // Ctrl-C
+	if (sig == SIGINT)
 	{
 		write(STDERR_FILENO, "\n", 1);
 		ft_set_exit_code(ms, 130);
-		exit(130); // Código típico para interrupções via Ctrl-C
+		exit(130);
 	}
 }
