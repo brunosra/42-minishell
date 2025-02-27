@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   1_handle_heredoc.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:08:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 00:49:06 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:37:18 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 int			ft_handle_heredoc(t_node *node, t_minishell *ms);
-int			ft_heredoc_syntax_error(t_minishell *ms);
+int			ft_heredoc_syntax_error(void);
 int			ft_handle_heredoc_fork_error(t_minishell *ms);
 static void	ft_heredoc_child_process(t_node *node, t_minishell *ms);
 static char	*ft_update_heredoc_buffer(char *temp, char *input);
@@ -35,7 +35,7 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 
 	save_stdout = -1;
 	if (!node->right)
-		return (ft_heredoc_syntax_error(ms));
+		return (ft_heredoc_syntax_error());
 	pipe_status = ft_create_pipe(ms);
 	if (pipe_status)
 		return (pipe_status);
@@ -52,7 +52,7 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
 	ft_set_main_signals();
 	ft_restore_stdin(ms);
 	if (save_stdout != -1)
-		ft_restore_stdout(save_stdout, ms);
+		ft_restore_stdout(save_stdout);
 	return (ft_handle_exit_status(ms, node));
 }
 
@@ -62,11 +62,11 @@ int	ft_handle_heredoc(t_node *node, t_minishell *ms)
  * @param  ms  Pointer to the minishell structure.
  * @return int  Always returns 1 (error).
  */
-int	ft_heredoc_syntax_error(t_minishell *ms)
+int	ft_heredoc_syntax_error(void)
 {
 	ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n",
 		STDERR_FILENO);
-	ft_set_exit_code(ms, 2);
+	ft_exit_code(2);
 	return (1);
 }
 
@@ -81,7 +81,7 @@ int	ft_handle_heredoc_fork_error(t_minishell *ms)
 	perror("fork");
 	close(ms->pipefd[0]);
 	close(ms->pipefd[1]);
-	ft_set_exit_code(ms, 1);
+	ft_exit_code(1);
 	return (1);
 }
 

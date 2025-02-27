@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   0_minishell.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 23:48:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 06:38:44 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:51:08 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,6 @@ static void	ft_init_ms(t_minishell *ms)
 	ms->save_stdout = -1;
 	ms->n_args = -1;
 	ms->pid = -1;
-	ms->exit_code = 0;
 	ms->c_multi_heredocs = 0;
 	ms->c_stuck_cats = 0;
 	ms->pipefd[0] = -1;
@@ -142,7 +141,7 @@ void	ft_create_prompt(t_minishell *ms)
 	char	*e;
 	char	p[PATH_MAX];
 
-	e = ft_itoa(ft_exit_code(ms));
+	e = ft_itoa(ft_exit_code(-1));
 	getcwd(p, PATH_MAX);
 	old_prompt = ms->prompt;
 	new_prompt = ft_strjoin_all(6,

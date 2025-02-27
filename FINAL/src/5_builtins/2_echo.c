@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   2_echo.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/31 17:18:39 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:42:02 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void		ft_builtin_echo(char **args, t_minishell *ms);
+void		ft_builtin_echo(char **args);
 static int	ft_check_valid_echo_opt(char *opt);
 
 /**
@@ -47,7 +47,7 @@ static int	ft_check_valid_echo_opt(char *opt)
  * @param 	args 	What should be written on the command line
  * @param 	ms	 	minishell struct pointer
  */
-void	ft_builtin_echo(char **args, t_minishell *ms)
+void	ft_builtin_echo(char **args)
 {
 	int	i;
 	int	newline;
@@ -70,5 +70,5 @@ void	ft_builtin_echo(char **args, t_minishell *ms)
 	}
 	if (newline)
 		printf("\n");
-	ft_set_exit_code(ms, EX_OK);
+	ft_exit_code(EX_OK);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mini_utils_2.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 04:38:05 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 04:39:07 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:52:30 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	ft_init_prompt(t_minishell *ms)
 
 	exit_code = NULL;
 	getcwd(ms->currpath, PATH_MAX);
-	exit_code = ft_itoa(ms->exit_code);
+	exit_code = ft_itoa(ft_exit_code(-1));
 	ms->prompt = ft_strjoin_all(4, RD"["RST, exit_code,
 			RD"] minishell"RST, "$ ");
 	free(exit_code);

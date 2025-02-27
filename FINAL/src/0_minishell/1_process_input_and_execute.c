@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   1_process_input_and_execute.c                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:04:02 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 00:03:30 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 17:59:15 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ int	ft_process_input_and_execute(t_minishell *ms)
 {
 	if (ft_handle_and_tokenize_input(ms))
 	{
-		if (ft_exit_code(ms) == 2)
+		if (ft_exit_code(-1) == 2)
 			return (1);
 		else
 			return (ft_putstr_and_return("minishell: unclosed quotes\n", 1));
@@ -143,6 +143,6 @@ static void	ft_clean_stuck_cats(t_minishell *ms)
 				break ;
 		}
 	}
-	ft_set_exit_code(ms, 0);
+	ft_exit_code(0);
 	return ;
 }

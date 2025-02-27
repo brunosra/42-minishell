@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   7_unset.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/27 02:02:01 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 17:59:15 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	ft_builtin_unset(char **args, t_minishell *ms)
 			ft_unset_env(args[i], ms);
 		i++;
 	}
-	ft_set_exit_code(ms, 0);
+	ft_exit_code(0);
 }
 
 /**

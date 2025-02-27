@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_signal.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 02:49:04 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:41:22 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,13 @@ void	ft_signal_heredoc_handler(int sig);
  */
 void	ft_signal_handler(int sig)
 {
-	t_minishell	*ms;
+	/* t_minishell	*ms;
 
-	ms = ft_ms_struct(NULL, 1);
+	ms = ft_ms_struct(NULL, 1); */
 	if (sig == SIGINT)
 	{
 		write(STDERR_FILENO, "\n", 1);
-		ft_set_exit_code(ms, 130);
+		ft_exit_code(130);
 		rl_replace_line("", 0);
 		rl_on_new_line();
 		rl_redisplay();
@@ -91,13 +91,11 @@ void	ft_set_heredoc_signals(void)
  */
 void	ft_signal_heredoc_handler(int sig)
 {
-	t_minishell	*ms;
-
-	ms = ft_ms_struct(NULL, 1);
+	// ms = ft_ms_struct(NULL, 1);
 	if (sig == SIGINT)
 	{
 		write(STDERR_FILENO, "\n", 1);
-		ft_set_exit_code(ms, 130);
+		ft_exit_code(130);
 		exit(130);
 	}
 }

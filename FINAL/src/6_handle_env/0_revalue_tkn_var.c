@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   0_revalue_tkn_var.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:03:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 03:55:56 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 17:57:31 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ static char	*ft_process_token_expansion(t_minishell *ms, t_token *token,
 	else if (ft_check_if_expand(token->value, ptr, 0) == 2)
 	{
 		key = ft_strdup("?");
-		ft_replace_str(&token->value, key, ptr, ft_itoa(ft_exit_code(ms)));
+		ft_replace_str(&token->value, key, ptr, ft_itoa(ft_exit_code(-1)));
 	}
 	else
 	{

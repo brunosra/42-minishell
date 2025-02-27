@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   1_cd.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/27 02:13:11 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:03:48 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 	curpwd = ft_get_env("PWD", ms);
 	if (curpwd == NULL)
 	{
-		ft_set_exit_code(ms, errno);
+		ft_exit_code(errno);
 		return ;
 	}
 	ft_cd_set_resolved_p(args, curpwd, res_p, ms);
@@ -43,7 +43,7 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 	ft_set_env("PWD", res_p, ms);
 	ft_strlcpy(ms->currpath, res_p, ft_strlen(res_p) + 1);
 	chdir(ms->currpath);
-	ft_set_exit_code(ms, 0);
+	ft_exit_code(0);
 }
 
 /**
@@ -115,7 +115,7 @@ static void	ft_cd_set_resolved_p(char **args, char *curpwd, char *res_p,
 		{
 			if (!ft_get_env("OLDPWD", ms))
 			{
-				ft_set_exit_code(ms, errno);
+				ft_exit_code(errno);
 				return ;
 			}
 			ft_strncpy(res_p, ft_get_env("OLDPWD", ms), PATH_MAX - 1);

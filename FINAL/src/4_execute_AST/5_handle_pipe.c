@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   5_handle_pipe.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:35:12 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 00:54:58 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:34:28 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int			ft_handle_pipe(t_node *node, t_minishell *ms);
 static int	ft_redirect_pipe_input(t_minishell *ms);
 static void	ft_execute_pipe_child(t_node *node, t_minishell *ms);
-int			ft_handle_fork_error(t_minishell *ms);
+int			ft_handle_fork_error(void);
 static int	ft_check_pipe_syntax(t_node *node, t_minishell *ms);
 
 /**
@@ -31,14 +31,14 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 {
 	if (ft_check_pipe_syntax(node, ms))
 	{
-		ft_set_exit_code(ms, 2);
+		ft_exit_code(2);
 		return (2);
 	}
 	if (ft_create_pipe(ms))
 		return (1);
 	ms->pid = fork();
 	if (ms->pid == -1)
-		return (ft_handle_fork_error(ms));
+		return (ft_handle_fork_error());
 	if (ms->pid == 0)
 		ft_execute_pipe_child(node, ms);
 	close(ms->pipefd[1]);
@@ -60,12 +60,12 @@ static int	ft_redirect_pipe_input(t_minishell *ms)
 	if (dup2(ms->pipefd[0], STDIN_FILENO) == -1)
 	{
 		perror("dup2");
-		ft_set_exit_code(ms, 1);
+		ft_exit_code(1);
 		close(ms->pipefd[0]);
 		return (1);
 	}
 	close(ms->pipefd[0]);
-	ft_set_exit_code(ms, 0);
+	ft_exit_code(0);
 	return (0);
 }
 
@@ -93,10 +93,10 @@ static void	ft_execute_pipe_child(t_node *node, t_minishell *ms)
  * @param  ms  Pointer to the minishell structure.
  * @return int Always returns 1.
  */
-int	ft_handle_fork_error(t_minishell *ms)
+int	ft_handle_fork_error(void)
 {
 	perror("fork");
-	ft_set_exit_code(ms, 1);
+	ft_exit_code(1);
 	return (1);
 }
 
@@ -112,12 +112,12 @@ static int	ft_check_pipe_syntax(t_node *node, t_minishell *ms)
 	char	*input;
 
 	if (!node->left)
-		return (ft_pipe_syntax_error(ms, "|", 2));
+		return (ft_pipe_syntax_error("|", 2));
 	if (node->right)
 		return (0);
 	input = readline("> ");
 	if (!input)
-		return (ft_pipe_syntax_error(ms, "unexpected end of file", 258));
+		return (ft_pipe_syntax_error("unexpected end of file", 258));
 	ft_handle_unfinished_pipe(ms, input);
 	ft_process_input_and_execute(ms);
 	return (1);

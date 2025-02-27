@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   3_revalue_heredoc_input.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:13:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 02:40:15 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:39:56 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int			ft_revalue_heredoc_input(char **input, t_minishell *ms);
 static int	ft_process_heredoc_expansion(char **input, t_minishell *ms,
 				char **ptr);
 static int	ft_expand_env_var(char **input, t_minishell *ms, char **ptr);
-static void	ft_expand_exit_code(char **input, t_minishell *ms, char **ptr);
+static void	ft_expand_exit_code(char **input, char **ptr);
 
 /**
  * @brief  Expands environment variables in heredoc input.
@@ -57,7 +57,7 @@ static int	ft_process_heredoc_expansion(char **input, t_minishell *ms,
 	if (expansion_type == 1)
 		ft_expand_env_var(input, ms, ptr);
 	else if (expansion_type == 2)
-		ft_expand_exit_code(input, ms, ptr);
+		ft_expand_exit_code(input, ptr);
 	if (ptr && *ptr)
 		*ptr = ft_strchr((*ptr) + 1, '$');
 	if (!ptr)
@@ -100,12 +100,12 @@ static int	ft_expand_env_var(char **input, t_minishell *ms, char **ptr)
  * @param  ms     Pointer to the minishell structure.
  * @param  ptr    Pointer to the position of the '$' in the string.
  */
-static void	ft_expand_exit_code(char **input, t_minishell *ms, char **ptr)
+static void	ft_expand_exit_code(char **input, char **ptr)
 {
 	char	*key;
 
 	key = ft_strdup("?");
-	ft_replace_str(input, key, *ptr, ft_itoa(ft_exit_code(ms)));
+	ft_replace_str(input, key, *ptr, ft_itoa(ft_exit_code(-1)));
 	free(key);
 	*ptr = ft_strchr(*input, '$');
 }

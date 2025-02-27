@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   1_handle_heredoc_utils2.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:18:16 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:32:06 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int		ft_duplicate_stdout(t_minishell *ms);
 int		ft_open_tty(t_minishell *ms, int save_stdout);
-void	ft_restore_stdout(int save_stdout, t_minishell *ms);
+void	ft_restore_stdout(int save_stdout);
 
 /**
  * @brief  Duplicates STDOUT file descriptor.
@@ -32,7 +32,7 @@ int	ft_duplicate_stdout(t_minishell *ms)
 		perror("dup");
 		close(ms->pipefd[0]);
 		close(ms->pipefd[1]);
-		ft_set_exit_code(ms, 1);
+		ft_exit_code(1);
 	}
 	return (save_stdout);
 }
@@ -55,7 +55,7 @@ int	ft_open_tty(t_minishell *ms, int save_stdout)
 		close(ms->pipefd[0]);
 		close(ms->pipefd[1]);
 		close(save_stdout);
-		ft_set_exit_code(ms, 1);
+		ft_exit_code(1);
 	}
 	return (tty_fd);
 }
@@ -65,13 +65,13 @@ int	ft_open_tty(t_minishell *ms, int save_stdout)
  * 
  * @param  save_stdout  File descriptor of the saved stdout.
  */
-void	ft_restore_stdout(int save_stdout, t_minishell *ms)
+void	ft_restore_stdout(int save_stdout)
 {
 	if (dup2(save_stdout, STDOUT_FILENO) == -1)
 	{
 		perror("dup2");
 		close(save_stdout);
-		ft_set_exit_code(ms, 1);
+		ft_exit_code(1);
 	}
 	close(save_stdout);
 }

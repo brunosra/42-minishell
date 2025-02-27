@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   1_handle_heredoc_utils1.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:12:40 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 00:50:58 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:03:51 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	ft_restore_stdin(t_minishell *ms)
 	{
 		perror("dup2");
 		close(ms->pipefd[0]);
-		ft_set_exit_code(ms, 1);
+		ft_exit_code(1);
 	}
 	close(ms->pipefd[0]);
 }
@@ -63,14 +63,14 @@ void	ft_restore_stdin(t_minishell *ms)
 int	ft_handle_exit_status(t_minishell *ms, t_node *node)
 {
 	if (WIFEXITED(ms->status))
-		ft_set_exit_code(ms, WEXITSTATUS(ms->status));
+		ft_exit_code(WEXITSTATUS(ms->status));
 	if (WIFEXITED(ms->status) && WEXITSTATUS(ms->status) == 130)
 	{
-		ft_set_exit_code(ms, 130);
+		ft_exit_code(130);
 		return (1);
 	}
 	else
-		ft_set_exit_code(ms, 1);
+		ft_exit_code(1);
 	return (ft_execute_ast(node->left, ms));
 }
 
@@ -115,5 +115,5 @@ void	ft_dup2_error(t_minishell *ms, int tty_fd, int save_stdout)
 	close(ms->pipefd[1]);
 	close(ms->save_stdout);
 	close(save_stdout);
-	ft_set_exit_code(ms, 1);
+	ft_exit_code(1);
 }

@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   4_handle_input_redirect.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:32:06 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 00:54:38 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:39:28 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 int			ft_handle_input_redirect(t_node *node, t_minishell *ms);
-static int	ft_validate_input_file(t_node *node, t_minishell *ms);
+static int	ft_validate_input_file(t_node *node);
 int			ft_invalid_right_token_value(char *value);
 void		ft_swap_redirects_values(t_node *node, t_type type);
 
@@ -30,17 +30,17 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms)
 {
 	int	fd;
 
-	if (ft_check_redirect_syntax(node, ms))
+	if (ft_check_redirect_syntax(node))
 		return (1);
-	if (ft_validate_input_file(node, ms))
+	if (ft_validate_input_file(node))
 		return (1);
 	fd = open(node->right->token->value, O_RDONLY);
 	if (fd == -1)
-		return (ft_handle_file_error(ms));
+		return (ft_handle_file_error());
 	if (dup2(fd, STDIN_FILENO) == -1)
-		return (ft_handle_dup_error(fd, ms));
+		return (ft_handle_dup_error(fd));
 	close(fd);
-	ft_set_exit_code(ms, 0);
+	ft_exit_code(0);
 	return (ft_execute_ast(node->left, ms));
 }
 
@@ -51,13 +51,13 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms)
  * @param  ms    Pointer to the minishell structure.
  * @return int   1 if the file is invalid, 0 otherwise.
  */
-static int	ft_validate_input_file(t_node *node, t_minishell *ms)
+static int	ft_validate_input_file(t_node *node)
 {
 	if (ft_is_valid_file(node->right->token->value, O_RDONLY))
 	{
 		ft_remove_created_files(node->prev);
 		ft_create_files(node->left);
-		ft_set_exit_code(ms, 1);
+		ft_exit_code(1);
 		return (1);
 	}
 	return (0);

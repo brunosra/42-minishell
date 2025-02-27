@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   2_handle_multiple_heredocs.c                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:21:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 00:51:19 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:37:18 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int	ft_handle_multiple_heredocs(t_node *node, t_minishell *ms)
 	if (!node || !node->heredoc_stops)
 		return (1);
 	if (!node->right)
-		return (ft_heredoc_syntax_error(ms));
+		return (ft_heredoc_syntax_error());
 	if (!isatty(STDOUT_FILENO))
 		save_stdout = ft_redirect_stdout(ms);
 	while (node->heredoc_stops[i])
@@ -97,7 +97,7 @@ static void	ft_cleanup_heredocs(t_minishell *ms, int save_stdout, t_node *node)
 		ft_restore_stdin(ms);
 	close(ms->pipefd[0]);
 	if (save_stdout != -1)
-		ft_restore_stdout(save_stdout, ms);
+		ft_restore_stdout(save_stdout);
 	current = node->left;
 	while (current && current->token->type == TKN_HDOC)
 	{

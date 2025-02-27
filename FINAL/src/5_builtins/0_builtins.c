@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   0_builtins.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 01:06:39 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:42:01 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@ int	ft_exec_builtins_check(t_node *node, t_minishell *ms)
 int	ft_exec_builtins(t_node *node, t_minishell *ms)
 {
 	if (!ft_strcmp(node->token->value, "echo"))
-		ft_builtin_echo(node->cmd_ready, ms);
+		ft_builtin_echo(node->cmd_ready);
 	else if (!ft_strcmp(node->token->value, "exit"))
 		ft_builtin_exit(node->cmd_ready);
 	else if (!ft_strcmp(node->token->value, "env"))
@@ -113,5 +113,5 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 		ft_builtin_export(node->cmd_ready, ms);
 	else if (!ft_strcmp(node->token->value, "unset"))
 		ft_builtin_unset(node->cmd_ready, ms);
-	return (ft_exit_code(ms));
+	return (ft_exit_code(-1));
 }

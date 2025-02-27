@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   3_env.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/31 17:28:29 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:03:46 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void	ft_builtin_env(char **args, t_minishell *ms)
 	if (args[1])
 	{
 		printf("env: ‘%s’: No such file or directory\n", args[1]);
-		ft_set_exit_code(ms, EX_NOTFOUNDERR);
+		ft_exit_code(EX_NOTFOUNDERR);
 		return ;
 	}
 	else
@@ -50,5 +50,5 @@ void	ft_builtin_env(char **args, t_minishell *ms)
 			env++;
 		}
 	}
-	ft_set_exit_code(ms, EX_OK);
+	ft_exit_code(EX_OK);
 }

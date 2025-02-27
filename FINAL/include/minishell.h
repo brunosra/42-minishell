@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 04:39:41 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:50:03 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,6 @@ typedef struct s_minishell
 	int		n_args;
 	pid_t	pid;
 	int		pipefd[2];
-	int		exit_code;
 	bool	swap_input_redirects;
 	bool	swap_output_redirects;
 	int		c_multi_heredocs;
@@ -174,7 +173,7 @@ char			**ft_remove_null_values(char **cmd_ready, int arg_count);
 int				ft_execute_ast(t_node *node, t_minishell *ms);
 /* 1_handle_heredoc.c */
 int				ft_handle_heredoc(t_node *node, t_minishell *ms);
-int				ft_heredoc_syntax_error(t_minishell *ms);
+int				ft_heredoc_syntax_error();
 int				ft_handle_heredoc_fork_error(t_minishell *ms);
 /* 1_handle_heredoc_utils1.c  */
 void			ft_write_heredoc(t_minishell *ms, t_node *node, char *temp);
@@ -185,29 +184,28 @@ void			ft_dup2_error(t_minishell *ms, int tty_fd, int save_stdout);
 /* 1_handle_heredoc_utils2.c */
 int				ft_duplicate_stdout(t_minishell *ms);
 int				ft_open_tty(t_minishell *ms, int save_stdout);
-void			ft_restore_stdout(int save_stdout, t_minishell *ms);
+void			ft_restore_stdout(int save_stdout);
 /* 2_handle_multiple_heredocs.c  */
 int				ft_handle_multiple_heredocs(t_node *node, t_minishell *ms);
 /* 2_handle_multiple_heredocs_utils.c */
 void			ft_finalize_heredoc(t_minishell *ms, int *i);
 int				ft_collect_heredocs(t_node *node, t_minishell *ms);
-int				ft_multiple_heredoc_syntax_error(t_node *current,
-					t_minishell *ms);
+int				ft_multiple_heredoc_syntax_error(t_node *current);
 /* 3_handle_output_redirect.c */
 int				ft_handle_output_redirect(t_node *node, t_minishell *ms);
-int				ft_check_redirect_syntax(t_node *node, t_minishell *ms);
-int				ft_handle_file_error(t_minishell *ms);
-int				ft_handle_dup_error(int fd, t_minishell *ms);
+int				ft_check_redirect_syntax(t_node *node);
+int				ft_handle_file_error(void);
+int				ft_handle_dup_error(int fd);
 /* 4_handle_input_redirect.c  */
 int				ft_handle_input_redirect(t_node *node, t_minishell *ms);
 int				ft_invalid_right_token_value(char *value);
 void			ft_swap_redirects_values(t_node *node, t_type type);
 /* 5_handle_pipe.c */
 int				ft_handle_pipe(t_node *node, t_minishell *ms);
-int				ft_handle_fork_error(t_minishell *ms);
+int				ft_handle_fork_error(void);
 /* 5_handle_pipe_utils.c  */
 int				ft_create_pipe(t_minishell *ms);
-int				ft_pipe_syntax_error(t_minishell *ms, char *token, int code);
+int				ft_pipe_syntax_error(char *token, int code);
 void			ft_handle_unfinished_pipe(t_minishell *ms, char *input);
 int				ft_has_cat(t_node *node);
 /* 6_execute_command.c */
@@ -232,7 +230,7 @@ void			ft_rsolve_rel_p(const char *base_p, const char *rel_p,
 /* 1_cd_utils.c  */
 int				ft_builtin_cd_check(char **args, t_minishell *ms);
 /* 2_echo.c  */
-void			ft_builtin_echo(char **args, t_minishell *ms);
+void			ft_builtin_echo(char **args);
 /* 3_env.c */
 void			ft_builtin_env(char **args, t_minishell *ms);
 /* 4_exit.c */
@@ -290,8 +288,10 @@ void			ft_signal_heredoc_handler(int sig);
 /* mini_utils_1.c  */
 int				ft_perror(char *error, int return_value);
 int				ft_putstr_and_return(char *msg, int return_value);
-void			ft_set_exit_code(t_minishell *ms, int exit_code);
-int				ft_exit_code(t_minishell *ms);
+/* void			ft_set_exit_code(t_minishell *ms, int exit_code);
+int				ft_exit_code(t_minishell *ms); */
+int				ft_exit_code(int newcode);
+
 /* mini_utils_2.c */
 void			ft_init_prompt(t_minishell *ms);
 char			*ft_strjoin_free(char *s1, char *s2, int free_s1, int free_s2);

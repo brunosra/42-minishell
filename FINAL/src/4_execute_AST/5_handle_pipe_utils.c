@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   5_handle_pipe_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:35:12 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 00:57:43 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:34:29 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 int		ft_create_pipe(t_minishell *ms);
-int		ft_pipe_syntax_error(t_minishell *ms, char *token, int code);
+int		ft_pipe_syntax_error(char *token, int code);
 void	ft_handle_unfinished_pipe(t_minishell *ms, char *input);
 int		ft_has_cat(t_node *node);
 
@@ -28,7 +28,7 @@ int	ft_create_pipe(t_minishell *ms)
 	if (pipe(ms->pipefd) == -1)
 	{
 		perror("pipe");
-		ft_set_exit_code(ms, 1);
+		ft_exit_code(1);
 		return (1);
 	}
 	return (0);
@@ -42,13 +42,13 @@ int	ft_create_pipe(t_minishell *ms)
  * @param  code   Exit code to set.
  * @return int    Always returns 1.
  */
-int	ft_pipe_syntax_error(t_minishell *ms, char *token, int code)
+int	ft_pipe_syntax_error(char *token, int code)
 {
 	ft_putstr_fd("minishell: syntax error near unexpected token `",
 		STDERR_FILENO);
 	ft_putstr_fd(token, STDERR_FILENO);
 	ft_putstr_fd("'\n", STDERR_FILENO);
-	ft_set_exit_code(ms, code);
+	ft_exit_code(code);
 	return (1);
 }
 

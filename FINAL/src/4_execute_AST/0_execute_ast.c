@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   0_execute_ast.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:05:11 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 00:48:36 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:36:37 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 int			ft_execute_ast(t_node *node, t_minishell *ms);
-static int	ft_handle_syntax_error(t_node *node, t_minishell *ms);
+static int	ft_handle_syntax_error(t_node *node);
 static int	ft_execute_output_redirect(t_node *node, t_minishell *ms);
 static int	ft_execute_input_redirect(t_node *node, t_minishell *ms);
 static int	ft_execute_heredoc(t_node *node, t_minishell *ms);
@@ -32,7 +32,7 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
 	if (!node || !ms->n_args)
 		return (1);
 	if (node->token->type == TKN_EXCPT)
-		return (ft_handle_syntax_error(node, ms));
+		return (ft_handle_syntax_error(node));
 	if (node->token->type == TKN_OUT_RD)
 		return (ft_execute_output_redirect(node, ms));
 	if (node->token->type == TKN_IN_RD)
@@ -54,13 +54,13 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
  * @param  ms    Pointer to the minishell structure.
  * @return int   Always returns 1 to indicate an error.
  */
-static int	ft_handle_syntax_error(t_node *node, t_minishell *ms)
+static int	ft_handle_syntax_error(t_node *node)
 {
 	ft_putstr_fd("minishell: syntax error near unexpected token `",
 		STDERR_FILENO);
 	ft_putstr_fd(node->token->value, STDERR_FILENO);
 	ft_putstr_fd("'\n", STDERR_FILENO);
-	ft_set_exit_code(ms, 2);
+	ft_exit_code(2);
 	return (1);
 }
 

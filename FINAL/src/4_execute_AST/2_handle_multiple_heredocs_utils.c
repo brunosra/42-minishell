@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   2_handle_multiple_heredocs_utils.c                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:21:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 07:07:08 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:35:57 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void		ft_finalize_heredoc(t_minishell *ms, int *i);
 int			ft_collect_heredocs(t_node *node, t_minishell *ms);
 static int	ft_allocate_heredoc_stops(t_node *node, t_minishell *ms);
-int			ft_multiple_heredoc_syntax_error(t_node *current, t_minishell *ms);
+int			ft_multiple_heredoc_syntax_error(t_node *current);
 
 /**
  * @brief  Finalizes heredoc processing and writes to pipe if needed.
@@ -84,7 +84,7 @@ static int	ft_allocate_heredoc_stops(t_node *node, t_minishell *ms)
 	while (current && --i >= 0)
 	{
 		if (!current->right)
-			return (ft_multiple_heredoc_syntax_error(current, ms));
+			return (ft_multiple_heredoc_syntax_error(current));
 		node->heredoc_stops[i] = current->right->token->value;
 		current = current->left;
 	}
@@ -99,12 +99,12 @@ static int	ft_allocate_heredoc_stops(t_node *node, t_minishell *ms)
  * @param  ms       Pointer to the minishell structure.
  * @return int      Returns 1 to indicate an error.
  */
-int	ft_multiple_heredoc_syntax_error(t_node *current, t_minishell *ms)
+int	ft_multiple_heredoc_syntax_error(t_node *current)
 {
 	ft_putstr_fd("minishell: syntax error near unexpected token `",
 		STDERR_FILENO);
 	ft_putchar_fd(current->left->token->value[0], STDERR_FILENO);
 	ft_putstr_fd("'\n", STDERR_FILENO);
-	ft_set_exit_code(ms, 2);
+	ft_exit_code(2);
 	return (1);
 }

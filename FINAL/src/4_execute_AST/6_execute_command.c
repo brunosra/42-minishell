@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   6_execute_command.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:43:45 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 00:59:56 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 18:33:25 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,25 +29,25 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 {
 	ms->pid = fork();
 	if (ms->pid == -1)
-		return (ft_handle_fork_error(ms));
+		return (ft_handle_fork_error());
 	if (ms->pid == 0)
 		ft_execute_child_process(node, ms);
 	ft_set_fork_signals();
 	waitpid(ms->pid, &ms->status, 0);
 	ft_handle_cmd_exit_status(node, ms);
 	ft_set_main_signals();
-	if (ft_exit_code(ms) != 0 && node->prev
+	if (ft_exit_code(-1) != 0 && node->prev
 		&& node->prev->token->type == TKN_IN_RD)
 		ft_remove_created_files(node->prev);
 	if (node->token->type == TKN_BLTIN && !ft_strcmp(node->cmd_ready[0], "exit")
-		&& ft_exit_code(ms) != 1)
+		&& ft_exit_code(-1) != 1)
 	{
 		ft_free_tokens(ms->tokens);
 		ft_free_ast(ms->ast_root);
 		free(ms->input);
-		exit(ft_exit_code(ms));
+		exit(ft_exit_code(-1));
 	}
-	return (ft_exit_code(ms));
+	return (ft_exit_code(-1));
 }
 
 /**
@@ -62,26 +62,26 @@ static void	ft_handle_cmd_exit_status(t_node *node, t_minishell *ms)
 
 	if (WIFEXITED(ms->status))
 	{
-		ft_set_exit_code(ms, WEXITSTATUS(ms->status));
-		if (ft_exit_code(ms) == 42 && node->cmd_ready[0])
+		ft_exit_code(WEXITSTATUS(ms->status));
+		if (ft_exit_code(-1) == 42 && node->cmd_ready[0])
 		{
 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
 			ft_putstr_fd(": command not found\n", STDERR_FILENO);
-			ft_set_exit_code(ms, 127);
+			ft_exit_code(127);
 		}
-		else if (ft_exit_code(ms) == 0 && node->token->type == TKN_BLTIN
+		else if (ft_exit_code(-1) == 0 && node->token->type == TKN_BLTIN
 			&& ft_strcmp(node->token->value, "echo"))
 			ft_exec_builtins(node, ms);
 	}
 	else if (WIFSIGNALED(ms->status))
 	{
 		sig = WTERMSIG(ms->status);
-		ft_set_exit_code(ms, 128 + sig);
+		ft_exit_code(128 + sig);
 		if (sig == SIGINT)
 			write(STDERR_FILENO, "\n", 1);
 	}
 	else
-		ft_set_exit_code(ms, 1);
+		ft_exit_code(1);
 }
 
 /**
