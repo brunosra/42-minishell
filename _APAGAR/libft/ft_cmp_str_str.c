@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_cmp_str_str.c                                   :+:      :+:    :+:   */
+/*   ft_strnstr_printf.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/18 02:49:12 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 19:22:12 by bschwell         ###   ########.fr       */
+/*   Updated: 2024/11/15 00:01:42 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	ft_cmp_str_str(const char *big, const char *lit, size_t len)
 	size_t	i;
 	size_t	j;
 	size_t	n;
-
+	
 	i = 0;
 	j = 0;
 	n = 0;
