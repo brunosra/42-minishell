@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:50:03 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/27 19:22:52 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,7 +173,7 @@ char			**ft_remove_null_values(char **cmd_ready, int arg_count);
 int				ft_execute_ast(t_node *node, t_minishell *ms);
 /* 1_handle_heredoc.c */
 int				ft_handle_heredoc(t_node *node, t_minishell *ms);
-int				ft_heredoc_syntax_error();
+int				ft_heredoc_syntax_error(void);
 int				ft_handle_heredoc_fork_error(t_minishell *ms);
 /* 1_handle_heredoc_utils1.c  */
 void			ft_write_heredoc(t_minishell *ms, t_node *node, char *temp);

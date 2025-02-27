@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:41:22 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/27 19:21:03 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,6 @@ void	ft_signal_heredoc_handler(int sig);
  */
 void	ft_signal_handler(int sig)
 {
-	/* t_minishell	*ms;
-
-	ms = ft_ms_struct(NULL, 1); */
 	if (sig == SIGINT)
 	{
 		write(STDERR_FILENO, "\n", 1);
@@ -91,7 +88,6 @@ void	ft_set_heredoc_signals(void)
  */
 void	ft_signal_heredoc_handler(int sig)
 {
-	// ms = ft_ms_struct(NULL, 1);
 	if (sig == SIGINT)
 	{
 		write(STDERR_FILENO, "\n", 1);
