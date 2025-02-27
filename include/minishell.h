@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 01:19:46 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 03:17:22 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,7 +190,7 @@ int		ft_builtin_exit(char **args);
 int		ft_builtin_pwd();
 void	ft_builtin_echo(char **args, t_minishell *ms);
 void 	ft_builtin_env(char **args, t_minishell *ms);
-void	ft_rsolve_rel_p(const char *base_p, const char *rel_p, char *res_p);
+void	ft_resolve_rel_p(const char *base_p, const char *rel_p, char *res_p);
 int		ft_builtin_cd_check(char **args, t_minishell *ms);
 void	ft_builtin_cd(char **args, t_minishell *ms);
 void	ft_builtin_unset(char **args, t_minishell *ms);

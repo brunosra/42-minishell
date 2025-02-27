@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 02:09:28 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 04:19:51 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 03:27:50 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int ft_perror(char *error, int return_value);
 int ft_putstr_and_return(char *msg, int return_value);
 void	ft_set_exit_code(t_minishell *ms, int exit_code);
 int		ft_exit_code(t_minishell *ms);
-char *ft_str_join_all(int argcount, ...);
+char *ft_strjoin_all(int argcount, ...);
 char	*ft_strjoin_free(char *s1, char *s2, int free_s1, int free_s2);
 static char	*ft_free_inputs(char *s1, char *s2, int free_s1, int free_s2);
 void	ft_print_ast(t_node *node, int depth);
@@ -78,7 +78,7 @@ int	ft_exit_code(t_minishell *ms)
  * @return char*     Pointer to the newly allocated concatenated string.
  **                  NULL if memory allocation fails.
  */
-char *ft_str_join_all(int argcount, ...)
+char *ft_strjoin_all(int argcount, ...)
 {
 	va_list	ap;
 	char *tmp;

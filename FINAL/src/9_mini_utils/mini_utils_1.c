@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 04:38:05 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 02:53:34 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 03:30:15 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ int		ft_perror(char *error, int return_value);
 int		ft_putstr_and_return(char *msg, int return_value);
 void	ft_set_exit_code(t_minishell *ms, int exit_code);
 int		ft_exit_code(t_minishell *ms);
-char	*ft_str_join_all(int argcount, ...);
 
 /**
  * @brief  Print an error message using perror and return a specified value.
@@ -64,37 +63,4 @@ void	ft_set_exit_code(t_minishell *ms, int exit_code)
 int	ft_exit_code(t_minishell *ms)
 {
 	return (ms->exit_code);
-}
-
-/**
- * @brief  Concatenate multiple strings into a single string.
- * 
- * @param  argcount  The number of strings to concatenate.
- * @param  ...       Variadic arguments representing the strings to join.
- * @return char*     Pointer to the newly allocated concatenated string.
- *                   NULL if memory allocation fails.
- */
-char	*ft_str_join_all(int argcount, ...)
-{
-	va_list	ap;
-	char	*tmp;
-	char	*to_free;
-	char	*curr_str;
-	int		curr_arg;
-
-	curr_arg = 0;
-	tmp = malloc(1);
-	if (!tmp)
-		return (NULL);
-	tmp[0] = 0;
-	va_start(ap, argcount);
-	while (curr_arg++ < argcount)
-	{
-		curr_str = va_arg(ap, char *);
-		to_free = tmp;
-		tmp = ft_strjoin(tmp, curr_str);
-		free(to_free);
-	}
-	va_end(ap);
-	return (tmp);
 }

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 23:48:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 02:57:37 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 03:32:12 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,13 +116,13 @@ static int	ft_save_stdin_stdout(t_minishell *ms)
  */
 static int	ft_readline(t_minishell *ms)
 {
-//	ft_create_prompt(ms);
+	ft_create_prompt(ms);
 	ms->swap_output_redirects = false;
 	ms->swap_input_redirects = false;
 	ms->input = readline(ms->prompt);
 	if (ms->input == NULL)
 	{
-//		write(STDOUT_FILENO, "exit\n", 5);
+		write(STDOUT_FILENO, "exit\n", 5);
 		return (1);
 	}
 	if (ms->input)
