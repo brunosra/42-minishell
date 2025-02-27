@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 23:48:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 03:32:12 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 04:31:20 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,12 +81,10 @@ static void	ft_init_ms(t_minishell *ms)
 	ms->swap_output_redirects = false;
 	ms->in_pipe = false;
 	ms->env.envp = NULL;
-	ms->env.env_paths = ft_calloc(1, sizeof(char *));
-	ms->env.paths = ft_calloc(1, sizeof(char **));
-	ms->env.full_path = ft_calloc(1, sizeof(char *));
-	getcwd(ms->currpath, PATH_MAX);
-	ms->prompt = ft_strjoin_all(4, RD"["RST, ft_itoa(ft_exit_code(ms)),
-			RD"] minishell"RST, "$ ");
+	ms->env.env_paths = NULL;
+	ms->env.paths = NULL;
+	ms->env.full_path = NULL;
+	ft_init_prompt(ms);
 }
 
 /**
@@ -149,5 +147,6 @@ void	ft_create_prompt(t_minishell *ms)
 	new_prompt = ft_strjoin_all(6,
 			RD"["RST, e, RD"] ["RST, p, RD"] minishell"RST, "$ ");
 	free(old_prompt);
+	free(e);
 	ms->prompt = new_prompt;
 }
