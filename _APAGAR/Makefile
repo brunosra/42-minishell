@@ -14,11 +14,11 @@ LIBFT = $(LIBFT_DIR)/libft.a
 CC = gcc
 CFLAGS = -g -Wall -Wextra -Werror -I $(INC_DIR)
 LDFLAGS = -L$(LIBFT_DIR) -lft -L. -lreadline
-VALGRIND = valgrind --leak-check=full --show-leak-kinds=all --suppressions=readline.supp
-# Buscar todos os arquivos .c dentro de src e seus subdiretórios
-SRCS = $(shell find $(SRC_DIR) -type f -name "*.c")
 
-# Regra principal
+# Arquivos fonte e objetos
+SRCS = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/builtins/*.c)
+
+# Regras principais
 all: $(LIBFT) $(NAME)
 
 # Criação do executável principal
@@ -29,13 +29,6 @@ $(NAME): $(LIBFT) $(SRCS)
 $(LIBFT):
 	$(MAKE) -C $(LIBFT_DIR)
 
-test: $(NAME)
-	clear && cd ./tester && ./tester	
-
-# Valgrind para rodar o programa e suprimir vazamentos
-valgrind: $(NAME)
-	$(VALGRIND) ./$(NAME)
-
 # Limpeza de arquivos objetos
 clean:
 	$(MAKE) -C $(LIBFT_DIR) clean
@@ -43,10 +36,13 @@ clean:
 # Limpeza total (inclui biblioteca e executável)
 fclean: clean
 	$(MAKE) -C $(LIBFT_DIR) fclean
-	rm -f $(NAME)
+	rm -f $(LIB) $(NAME)
 
-# Recompilar tudo
+test: $(NAME)
+	clear && cd ./tester && ./tester
+
+# Recompila tudo
 re: fclean all
 
 # Declarando que não são arquivos reais
-.PHONY: all clean fclean  re test
+.PHONY: all clean fclean re tester
