@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:41:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 00:25:52 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 07:00:16 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ t_token	*ft_tokenize_input(char *str, int n_args, int i, int j)
 	int		n_tokens;
 
 	n_tokens = 0;
-	tokens = malloc(sizeof(t_token) * (n_args + 1));
+	tokens = ft_calloc(sizeof(t_token), (n_args + 1));
 	if (!tokens)
 		return (NULL);
 	while (str[i])

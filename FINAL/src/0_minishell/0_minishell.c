@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 23:48:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 04:31:20 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 06:38:44 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,7 @@ static int	ft_readline(t_minishell *ms)
 	if (ms->input == NULL)
 	{
 		write(STDOUT_FILENO, "exit\n", 5);
+		free(ms->prompt);
 		return (1);
 	}
 	if (ms->input)

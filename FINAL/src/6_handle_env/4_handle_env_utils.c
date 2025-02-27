@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:17:28 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 02:45:07 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 05:21:54 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ char	**ft_duplicate_envp(char **envp)
 	i = 0;
 	while (envp[i])
 		i++;
-	new_envp = malloc(sizeof(char *) * (i + 1));
+	new_envp = ft_calloc(sizeof(char *), (i + 1));
 	if (!new_envp)
 		return (NULL);
 	i = 0;
