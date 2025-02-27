@@ -6,16 +6,16 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 07:24:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 01:06:39 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int	ft_builtin_error(char *msg, int err);
+int		ft_builtin_error(char *msg, int err);
 char	*ft_strtok(char *str, const char *delim);
-int	ft_exec_builtins_check(t_node *node, t_minishell *ms);
-int	ft_exec_builtins(t_node *node, t_minishell *ms);
+int		ft_exec_builtins_check(t_node *node, t_minishell *ms);
+int		ft_exec_builtins(t_node *node, t_minishell *ms);
 
 /**
  * @brief  Print an error message using perror and return a specified error code.
@@ -86,7 +86,7 @@ int	ft_exec_builtins_check(t_node *node, t_minishell *ms)
 	else if (!ft_strcmp(node->token->value, "cd"))
 		return (ft_builtin_cd_check(node->cmd_ready, ms));
 	else if (!ft_strcmp(node->token->value, "export"))
-		ft_builtin_export_check(node->cmd_ready/* , ms */);
+		ft_builtin_export_check(node->cmd_ready);
 	return (EX_OK);
 }
 

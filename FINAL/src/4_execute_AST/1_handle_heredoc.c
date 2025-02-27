@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:08:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 07:11:07 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:49:06 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@ static void	ft_heredoc_child_process(t_node *node, t_minishell *ms);
 static char	*ft_update_heredoc_buffer(char *temp, char *input);
 
 /**
- * @brief  Handles heredoc redirection by reading user input until a delimiter is reached.
+ * @brief  Handles heredoc redirection by reading user input until a delimiter
+ * is reached.
  * 
  * @param  node  Pointer to the heredoc node in the AST.
  * @param  ms    Pointer to the minishell structure.
@@ -110,7 +111,7 @@ static void	ft_heredoc_child_process(t_node *node, t_minishell *ms)
 			break ;
 		}
 		if (!ft_strcmp(input, node->right->token->value))
-			break;
+			break ;
 		temp = ft_update_heredoc_buffer(temp, input);
 		free(input);
 	}

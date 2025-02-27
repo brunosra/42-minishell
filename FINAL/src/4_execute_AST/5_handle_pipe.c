@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:35:12 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 07:05:16 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:54:58 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int			ft_handle_pipe(t_node *node, t_minishell *ms);
 static int	ft_redirect_pipe_input(t_minishell *ms);
 static void	ft_execute_pipe_child(t_node *node, t_minishell *ms);
-int	ft_handle_fork_error(t_minishell *ms);
+int			ft_handle_fork_error(t_minishell *ms);
 static int	ft_check_pipe_syntax(t_node *node, t_minishell *ms);
 
 /**

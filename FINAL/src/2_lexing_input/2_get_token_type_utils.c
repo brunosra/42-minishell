@@ -6,13 +6,13 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:57:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 07:00:49 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:33:25 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int ft_check_builtins(char *str);
+int	ft_check_builtins(char *str);
 int	ft_verify_variable_value(char *str, int i);
 
 /**
@@ -23,7 +23,7 @@ int	ft_verify_variable_value(char *str, int i);
  **        1 if the command is a builtin.
  **        0 otherwise.
  */
-int ft_check_builtins(char *str)
+int	ft_check_builtins(char *str)
 {
 	if (!ft_strcmp(str, "echo"))
 		return (1);
@@ -63,15 +63,15 @@ int	ft_verify_variable_value(char *str, int i)
 		if ((str[i] == '"' || str[i] == '\''))
 		{
 			if (quote_type == str[i])
-				quote_type = '\0'; // Fecha aspas
+				quote_type = '\0';
 			else if (quote_type == '\0')
-				quote_type = str[i]; // Abre aspas
+				quote_type = str[i];
 			i++;
-			continue;
+			continue ;
 		}
 		if (str[i] == '$')
 		{
-			if (quote_type != '\'') // Expande fora de aspas ou em aspas duplas
+			if (quote_type != '\'')
 				expand = 1;
 		}
 		i++;

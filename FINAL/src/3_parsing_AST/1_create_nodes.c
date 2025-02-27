@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 01:43:53 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:37:06 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,12 @@ t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right);
  */
 t_node	*ft_create_cmd_node(t_token *token)
 {
-	t_node *node;
+	t_node	*node;
 
 	node = malloc(sizeof(t_node));
-	if (!node) 
+	if (!node)
 		return (NULL);
-	node->cmd_ready = NULL;	
+	node->cmd_ready = NULL;
 	node->token = token;
 	node->left = NULL;
 	node->right = NULL;
@@ -48,17 +48,17 @@ t_node	*ft_create_cmd_node(t_token *token)
  */
 t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right)
 {
-    t_node *node;
+	t_node	*node;
 
 	node = malloc(sizeof(t_node));
-    if (!node)
+	if (!node)
 		return (NULL);
-	node->cmd_ready = NULL;	
-    node->token = token;
-    node->left = left;
-    node->right = right;
+	node->cmd_ready = NULL;
+	node->token = token;
+	node->left = left;
+	node->right = right;
 	node->prev = NULL;
 	node->file = false;
 	node->heredoc_stops = NULL;
-    return (node);
+	return (node);
 }

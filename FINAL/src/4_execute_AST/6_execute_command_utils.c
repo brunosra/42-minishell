@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 03:00:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 01:00:45 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ static int	ft_build_executable_path(t_minishell *ms, char *dir, char *cmd);
  * into directories, and iterates through them to check if the given command 
  * exists and is executable. If found, it updates the `full_path` in `ms->env`.
  * 
- * @param  ms   Pointer to the minishell structure containing environment variables.
+ * @param  ms   Pointer to the minishell structure containing environment vars.
  * @param  cmd  Command to search for in the PATH.
  * @return int  Status of the search.
  **         0 if the executable is found and updated in `ms->env.full_path`.

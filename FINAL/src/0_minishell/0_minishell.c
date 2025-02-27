@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 23:48:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 07:44:55 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 02:57:37 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int			main(int argc, char **argv, char **envp);
 static void	ft_init_ms(t_minishell *ms);
 static int	ft_save_stdin_stdout(t_minishell *ms);
 static int	ft_readline(t_minishell *ms);
-void		ft_create_prompt(t_minishell *ms); //nao esta static pq pensei usar no handle_signal mas nao funcionou!
+void		ft_create_prompt(t_minishell *ms);
 
 /**
  * @brief  Main entry point of the program.
@@ -62,7 +62,7 @@ int	main(int argc, char **argv, char **envp)
  * @param  ms  Pointer to the minishell structure.
  * @return void
  */
-static void ft_init_ms(t_minishell *ms)
+static void	ft_init_ms(t_minishell *ms)
 {
 	ms->input = NULL;
 	ms->tokens = NULL;
@@ -86,7 +86,7 @@ static void ft_init_ms(t_minishell *ms)
 	ms->env.full_path = ft_calloc(1, sizeof(char *));
 	getcwd(ms->currpath, PATH_MAX);
 	ms->prompt = ft_strjoin_all(4, RD"["RST, ft_itoa(ft_exit_code(ms)),
-								RD"] minishell"RST, "$ ");
+			RD"] minishell"RST, "$ ");
 }
 
 /**
@@ -97,7 +97,7 @@ static void ft_init_ms(t_minishell *ms)
  **        0 on success
  **        1 if an error occurs during duplication
  */
-static int ft_save_stdin_stdout(t_minishell *ms)
+static int	ft_save_stdin_stdout(t_minishell *ms)
 {
 	ms->save_stdin = dup(STDIN_FILENO);
 	ms->save_stdout = dup(STDOUT_FILENO);
@@ -116,14 +116,14 @@ static int ft_save_stdin_stdout(t_minishell *ms)
  */
 static int	ft_readline(t_minishell *ms)
 {
-	ft_create_prompt(ms);
+//	ft_create_prompt(ms);
 	ms->swap_output_redirects = false;
 	ms->swap_input_redirects = false;
 	ms->input = readline(ms->prompt);
 	if (ms->input == NULL)
 	{
-		write(STDOUT_FILENO, "exit\n", 5);
-		return (1) ;
+//		write(STDOUT_FILENO, "exit\n", 5);
+		return (1);
 	}
 	if (ms->input)
 		add_history(ms->input);
@@ -136,17 +136,18 @@ static int	ft_readline(t_minishell *ms)
  * @param  ms  Pointer to the minishell structure.
  * @return void
  */
-void ft_create_prompt(t_minishell *ms)
+void	ft_create_prompt(t_minishell *ms)
 {
-	char *old_prompt;
-	char *new_prompt;
-	char *e;
-	char p[PATH_MAX];
+	char	*old_prompt;
+	char	*new_prompt;
+	char	*e;
+	char	p[PATH_MAX];
 
 	e = ft_itoa(ft_exit_code(ms));
 	getcwd(p, PATH_MAX);
 	old_prompt = ms->prompt;
-	new_prompt = ft_strjoin_all(6, RD"["RST, e, RD"] ["RST, p, RD"] minishell"RST, "$ ");
+	new_prompt = ft_strjoin_all(6,
+			RD"["RST, e, RD"] ["RST, p, RD"] minishell"RST, "$ ");
 	free(old_prompt);
 	ms->prompt = new_prompt;
 }

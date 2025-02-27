@@ -6,16 +6,16 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:35:12 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 07:16:17 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:57:43 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int			ft_create_pipe(t_minishell *ms);
-int			ft_pipe_syntax_error(t_minishell *ms, char *token, int code);
-void		ft_handle_unfinished_pipe(t_minishell *ms, char *input);
-int 		ft_has_cat(t_node *node);
+int		ft_create_pipe(t_minishell *ms);
+int		ft_pipe_syntax_error(t_minishell *ms, char *token, int code);
+void	ft_handle_unfinished_pipe(t_minishell *ms, char *input);
+int		ft_has_cat(t_node *node);
 
 /**
  * @brief  Creates a pipe for heredoc input.
@@ -80,9 +80,9 @@ void	ft_handle_unfinished_pipe(t_minishell *ms, char *input)
  **         1 if "cat" is found.
  **         0 otherwise.
  */
-int ft_has_cat(t_node *node) // FUNCAO DESENRASQUE ALTERAR
+int	ft_has_cat(t_node *node)
 {
-	t_node *current;
+	t_node	*current;
 
 	current = node;
 	if (!current)
@@ -90,11 +90,10 @@ int ft_has_cat(t_node *node) // FUNCAO DESENRASQUE ALTERAR
 	if (current->token->type == TKN_CMD)
 	{
 		if (!ft_strcmp(current->cmd_ready[0], "cat")
-		|| !ft_strcmp(current->cmd_ready[0], "/bin/cat"))
+			|| !ft_strcmp(current->cmd_ready[0], "/bin/cat"))
 			return (1);
 	}
- 	if (!current->left && !current->right)
+	if (!current->left && !current->right)
 		return (0);
 	return (ft_has_cat(current->left));
-	// ft_has_cat(current->right);
 }

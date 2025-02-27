@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:32:06 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:54:38 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,8 @@ static int	ft_validate_input_file(t_node *node, t_minishell *ms)
 }
 
 /**
- * @brief  Checks if the token value on the right side is invalid for redirection or other syntax.
+ * @brief  Checks if the token value on the right side is invalid for
+ * redirection or other syntax.
  * 
  * @param  value  Token value to check.
  * @return int    Boolean indicating validity.
@@ -73,11 +74,10 @@ static int	ft_validate_input_file(t_node *node, t_minishell *ms)
  */
 int	ft_invalid_right_token_value(char *value)
 {
-	if (!value || 
-		ft_strcmp(value, ">") == 0 || ft_strcmp(value, ">>") == 0 || 
-		ft_strcmp(value, "<") == 0 || ft_strcmp(value, "<<") == 0 || 
-		ft_strcmp(value, "|") == 0 || ft_strcmp(value, "&&") == 0 || 
-		ft_strcmp(value, "||") == 0)
+	if (!value || ft_strcmp(value, ">") == 0 || ft_strcmp(value, ">>") == 0
+		|| ft_strcmp(value, "<") == 0 || ft_strcmp(value, "<<") == 0
+		|| ft_strcmp(value, "|") == 0 || ft_strcmp(value, "&&") == 0
+		|| ft_strcmp(value, "||") == 0)
 		return (1);
 	return (0);
 }
@@ -94,11 +94,11 @@ void	ft_swap_redirects_values(t_node *node, t_type type)
 	char	*temp_value;
 
 	if (!node || node->token->type != type)
-		return;
+		return ;
 	current = node;
 	while (current && current->left && current->left->token->type == type)
 		current = current->left;
-	if (current != node) // Troca os valores do último nó (mais profundo) com o atual
+	if (current != node)
 	{
 		temp_value = current->right->token->value;
 		current->right->token->value = node->right->token->value;

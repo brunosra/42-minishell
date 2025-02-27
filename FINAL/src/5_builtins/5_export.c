@@ -6,16 +6,15 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 21:13:47 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 02:01:03 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int	ft_builtin_export_check(char **args/* , t_minishell *ms */);
-void	ft_builtin_export(char **args, t_minishell *ms);
+int			ft_builtin_export_check(char **args/* , t_minishell *ms */);
+void		ft_builtin_export(char **args, t_minishell *ms);
 static void	ft_export_1_arg(t_minishell *ms);
-
 
 // TODO: implement
 int	ft_builtin_export_check(char **args/* , t_minishell *ms */)

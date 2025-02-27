@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:47:54 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 02:00:22 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,10 +53,7 @@ int	ft_builtin_exit(char **args)
 		exit(mod);
 	}
 	else if (!ft_value_is_numeric(args[1]))
-	{
 		ft_putstr_and_exit(args[1]);
-		// return (2);
-	}
 	return (0);
 }
 

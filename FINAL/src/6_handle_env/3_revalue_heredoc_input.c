@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:13:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 02:40:15 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int			ft_revalue_heredoc_input(char **input, t_minishell *ms);
 static int	ft_process_heredoc_expansion(char **input, t_minishell *ms,
-											char **ptr);
+				char **ptr);
 static int	ft_expand_env_var(char **input, t_minishell *ms, char **ptr);
 static void	ft_expand_exit_code(char **input, t_minishell *ms, char **ptr);
 
@@ -86,7 +86,7 @@ static int	ft_expand_env_var(char **input, t_minishell *ms, char **ptr)
 		ft_replace_str(input, key, *ptr, env_value);
 		*ptr = ft_strchr(*input, '$');
 		return (0);
-	}	
+	}
 	if (!*input)
 		return (1);
 	free(key);

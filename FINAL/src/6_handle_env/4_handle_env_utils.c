@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:17:28 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 07:40:26 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 02:45:07 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,10 @@
 
 char	**ft_duplicate_envp(char **envp);
 char	*ft_get_env_value(const char *str, t_minishell *ms, char **key,
-							bool heredoc);
+			bool heredoc);
 char	*ft_get_env(const char *key, t_minishell *ms);
 int		ft_unset_env(const char *key, t_minishell *ms);
 int		ft_set_env(const char *key, const char *value, t_minishell *ms);
-
 
 /**
  * @brief  Duplicates the environment variables array.
@@ -69,7 +68,7 @@ char	*ft_get_env_value(const char *str, t_minishell *ms, char **key,
 	int		i;
 	char	*value;
 	int		start;
-	char **envp;
+	char	**envp;
 
 	envp = ms->env.envp;
 	if (!str || !envp)
@@ -91,7 +90,7 @@ char	*ft_get_env_value(const char *str, t_minishell *ms, char **key,
 }
 
 /**
- * @brief  Retrieves the value of an environment variable from the environment array.
+ * @brief  Retrieves the value of an environment var from the environment array.
  * 
  * @param  key  Variable name to search for.
  * @param  ms   Pointer to the minishell structure.
@@ -127,11 +126,11 @@ char	*ft_get_env(const char *key, t_minishell *ms)
  **         0 on success.
  **         1 if the variable does not exist or on error.
  */
-int ft_unset_env(const char *key, t_minishell *ms)
+int	ft_unset_env(const char *key, t_minishell *ms)
 {
-	int i;
-	int j;
-	size_t len;
+	int		i;
+	int		j;
+	size_t	len;
 
 	len = ft_strlen(key);
 	i = 0;
@@ -140,15 +139,13 @@ int ft_unset_env(const char *key, t_minishell *ms)
 		return (1);
 	while (ms->env.envp[i])
 	{
-		if (!ft_strncmp(ms->env.envp[i], key, len) && ms->env.envp[i][len] == '=')
+		if (!ft_strncmp(ms->env.envp[i], key, len)
+			&& ms->env.envp[i][len] == '=')
 		{
 			free(ms->env.envp[i]);
-			j = i;
-			while (ms->env.envp[j])
-			{
+			j = i - 1;
+			while (ms->env.envp[++j])
 				ms->env.envp[j] = ms->env.envp[j + 1];
-				j++;
-			}
 			return (0);
 		}
 		i++;
@@ -179,7 +176,8 @@ int	ft_set_env(const char *key, const char *value, t_minishell *ms)
 		return (1);
 	while (ms->env.envp[i])
 	{
-		if (!ft_strncmp(ms->env.envp[i], key, len) && ms->env.envp[i][len] == '=')
+		if (!ft_strncmp(ms->env.envp[i], key, len)
+			&& ms->env.envp[i][len] == '=')
 		{
 			free(ms->env.envp[i]);
 			ms->env.envp[i] = new_var;

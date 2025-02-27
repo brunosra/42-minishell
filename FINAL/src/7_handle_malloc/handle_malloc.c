@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 22:18:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 02:45:53 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,9 +61,9 @@ void	ft_free_ast(t_node *root)
  * 
  * @param  str  Pointer to the array of strings to free.
  */
-void ft_free_split(char **str)
+void	ft_free_split(char **str)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (!str || !*str)

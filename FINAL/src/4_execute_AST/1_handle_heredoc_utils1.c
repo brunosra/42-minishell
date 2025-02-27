@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:12:40 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:50:58 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,10 +65,10 @@ int	ft_handle_exit_status(t_minishell *ms, t_node *node)
 	if (WIFEXITED(ms->status))
 		ft_set_exit_code(ms, WEXITSTATUS(ms->status));
 	if (WIFEXITED(ms->status) && WEXITSTATUS(ms->status) == 130)
-    {
-            ft_set_exit_code(ms, 130);
-			return (1);
-    }
+	{
+		ft_set_exit_code(ms, 130);
+		return (1);
+	}
 	else
 		ft_set_exit_code(ms, 1);
 	return (ft_execute_ast(node->left, ms));

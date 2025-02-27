@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:48:45 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 01:03:43 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@ void		ft_remove_created_files(t_node *node);
 void		ft_create_files(t_node *node);
 
 /**
- * @brief  Checks if the given file is valid and accessible for the specified mode.
+ * @brief  Checks if the given file is valid and accessible for the specified
+ * mode.
  * 
  * @param  filepath  Path to the file.
  * @param  mode      Access mode to check (e.g., read, write, execute).
@@ -34,7 +35,7 @@ int	ft_is_valid_file(char *filepath, int mode)
 
 	if (!filepath)
 		return (ft_file_error(NULL, "syntax error near unexpected token "
-			"`newline'", 1));
+				"`newline'", 1));
 	if (stat(filepath, &file_stat) == -1)
 		return (ft_file_error(filepath, "No such file or directory", 127));
 	if (S_ISDIR(file_stat.st_mode))
@@ -43,7 +44,8 @@ int	ft_is_valid_file(char *filepath, int mode)
 }
 
 /**
- * @brief  Handles file-related error messages and returns the appropriate error code.
+ * @brief  Handles file-related error messages and returns the appropriate error
+ * code.
  * 
  * @param  filepath  Path to the file.
  * @param  msg       Error message to display.
@@ -92,59 +94,60 @@ static int	ft_check_file_access(char *filepath, int mode)
 }
 
 /**
- * @brief  Creates files for output redirection nodes if they don't already exist.
+ * @brief  Creates files for output redirection nodes if they don't already
+ * exist.
  * 
- * @param  node  Pointer to the node in the AST containing the output redirection.
+ * @param  node  Pointer to the node in the AST containing the out redirection.
  */
 void	ft_create_files(t_node *node)
 {
-	int fd;
+	int	fd;
 
 	if (!node)
-		return;
+		return ;
 	if (node->token->type == TKN_OUT_RD && node->right
 		&& node->right->token->value && node->file == false)
 	{
 		if (ft_strcmp(node->token->value, ">>") == 0)
 			fd = open(node->right->token->value,
-				O_WRONLY | O_CREAT | O_APPEND, 0644);
+					O_WRONLY | O_CREAT | O_APPEND, 0644);
 		else
 			fd = open(node->right->token->value,
-				O_WRONLY | O_CREAT | O_TRUNC, 0644);
+					O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd != -1)
 			close(fd);
 		else
 			perror("open");
 	}
-	if (node->left && node->left->token->type == TKN_OUT_RD) // Se o nó à esquerda também for um output redirect, continuar a verificação
+	if (node->left && node->left->token->type == TKN_OUT_RD)
 		ft_create_files(node->left);
 }
 
 /**
- * @brief  Removes files created during the execution of output redirection nodes.
+ * @brief  Removes files created during the execution of output redirection
+ * nodes.
  * 
- * @param  node  Pointer to the node in the AST containing the output redirection.
+ * @param  node  Pointer to the node in the AST containing the out redirection.
  */
 void	ft_remove_created_files(t_node *node)
 {
 	if (!node)
 		return ;
 	if (node->token->type == TKN_OUT_RD && node->right
-		&& node->right->token->value && node->file == true) // Se for um OUTPUT_REDIRECT, tenta remover o arquivo associado
+		&& node->right->token->value && node->file == true)
 	{
 		if (unlink(node->right->token->value) == -1)
 			perror("unlink");
 		else
 			node->file = false;
 	}
-	if (node->prev && node->prev->right == node) // Se estivermos em um ramo direito, seguimos para o nó anterior diretamente
+	if (node->prev && node->prev->right == node)
 	{
 		ft_remove_created_files(node->prev);
 		return ;
 	}
-	if (node->prev && node->prev->right) // Se estivermos em um ramo esquerdo, verificamos o ramo direito do nó anterior
+	if (node->prev && node->prev->right)
 		ft_remove_created_files(node->prev->right);
-	if (node->prev) // Continua a recursão para o nó anterior
+	if (node->prev)
 		ft_remove_created_files(node->prev);
 }
-

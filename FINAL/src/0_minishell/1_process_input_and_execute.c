@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:04:02 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:03:30 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 int			ft_process_input_and_execute(t_minishell *ms);
 static int	ft_handle_and_tokenize_input(t_minishell *ms);
-static void ft_find_stuck_cats(t_minishell *ms, t_node *node);
-static void ft_close_stdin_stdout(t_minishell *ms);
-static void ft_clean_stuck_cats(t_minishell *ms);
+static void	ft_find_stuck_cats(t_minishell *ms, t_node *node);
+static void	ft_close_stdin_stdout(t_minishell *ms);
+static void	ft_clean_stuck_cats(t_minishell *ms);
 
 /**
  * @brief  Process the user input and execute commands.
@@ -35,7 +35,7 @@ int	ft_process_input_and_execute(t_minishell *ms)
 		else
 			return (ft_putstr_and_return("minishell: unclosed quotes\n", 1));
 	}
- 	ms->ast_root = ft_parse_ast(ms->tokens);
+	ms->ast_root = ft_parse_ast(ms->tokens);
 	ft_find_stuck_cats(ms, ms->ast_root);
 	if (ms->ast_root)
 	{
@@ -44,7 +44,7 @@ int	ft_process_input_and_execute(t_minishell *ms)
 			|| dup2(ms->save_stdout, STDOUT_FILENO) == -1)
 		{
 			ft_close_stdin_stdout(ms);
-			return(ft_perror("dup2", 1));
+			return (ft_perror("dup2", 1));
 		}
 		if (ms->in_pipe == true)
 			ms->in_pipe = false;
@@ -65,10 +65,9 @@ int	ft_process_input_and_execute(t_minishell *ms)
  */
 static int	ft_handle_and_tokenize_input(t_minishell *ms)
 {
-	
 	if (ft_check_quotes(ms->input))
 		return (1);
-	ms->n_args = ft_count_args(ms->input);
+	ms->n_args = ft_count_args(ms->input, 0);
 	if (ms->n_args == -1)
 		return (1);
 	ms->tokens = ft_tokenize_input(ms->input, ms->n_args, 0, 0);
@@ -83,22 +82,23 @@ static int	ft_handle_and_tokenize_input(t_minishell *ms)
  * @param  node  Current node in the AST.
  * @return void
  */
-static void ft_find_stuck_cats(t_minishell *ms, t_node *node)
+static void	ft_find_stuck_cats(t_minishell *ms, t_node *node)
 {
-	t_node *current;
-	
+	t_node	*current;
+
 	current = node;
 	if (!current)
-		return;
+		return ;
 	if (current->token->type == TKN_CMD)
 	{
 		if (current->cmd_ready[1] == NULL
-		&& (!ft_strcmp(current->cmd_ready[0], "cat")
-		|| !ft_strcmp(current->cmd_ready[0], "/bin/cat"))
-		&& current->prev && current->prev->token->type == TKN_PIPE 
-		&& (current->prev->left == current || (current->prev->prev
-		&& current->prev->prev->token->type == TKN_PIPE
-		&& current->prev->right == current)))
+			&& (!ft_strcmp(current->cmd_ready[0], "cat")
+				|| !ft_strcmp(current->cmd_ready[0], "/bin/cat"))
+			&& current->prev && current->prev->token->type == TKN_PIPE
+			&& (current->prev->left == current
+				|| (current->prev->prev
+					&& current->prev->prev->token->type == TKN_PIPE
+					&& current->prev->right == current)))
 			ms->c_stuck_cats++;
 	}
 	if (!current->left && !current->right)
@@ -106,9 +106,8 @@ static void ft_find_stuck_cats(t_minishell *ms, t_node *node)
 	ft_find_stuck_cats(ms, current->left);
 	if (!ms->c_stuck_cats)
 		return ;
-	ft_find_stuck_cats(ms, current->right);	
+	ft_find_stuck_cats(ms, current->right);
 }
-
 
 /**
  * @brief  Close saved stdin and stdout file descriptors.
@@ -116,7 +115,7 @@ static void ft_find_stuck_cats(t_minishell *ms, t_node *node)
  * @param  ms  Pointer to the minishell structure.
  * @return void
  */
-static void ft_close_stdin_stdout(t_minishell *ms)
+static void	ft_close_stdin_stdout(t_minishell *ms)
 {
 	close(ms->save_stdin);
 	close(ms->save_stdout);
@@ -128,17 +127,17 @@ static void ft_close_stdin_stdout(t_minishell *ms)
  * @param  ms  Pointer to the minishell structure.
  * @return void
  */
-static void ft_clean_stuck_cats(t_minishell *ms)
+static void	ft_clean_stuck_cats(t_minishell *ms)
 {
-	char c;
+	char	c;
 
 	if (!ms->c_stuck_cats)
 		return ;
 	while (ms->c_stuck_cats)
 	{
 		while (read(STDIN_FILENO, &c, 1) > 0)
-    	{
-       		if (c == '\n') // Enter pressionado
+		{
+			if (c == '\n')
 				ms->c_stuck_cats--;
 			if (ms->c_stuck_cats == 0)
 				break ;

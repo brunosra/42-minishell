@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 01:34:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:36:00 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,13 @@
 
 t_node			*ft_parse_ast(t_token *tokens);
 static void		ft_process_token(t_token *tokens, int *i, t_node **current,
-				t_node **root);
+					t_node **root);
 static t_node	*ft_handle_op_node(t_token *tokens, int *i,
-				t_node **current, t_node **root);
+					t_node **current, t_node **root);
 static void		ft_adjust_input_redirect(t_token *tokens, int *i,
-				t_ast_helper *ast);
+					t_ast_helper *ast);
 static t_node	*ft_handle_cmd_node(t_token *tokens, int *i, t_node **current,
-				t_node **root);
+					t_node **root);
 
 /**
  * @brief Parses tokens into an Abstract Syntax Tree (AST).
@@ -63,8 +63,7 @@ static void	ft_process_token(t_token *tokens, int *i, t_node **current,
 		|| tokens[*i].type == TKN_FILE
 		|| tokens[*i].type == TKN_ARG)
 	{
-		if (tokens[*i].type == TKN_FILE /* && *current
-			&& (*current)->token->type == TKN_HDOC */)
+		if (tokens[*i].type == TKN_FILE)
 		{
 			tokens[*i].old_value = ft_strdup(tokens[*i].value);
 			tokens[*i].value = ft_remove_quotes(tokens[*i].value);
@@ -162,13 +161,13 @@ static t_node	*ft_handle_cmd_node(t_token *tokens, int *i, t_node **current,
 	if (!*root)
 		*root = cmd_node;
 	else if (*current && ((*current)->token->type == TKN_PIPE
-		|| (*current)->token->type == TKN_OUT_RD
-		|| (*current)->token->type == TKN_IN_RD
-		|| (*current)->token->type == TKN_HDOC
-		|| (*current)->token->type == TKN_EXCPT))
+			|| (*current)->token->type == TKN_OUT_RD
+			|| (*current)->token->type == TKN_IN_RD
+			|| (*current)->token->type == TKN_HDOC
+			|| (*current)->token->type == TKN_EXCPT))
 		(*current)->right = cmd_node;
 	else if (tokens[*i].type != TKN_ARG
-			&& cmd_node->token->type != TKN_ARG)
+		&& cmd_node->token->type != TKN_ARG)
 		(*current)->prev->left = cmd_node;
 	cmd_node->prev = *current;
 	*current = cmd_node;

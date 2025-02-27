@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:02:16 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:47:00 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 char		**ft_remove_null_values(char **cmd_ready, int arg_count);
 static void	ft_copy_valid_args(char **cmd_ready, char **new_cmd_ready,
-					int valid_count);
+				int valid_count);
 static int	ft_count_valid_args(char **cmd_ready);
 
 /**

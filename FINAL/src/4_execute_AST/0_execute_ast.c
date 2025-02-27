@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:05:11 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:48:36 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,8 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
 		return (ft_execute_heredoc(node, ms));
 	if (node->token->type == TKN_PIPE)
 		return (ft_handle_pipe(node, ms));
-	if (node->token->type == TKN_BLTIN ||
-		node->token->type == TKN_CMD)
+	if (node->token->type == TKN_BLTIN
+		|| node->token->type == TKN_CMD)
 		return (ft_execute_command(node, ms));
 	return (0);
 }

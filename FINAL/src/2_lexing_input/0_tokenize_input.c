@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:41:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:25:52 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,7 @@
 
 t_token		*ft_tokenize_input(char *str, int n_args, int i, int j);
 static int	ft_tokenize(char *str, int *i, t_token *tokens, int *j);
-static int	ft_handle_quoted_token(char *str, int *i, t_token *tokens, 
-									int *j, t_type prev_type);
+static int	ft_handle_quoted_token(char *str, int *i, t_token *tokens, int *j);
 static void	ft_handle_operator_token(char *str, int *i);
 static void	ft_handle_regular_token(char *str, int *i);
 
@@ -31,7 +30,7 @@ static void	ft_handle_regular_token(char *str, int *i);
 t_token	*ft_tokenize_input(char *str, int n_args, int i, int j)
 {
 	t_token	*tokens;
-	int 	n_tokens;
+	int		n_tokens;
 
 	n_tokens = 0;
 	tokens = malloc(sizeof(t_token) * (n_args + 1));
@@ -40,7 +39,7 @@ t_token	*ft_tokenize_input(char *str, int n_args, int i, int j)
 	while (str[i])
 	{
 		while (str[i] == ' ')
-			i++;		
+			i++;
 		if (str[i] == '\0')
 			break ;
 		i = ft_tokenize(str, &i, tokens, &j);
@@ -74,8 +73,14 @@ static int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
 		prev_type = TKN_NULL;
 	tokens[*j].old_value = NULL;
 	if (str[*i] == '"' || str[*i] == '\'')
-		return (ft_handle_quoted_token(str, i, tokens, j, prev_type));
-	if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<' || str[*i] == ';' || str[*i] == '&')
+	{
+		ft_handle_quoted_token(str, i, tokens, j);
+		tokens[*j].type = ft_get_token_type(tokens[*j].value, prev_type);
+		*j += 1;
+		return (*i);
+	}
+	if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<' || str[*i] == ';'
+		|| str[*i] == '&')
 		ft_handle_operator_token(str, i);
 	else
 		ft_handle_regular_token(str, i);
@@ -95,8 +100,7 @@ static int	ft_tokenize(char *str, int *i, t_token *tokens, int *j)
  * @param prev_type   Type of the previous token.
  * @return int        Updated index after processing the quoted token.
  */
-static int	ft_handle_quoted_token(char *str, int *i, t_token *tokens, int *j, 
-									t_type prev_type)
+static int	ft_handle_quoted_token(char *str, int *i, t_token *tokens, int *j)
 {
 	int	start;
 	int	end;
@@ -108,8 +112,6 @@ static int	ft_handle_quoted_token(char *str, int *i, t_token *tokens, int *j,
 		tokens[*j].value = ft_strdup("\0");
 	else
 		tokens[*j].value = ft_revalue_quoted_value(tokens[*j].value);
-	tokens[*j].type = ft_get_token_type(tokens[*j].value, prev_type);
-	*j += 1;
 	*i += 1;
 	return (*i);
 }
@@ -123,7 +125,8 @@ static int	ft_handle_quoted_token(char *str, int *i, t_token *tokens, int *j,
 static void	ft_handle_operator_token(char *str, int *i)
 {
 	*i += 1;
-	if (str[*i] == '>' || str[*i] == '<' || str[*i] == '|' || str[*i] == ';' || str[*i] == '&')
+	if (str[*i] == '>' || str[*i] == '<' || str[*i] == '|' || str[*i] == ';'
+		|| str[*i] == '&')
 		*i += 1;
 }
 
@@ -137,9 +140,9 @@ static void	ft_handle_regular_token(char *str, int *i)
 {
 	while (str[*i] && str[*i] != ' ')
 	{
-		if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<' || str[*i] == ';' || str[*i] == '&')
-			break;
+		if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<' || str[*i] == ';'
+			|| str[*i] == '&')
+			break ;
 		*i += 1;
 	}
 }
-

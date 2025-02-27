@@ -6,14 +6,14 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 01:51:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 07:01:47 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:46:41 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 void			ft_collect_arguments(t_token *tokens, int *index,
-										t_cmd_helper *h);
+					t_cmd_helper *h);
 t_cmd_helper	ft_init_cmd_helper(t_node *cmd_node);
 int				ft_verify_cmd_node_value(t_node *cmd_node);
 
@@ -30,7 +30,7 @@ int				ft_verify_cmd_node_value(t_node *cmd_node);
  */
 t_cmd_helper	ft_init_cmd_helper(t_node *cmd_node)
 {
-	t_cmd_helper h;
+	t_cmd_helper	h;
 
 	h.cmd_nd_value = NULL;
 	h.arg_count = 1;
@@ -56,9 +56,9 @@ t_cmd_helper	ft_init_cmd_helper(t_node *cmd_node)
  */
 void	ft_collect_arguments(t_token *tokens, int *index, t_cmd_helper *h)
 {
-	while (tokens[*index].value && 
-		(tokens[*index].type == TKN_ARG || 
-		tokens[*index].type == TKN_VAR))
+	while (tokens[*index].value
+		&& (tokens[*index].type == TKN_ARG
+			|| tokens[*index].type == TKN_VAR))
 	{
 		if (tokens[*index].value[0] == '\0')
 		{
@@ -79,11 +79,11 @@ void	ft_collect_arguments(t_token *tokens, int *index, t_cmd_helper *h)
  * @param  cmd_node  Command node to evaluate.
  * @return int       Number of arguments found within the command node value.
  */
-int ft_verify_cmd_node_value(t_node *cmd_node)
+int	ft_verify_cmd_node_value(t_node *cmd_node)
 {
-	int i;
-	int count;
-	char *value;
+	int		i;
+	int		count;
+	char	*value;
 
 	i = 0;
 	count = 0;
@@ -97,7 +97,7 @@ int ft_verify_cmd_node_value(t_node *cmd_node)
 		while (value[i] && value[i] != ' ')
 			i++;
 		while (value[i] && value[i] == ' ')
-			i++;	
+			i++;
 	}
 	return (count);
 }

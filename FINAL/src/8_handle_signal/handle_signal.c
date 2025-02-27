@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 02:49:04 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,15 +34,14 @@ void	ft_signal_handler(int sig)
 	if (sig == SIGINT)
 	{
 		write(STDERR_FILENO, "\n", 1);
-		ft_set_exit_code(ms, 130); // Atualiza o exit_code antes de recriar o prompt
-		// ft_create_prompt(ms); // nao funcioma! nao atualiza novo prompt para 130!
+		ft_set_exit_code(ms, 130);
 		rl_replace_line("", 0);
 		rl_on_new_line();
-		rl_redisplay(); 
+		rl_redisplay();
 	}
 }
 
- /**
+/**
  * @brief Configures signal handling for the main minishell process.
  * 
  * This function ensures SIGINT is properly handled to update the prompt,
@@ -50,11 +49,11 @@ void	ft_signal_handler(int sig)
  */
 void	ft_set_main_signals(void)
 {
-	struct sigaction sa;
+	struct sigaction	sa;
 
 	sa.sa_handler = ft_signal_handler;
 	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_RESTART;  // Reinicia chamadas interrompidas
+	sa.sa_flags = SA_RESTART;
 	sigaction(SIGINT, &sa, NULL);
 	signal(SIGQUIT, SIG_IGN);
 }
@@ -67,9 +66,9 @@ void	ft_set_main_signals(void)
  */
 void	ft_set_fork_signals(void)
 {
-	signal(SIGINT, SIG_IGN); 
-	signal(SIGQUIT, SIG_IGN); // Se for para executar alterar para SIG_DFL
-} 
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
+}
 
 /**
  * @brief Configures signal handling for heredoc input mode.
@@ -79,7 +78,7 @@ void	ft_set_fork_signals(void)
 void	ft_set_heredoc_signals(void)
 {
 	signal(SIGINT, ft_signal_heredoc_handler);
-	signal(SIGQUIT, SIG_IGN); // Ignora Ctrl-'\'
+	signal(SIGQUIT, SIG_IGN);
 }
 
 /**

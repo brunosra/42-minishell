@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:09:47 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 02:39:34 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,6 @@ static int	ft_replace_entire_str(char **value, char *env_value)
 	return (0);
 }
 
-
 /**
  * @brief  Checks if the quotes in a string are balanced up to a specific index.
  * 
@@ -133,16 +132,10 @@ int	ft_check_balanced_quotes(char *str, int idx)
 	is_balanced = 1;
 	while (i < idx && str[i])
 	{
-		if (str[i] == '"' || str[i] == '\'')
-		{
-			if (quote_type == str[i])
-				quote_type = '\0'; // Fecha aspas
-			else if (quote_type == '\0')
-				quote_type = str[i]; // Abre aspas
-		}
+		ft_verify_quotes(&quote_type, str[i]);
 		i++;
 	}
 	if (quote_type != '\0')
-		is_balanced = 0; // Par de aspas não está fechado
+		is_balanced = 0;
 	return (is_balanced);
 }

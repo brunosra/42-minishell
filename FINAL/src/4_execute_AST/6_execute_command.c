@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:43:45 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:59:56 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,8 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	waitpid(ms->pid, &ms->status, 0);
 	ft_handle_cmd_exit_status(node, ms);
 	ft_set_main_signals();
-	if (ft_exit_code(ms) != 0 && node->prev &&
-		node->prev->token->type == TKN_IN_RD)
+	if (ft_exit_code(ms) != 0 && node->prev
+		&& node->prev->token->type == TKN_IN_RD)
 		ft_remove_created_files(node->prev);
 	if (node->token->type == TKN_BLTIN && !ft_strcmp(node->cmd_ready[0], "exit")
 		&& ft_exit_code(ms) != 1)
@@ -69,8 +69,8 @@ static void	ft_handle_cmd_exit_status(t_node *node, t_minishell *ms)
 			ft_putstr_fd(": command not found\n", STDERR_FILENO);
 			ft_set_exit_code(ms, 127);
 		}
-		else if (ft_exit_code(ms) == 0 && node->token->type == TKN_BLTIN &&
-				 ft_strcmp(node->token->value, "echo"))
+		else if (ft_exit_code(ms) == 0 && node->token->type == TKN_BLTIN
+			&& ft_strcmp(node->token->value, "echo"))
 			ft_exec_builtins(node, ms);
 	}
 	else if (WIFSIGNALED(ms->status))
@@ -101,11 +101,11 @@ static void	ft_execute_child_process(t_node *node, t_minishell *ms)
 		ft_execute_external(node, ms);
 	if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
 		exit(42);
-	if (node->cmd_ready[1] == NULL && !ft_strcmp(node->cmd_ready[0], "cat") &&
-		node->prev && node->prev->token->type == TKN_PIPE &&
-		(node->prev->left == node ||
-			(node->prev->prev && node->prev->prev->token->type == TKN_PIPE &&
-				node->prev->right == node)))
+	if (node->cmd_ready[1] == NULL && !ft_strcmp(node->cmd_ready[0], "cat")
+		&& node->prev && node->prev->token->type == TKN_PIPE
+		&& (node->prev->left == node
+			|| (node->prev->prev && node->prev->prev->token->type == TKN_PIPE
+				&& node->prev->right == node)))
 		exit(13);
 	execve(ms->env.full_path, node->cmd_ready, ms->env.envp);
 	perror("execve");

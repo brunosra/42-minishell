@@ -6,14 +6,14 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:19:06 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:07:40 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 int			ft_check_quotes(char *str);
-int			ft_count_args(char *str);
+int			ft_count_args(char *str, int i);
 int			ft_handle_quotes(char *str, int i, int *start, int *end);
 static int	ft_skip_and_process(char *str, int i, char quote_type);
 static int	ft_handle_argument(char *str, int i);
@@ -53,24 +53,23 @@ int	ft_check_quotes(char *str)
  * @return int
  **        Number of arguments found in the string.
  */
-int	ft_count_args(char *str)
+int	ft_count_args(char *str, int i)
 {
-	int count;
-	int i;
+	int	count;
 
-	i = 0;
 	count = 0;
-
 	while (str[i])
 	{
 		while (str[i] == ' ')
 			i++;
 		if (str[i] == '\0')
 			break ;
-		if (str[i] == '|' || str[i] == '<' || str[i] == '>' || str[i] == ';' || str[i] == '&')
+		if (str[i] == '|' || str[i] == '<' || str[i] == '>' || str[i] == ';'
+			|| str[i] == '&')
 		{
 			i++;
-			if (str[i] && str[i + 1] && (str[i] == '<' || str[i] == '>' || str[i] == '&'))
+			if (str[i] && str[i + 1] && (str[i] == '<' || str[i] == '>'
+					|| str[i] == '&'))
 				i++;
 		}
 		else if (str[i] == '"' || str[i] == '\'')
@@ -87,8 +86,8 @@ int	ft_count_args(char *str)
  * 
  * @param  str    Input string.
  * @param  i      Current index in the string.
- * @param  start  Pointer to store the start index of the quoted section (optional).
- * @param  end    Pointer to store the end index of the quoted section (optional).
+ * @param  start  Pointer to store the start index of the quoted section.
+ * @param  end    Pointer to store the end index of the quoted section.
  * @return int    Updated index after handling the quoted section.
  */
 int	ft_handle_quotes(char *str, int i, int *start, int *end)
@@ -107,7 +106,7 @@ int	ft_handle_quotes(char *str, int i, int *start, int *end)
 			else
 				i = ft_skip_and_process(str, i, quote_type);
 			if (str[i] == ' ')
-				break;
+				break ;
 		}
 		else
 			i++;
@@ -147,8 +146,8 @@ static int	ft_skip_and_process(char *str, int i, char quote_type)
  */
 static int	ft_handle_argument(char *str, int i)
 {
-	while (str[i] && str[i] != ' ' && str[i] != '|' && str[i] != '>' 
-				&& str[i] != '<' && str[i] != ';' && str[i] != '&')
+	while (str[i] && str[i] != ' ' && str[i] != '|' && str[i] != '>'
+		&& str[i] != '<' && str[i] != ';' && str[i] != '&')
 		i++;
 	return (i);
 }

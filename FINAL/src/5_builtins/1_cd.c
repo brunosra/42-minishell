@@ -6,16 +6,17 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/26 07:37:56 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 02:13:11 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 void		ft_builtin_cd(char **args, t_minishell *ms);
-static void	ft_cd_set_resolved_path(char **args, char *curpwd, char *res_p,
-										t_minishell *ms);
-void		ft_resolve_rel_p(const char *base_p, const char *rel_p, char *res_p);
+static void	ft_cd_set_resolved_p(char **args, char *curpwd, char *res_p,
+				t_minishell *ms);
+void		ft_resolve_rel_p(const char *base_p, const char *rel_p,
+				char *res_p);
 static void	ft_resolve_tilde(const char *rel_p, char *tmp_p);
 static char	*ft_norm_pth(char *tmp_p, char *norm_p);
 
@@ -37,7 +38,7 @@ void	ft_builtin_cd(char **args, t_minishell *ms)
 		ft_set_exit_code(ms, errno);
 		return ;
 	}
-	ft_cd_set_resolved_path(args, curpwd, res_p, ms);
+	ft_cd_set_resolved_p(args, curpwd, res_p, ms);
 	ft_set_env("OLDPWD", curpwd, ms);
 	ft_set_env("PWD", res_p, ms);
 	ft_strlcpy(ms->currpath, res_p, ft_strlen(res_p) + 1);
@@ -71,7 +72,7 @@ static void	ft_resolve_tilde(const char *rel_p, char *tmp_p)
  * @param	rel_p 		relative path to solve to
  * @param	res_p 		pointer to where to store the resolved path
  */
-void	ft_resolve_rel_p(const char *base_p, const char *rel_p, char *res_p)
+void	ft_rsolve_rel_p(const char *base_p, const char *rel_p, char *res_p)
 {
 	char		tmp_p[PATH_MAX];
 	char		norm_pth[PATH_MAX];
@@ -103,7 +104,7 @@ void	ft_resolve_rel_p(const char *base_p, const char *rel_p, char *res_p)
  * @param  ms      Pointer to the minishell structure.
  * @return void    Updates `res_p` with the resolved path.
  */
-static void	ft_cd_set_resolved_path(char **args, char *curpwd, char *res_p,
+static void	ft_cd_set_resolved_p(char **args, char *curpwd, char *res_p,
 				t_minishell *ms)
 {
 	if (args[1] == NULL)
@@ -122,7 +123,7 @@ static void	ft_cd_set_resolved_path(char **args, char *curpwd, char *res_p,
 		else if (!ft_strcmp(args[1], "~"))
 			ft_strncpy(res_p, ft_get_env("HOME", ms), PATH_MAX - 1);
 		else
-			ft_resolve_rel_p(curpwd, args[1], res_p);
+			ft_rsolve_rel_p(curpwd, args[1], res_p);
 	}
 }
 

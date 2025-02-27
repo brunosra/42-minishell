@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:21:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:51:19 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static int	ft_fork_heredoc(t_minishell *ms, t_node *node, int *i);
 static void	ft_cleanup_heredocs(t_minishell *ms, int save_stdout, t_node *node);
 static void	ft_multiple_heredoc_child(t_node *node, t_minishell *ms, int *i);
 static int	ft_process_heredoc_input(t_node *node, t_minishell *ms,
-										char *input, int *i);
+				char *input, int *i);
 
 /**
  * @brief  Handles multiple heredocs consecutively and passes the data.

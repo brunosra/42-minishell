@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:48:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:30:58 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 t_type			ft_get_token_type(char *str, t_type prev_type);
 static t_type	ft_check_redirection_and_operator(char *str, t_type prev_type,
-													bool *inverted);
+					bool *inverted);
 static t_type	ft_check_redirection(char *str);
 static t_type	ft_check_operator_or_exception(char *str);
 static t_type	ft_check_variable(char *str);
@@ -34,8 +34,8 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 	type = ft_check_redirection_and_operator(str, prev_type, &inverted);
 	if (type != TKN_CMD)
 		return (type);
-	if (prev_type == TKN_NULL || prev_type == TKN_PIPE ||
-				(prev_type == TKN_FILE && inverted == true))
+	if (prev_type == TKN_NULL || prev_type == TKN_PIPE
+		|| (prev_type == TKN_FILE && inverted == true))
 	{
 		inverted = false;
 		if (ft_check_builtins(str))
@@ -45,9 +45,9 @@ t_type	ft_get_token_type(char *str, t_type prev_type)
 	if (str && (str[0] == '$' || ft_strchr(str, '$')))
 		return (ft_check_variable(str));
 	if ((str[0] == '"' || str[0] == '\'') && (prev_type != TKN_CMD
-		&& prev_type != TKN_BLTIN && prev_type != TKN_VAR 
-		&& prev_type != TKN_PIPE && prev_type != TKN_EXCPT
-		&& prev_type != TKN_ARG && prev_type != TKN_FILE))
+			&& prev_type != TKN_BLTIN && prev_type != TKN_VAR
+			&& prev_type != TKN_PIPE && prev_type != TKN_EXCPT
+			&& prev_type != TKN_ARG && prev_type != TKN_FILE))
 		return (TKN_FILE);
 	if (prev_type == TKN_CMD || prev_type == TKN_BLTIN || prev_type == TKN_ARG
 		|| prev_type == TKN_VAR || prev_type == TKN_FILE)
@@ -69,16 +69,16 @@ static t_type	ft_check_redirection_and_operator(char *str, t_type prev_type,
 	t_type	type;
 
 	type = ft_check_redirection(str);
-	if ((type == TKN_OUT_RD || type == TKN_HDOC) &&
-		(prev_type == TKN_PIPE || prev_type == TKN_NULL))
+	if ((type == TKN_OUT_RD || type == TKN_HDOC)
+		&& (prev_type == TKN_PIPE || prev_type == TKN_NULL))
 		*inverted = true;
 	if (type != TKN_CMD)
 		return (type);
-	if (prev_type == TKN_OUT_RD || prev_type == TKN_IN_RD ||
-		prev_type == TKN_HDOC)
-	return (TKN_FILE);
-		type = ft_check_operator_or_exception(str);
-	if (type == TKN_PIPE &&	(prev_type == TKN_PIPE || prev_type == TKN_EXCPT))
+	if (prev_type == TKN_OUT_RD || prev_type == TKN_IN_RD
+		|| prev_type == TKN_HDOC)
+		return (TKN_FILE);
+	type = ft_check_operator_or_exception(str);
+	if (type == TKN_PIPE && (prev_type == TKN_PIPE || prev_type == TKN_EXCPT))
 		return (TKN_EXCPT);
 	return (type);
 }
@@ -94,7 +94,7 @@ static t_type	ft_check_redirection(char *str)
 	if (!ft_strcmp(str, "<"))
 		return (TKN_IN_RD);
 	else if (!ft_strcmp(str, ">") || !ft_strcmp(str, ">>")
-			|| !ft_strcmp(str, ">|"))
+		|| !ft_strcmp(str, ">|"))
 		return (TKN_OUT_RD);
 	else if (!ft_strcmp(str, "<<"))
 		return (TKN_HDOC);
@@ -111,7 +111,9 @@ static t_type	ft_check_operator_or_exception(char *str)
 {
 	if (!ft_strcmp(str, "|"))
 		return (TKN_PIPE);
-	else if (!ft_strcmp(str, "||") || !ft_strcmp(str, "&&") || !ft_strcmp(str, ";") || !ft_strcmp(str, "&") || str[0] == ';' || str[0] == '&' || (str[0] == '|' && str[1]))
+	else if (!ft_strcmp(str, "||") || !ft_strcmp(str, "&&")
+		|| !ft_strcmp(str, ";") || !ft_strcmp(str, "&")
+		|| str[0] == ';' || str[0] == '&' || (str[0] == '|' && str[1]))
 		return (TKN_EXCPT);
 	return (TKN_CMD);
 }

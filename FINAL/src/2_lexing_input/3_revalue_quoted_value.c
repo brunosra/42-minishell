@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 01:07:37 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:33:53 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@ static char	*ft_process_unquoted_segment(char *value, int *i);
 static void	ft_append_to_final(char **final, char *segment);
 
 /**
- * @brief Processes a string containing quoted and unquoted segments, removing quotes and combining parts.
+ * @brief Processes a string containing quoted and unquoted segments,
+ * removing quotes and combining parts.
  * 
  * @param value Original string to process.
  * @return char* Processed string with quotes removed.

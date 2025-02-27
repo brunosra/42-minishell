@@ -6,18 +6,19 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:03:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 02:24:19 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 int			ft_revalue_tkn_var(t_minishell *ms);
-static char	*ft_process_token_expansion(t_minishell *ms, t_token *token, char *ptr);
+static char	*ft_process_token_expansion(t_minishell *ms, t_token *token,
+				char *ptr);
 static int	ft_is_expandable_token(t_type type);
 
 /**
- * @brief  Expands environment variables in tokens of type VAR, CMD, FILE, or ARG.
+ * @brief  Expands environment variables in tkns of type VAR, CMD, FILE, or ARG.
  * 
  * @param  ms  Pointer to the minishell structure.
  * @return int Status code.
@@ -26,7 +27,7 @@ static int	ft_is_expandable_token(t_type type);
  */
 int	ft_revalue_tkn_var(t_minishell *ms)
 {
-	int	i;
+	int		i;
 	char	*ptr;
 
 	if (!ms || !ms->tokens || !ms->env.envp)
@@ -34,7 +35,8 @@ int	ft_revalue_tkn_var(t_minishell *ms)
 	i = -1;
 	while (ms->tokens[++i].value)
 	{
-		if (ft_is_expandable_token(ms->tokens[i].type) && ms->tokens[i - 1].type != TKN_HDOC)
+		if (ft_is_expandable_token(ms->tokens[i].type)
+			&& ms->tokens[i - 1].type != TKN_HDOC)
 		{
 			ptr = ft_strchr(ms->tokens[i].value, '$');
 			while (ptr && *ptr)
@@ -52,7 +54,8 @@ int	ft_revalue_tkn_var(t_minishell *ms)
  * @param  ptr    Pointer to the `$` inside the token value.
  * @return char*  Pointer to the next `$` to expand, or NULL if none remain.
  */
-static char	*ft_process_token_expansion(t_minishell *ms, t_token *token, char *ptr)
+static char	*ft_process_token_expansion(t_minishell *ms, t_token *token,
+				char *ptr)
 {
 	char	*env_value;
 	char	*key;
@@ -88,5 +91,6 @@ static char	*ft_process_token_expansion(t_minishell *ms, t_token *token, char *p
  */
 static int	ft_is_expandable_token(t_type type)
 {
-	return (type == TKN_VAR || type == TKN_CMD || type == TKN_FILE || type == TKN_ARG);
+	return (type == TKN_VAR || type == TKN_CMD || type == TKN_FILE
+		|| type == TKN_ARG);
 }

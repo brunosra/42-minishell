@@ -6,18 +6,18 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 01:47:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:44:18 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-t_node	*ft_group_command_tokens(t_token *tokens, int *index);
+t_node		*ft_group_command_tokens(t_token *tokens, int *index);
 static void	ft_process_cmd_value(t_node *cmd_node, t_cmd_helper *h);
 static void	ft_fill_cmd_node(t_token *tokens, int *index, t_node *cmd_node,
-								t_cmd_helper *h);
+				t_cmd_helper *h);
 static void	ft_handle_individual_token(t_token *tokens, int *index,
-										t_node *cmd_node, t_cmd_helper *h);
+				t_node *cmd_node, t_cmd_helper *h);
 static void	ft_handle_redirects(t_token *tokens, int *index, t_cmd_helper *h);
 
 /**
@@ -34,8 +34,8 @@ static void	ft_handle_redirects(t_token *tokens, int *index, t_cmd_helper *h);
  */
 t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 {
-	t_node		*cmd_node;
-	t_cmd_helper h;
+	t_node			*cmd_node;
+	t_cmd_helper	h;
 
 	cmd_node = ft_create_cmd_node(&tokens[*index]);
 	h = ft_init_cmd_helper(cmd_node);
@@ -43,8 +43,8 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 	ft_collect_arguments(tokens, index, &h);
 	h.stop = *index;
 	ft_handle_redirects(tokens, index, &h);
-	cmd_node->cmd_ready = malloc(sizeof(char *) * (h.arg_count + 
-		(h.n_args_cmd_nd_values - 1) + 1));
+	cmd_node->cmd_ready = malloc(sizeof(char *)
+			* (h.arg_count + (h.n_args_cmd_nd_values - 1) + 1));
 	if (!cmd_node->cmd_ready)
 		return (NULL);
 	ft_process_cmd_value(cmd_node, &h);
@@ -54,7 +54,7 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 		*index = h.stop;
 	cmd_node->cmd_ready[h.i] = NULL;
 	cmd_node->cmd_ready = ft_remove_null_values(cmd_node->cmd_ready,
-												h.arg_count);
+			h.arg_count);
 	return (cmd_node);
 }
 
@@ -71,15 +71,14 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
  */
 static void	ft_handle_redirects(t_token *tokens, int *index, t_cmd_helper *h)
 {
-	while (tokens[*index].value && 
-		(tokens[*index].type != TKN_PIPE && 
-		tokens[*index].type != TKN_EXCPT &&
-		tokens[*index].type != TKN_CMD))
+	while (tokens[*index].value && (tokens[*index].type != TKN_PIPE
+			&& tokens[*index].type != TKN_EXCPT
+			&& tokens[*index].type != TKN_CMD))
 	{
-		if (tokens[*index].type == TKN_IN_RD || 
-			tokens[*index].type == TKN_OUT_RD || 
-			tokens[*index].type == TKN_HDOC || 
-			tokens[*index].type == TKN_FILE)
+		if (tokens[*index].type == TKN_IN_RD
+			|| tokens[*index].type == TKN_OUT_RD
+			|| tokens[*index].type == TKN_HDOC
+			|| tokens[*index].type == TKN_FILE)
 		{
 			h->c_except++;
 			(*index)++;
@@ -94,7 +93,7 @@ static void	ft_handle_redirects(t_token *tokens, int *index, t_cmd_helper *h)
 }
 
 /**
- * @brief  Handles an individual token and updates the command node's `cmd_ready`.
+ * @brief  Handles an individual token and updates the cmd node's `cmd_ready`.
  * 
  * This helper function processes an individual token, checking if the
  * token value is empty and skipping it if necessary. It also removes
@@ -112,7 +111,7 @@ static void	ft_handle_individual_token(t_token *tokens, int *index,
 	if (tokens[*index].value[0] == '\0')
 	{
 		(*index)++;
-		return;
+		return ;
 	}
 	if (h->i > h->j)
 		tokens[*index].value = ft_remove_quotes(tokens[*index].value);
@@ -142,9 +141,9 @@ static void	ft_fill_cmd_node(t_token *tokens, int *index, t_node *cmd_node,
 	while (h->i < h->arg_count)
 	{
 		if (tokens[*index].value && (tokens[*index].type == TKN_ARG
-			|| tokens[*index].type == TKN_VAR 
-			|| tokens[*index].type == TKN_CMD
-			|| tokens[*index].type == TKN_BLTIN))
+				|| tokens[*index].type == TKN_VAR
+				|| tokens[*index].type == TKN_CMD
+				|| tokens[*index].type == TKN_BLTIN))
 		{
 			ft_handle_individual_token(tokens, index, cmd_node, h);
 		}
@@ -154,7 +153,7 @@ static void	ft_fill_cmd_node(t_token *tokens, int *index, t_node *cmd_node,
 				|| tokens[*index].type == TKN_FILE))
 			(*index)++;
 		else
-			break;
+			break ;
 	}
 }
 
@@ -182,6 +181,6 @@ static void	ft_process_cmd_value(t_node *cmd_node, t_cmd_helper *h)
 		h->arg_count--;
 	}
 	else if (ft_cmp_str_str(cmd_node->token->value, "\"", h->len_value)
-			|| ft_cmp_str_str(cmd_node->token->value, "'", h->len_value))
+		|| ft_cmp_str_str(cmd_node->token->value, "'", h->len_value))
 		cmd_node->token->value = ft_remove_quotes(cmd_node->token->value);
 }

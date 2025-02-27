@@ -6,16 +6,16 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:06:35 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 02:35:38 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 int			ft_check_if_expand(char *str, char *ptr, int heredoc);
-static int	ft_verify_quotes(char *quote_type, char c);
+int			ft_verify_quotes(char *quote_type, char c);
 static int	ft_check_expansion_conditions(char *str, int i, int heredoc,
-											char quote_type);
+				char quote_type);
 static int	ft_is_invalid_dollar_char(char c);
 
 /**
@@ -41,7 +41,7 @@ int	ft_check_if_expand(char *str, char *ptr, int heredoc)
 		if (ft_verify_quotes(&quote_type, str[i]))
 		{
 			i++;
-			continue;
+			continue ;
 		}
 		if (&str[i] == ptr)
 			return (ft_check_expansion_conditions(str, i, heredoc, quote_type));
@@ -57,14 +57,14 @@ int	ft_check_if_expand(char *str, char *ptr, int heredoc)
  * @param  c          The current character in the string.
  * @return int        1 if the character is a quote, 0 otherwise.
  */
-static int	ft_verify_quotes(char *quote_type, char c)
+int	ft_verify_quotes(char *quote_type, char c)
 {
 	if (c == '"' || c == '\'')
 	{
 		if (*quote_type == c)
-			*quote_type = '\0'; // Fecha aspas
+			*quote_type = '\0';
 		else if (*quote_type == '\0')
-			*quote_type = c; // Abre aspas
+			*quote_type = c;
 		return (1);
 	}
 	return (0);
@@ -80,7 +80,7 @@ static int	ft_verify_quotes(char *quote_type, char c)
  * @return int        Expansion status.
  */
 static int	ft_check_expansion_conditions(char *str, int i, int heredoc,
-											char quote_type)
+				char quote_type)
 {
 	if (str[i + 1] == '\'' || str[i + 1] == '"')
 	{
@@ -88,9 +88,9 @@ static int	ft_check_expansion_conditions(char *str, int i, int heredoc,
 			return (1);
 		return (0);
 	}
-	if (quote_type == '\'' && !heredoc) // Aspas simples: não expande
+	if (quote_type == '\'' && !heredoc)
 		return (0);
-	if (str[i + 1] == '?') // Trata caso especial do `$?`
+	if (str[i + 1] == '?')
 		return (2);
 	if (ft_is_invalid_dollar_char(str[i + 1]))
 		return (0);
@@ -105,7 +105,7 @@ static int	ft_check_expansion_conditions(char *str, int i, int heredoc,
  */
 static int	ft_is_invalid_dollar_char(char c)
 {
-	return (!c || c == ' ' || c == '$' || c == '.' || c == ',' || c == '!' ||
-			c == '?' || c == ';' || c == ':' || c == '~' || c == '^' || c == '-' ||
-			c == '+' || c == '*' || c == '/');
+	return (!c || c == ' ' || c == '$' || c == '.' || c == ',' || c == '!'
+		|| c == '?' || c == ';' || c == ':' || c == '~' || c == '^'
+		|| c == '-' || c == '+' || c == '*' || c == '/');
 }

@@ -6,15 +6,15 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 02:12:31 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int	ft_builtin_cd_check(char **args, t_minishell *ms);
-static int	ft_cd_set_resolved_path_check(char **args, char *curpwd,
-	char *res_p, t_minishell *ms);
+int			ft_builtin_cd_check(char **args, t_minishell *ms);
+static int	ft_cd_set_resolved_p_check(char **args, char *curpwd,
+				char *res_p, t_minishell *ms);
 
 /**
  * @brief  Determines and sets the resolved path for the `cd` command.
@@ -28,7 +28,7 @@ static int	ft_cd_set_resolved_path_check(char **args, char *curpwd,
  **         1 if `HOME` or `OLDPWD` is not set.
  **         2 if too many arguments are passed.
  */
-static int	ft_cd_set_resolved_path_check(char **args, char *curpwd,
+static int	ft_cd_set_resolved_p_check(char **args, char *curpwd,
 				char *res_p, t_minishell *ms)
 {
 	if (args[1] == NULL)
@@ -46,7 +46,7 @@ static int	ft_cd_set_resolved_path_check(char **args, char *curpwd,
 			ft_strncpy(res_p, ft_get_env("OLDPWD", ms), PATH_MAX - 1);
 		}
 		else
-			ft_resolve_rel_p(curpwd, args[1], res_p);
+			ft_rsolve_rel_p(curpwd, args[1], res_p);
 	}
 	else
 		return (ft_builtin_error("minishell: cd: too many arguments", 1));
@@ -62,7 +62,7 @@ static int	ft_cd_set_resolved_path_check(char **args, char *curpwd,
  **         0 on success.
  **         1 if `getcwd` fails or path resolution fails.
  **         1 if the target directory does not exist.
- **         Returns specific error codes from `ft_cd_set_resolved_path_check`.
+ **         Returns specific error codes from `ft_cd_set_resolved_p_check`.
  */
 int	ft_builtin_cd_check(char **args, t_minishell *ms)
 {
@@ -76,7 +76,7 @@ int	ft_builtin_cd_check(char **args, t_minishell *ms)
 		printf("getcwd error\n");
 		return (ft_builtin_error("getcwd:", errno));
 	}
-	ret = ft_cd_set_resolved_path_check(args, curpwd, res_p, ms);
+	ret = ft_cd_set_resolved_p_check(args, curpwd, res_p, ms);
 	if (ret != 0)
 		return (ret);
 	if (chdir(res_p) != 0)

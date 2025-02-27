@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:29:26 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 07:14:40 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 00:52:47 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,8 @@ int	ft_check_redirect_syntax(t_node *node, t_minishell *ms)
 {
 	if (!node->right)
 	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n",
-			STDERR_FILENO);
+		ft_putstr_fd("minishell: syntax error near unexpected token"
+			"`newline'\n", STDERR_FILENO);
 		ft_set_exit_code(ms, 2);
 		return (1);
 	}
@@ -87,9 +87,11 @@ static int	ft_open_output_file(t_node *node)
 	int	fd;
 
 	if (ft_strcmp(node->token->value, ">>") == 0)
-		fd = open(node->right->token->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		fd = open(node->right->token->value,
+				O_WRONLY | O_CREAT | O_APPEND, 0644);
 	else
-		fd = open(node->right->token->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		fd = open(node->right->token->value,
+				O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd != -1)
 		node->file = true;
 	return (fd);
