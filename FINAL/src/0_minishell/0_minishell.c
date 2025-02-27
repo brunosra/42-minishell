@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 23:48:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:51:08 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/27 19:05:01 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,7 +145,7 @@ void	ft_create_prompt(t_minishell *ms)
 	getcwd(p, PATH_MAX);
 	old_prompt = ms->prompt;
 	new_prompt = ft_strjoin_all(6,
-			RD"["RST, e, RD"] ["RST, p, RD"] minishell"RST, "$ ");
+			CY"["RST, e, CY"] ["RST, p, CY"] minishell"RST, "$ ");
 	free(old_prompt);
 	free(e);
 	ms->prompt = new_prompt;
