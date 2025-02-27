@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 23:32:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 09:29:40 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/27 03:17:22 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,6 +130,7 @@ typedef struct s_cmd_helper
 void ft_init_ms(t_minishell *ms);
 int ft_save_stdin_stdout(t_minishell *ms);
 int	ft_readline(t_minishell *ms);
+void ft_create_prompt(t_minishell *ms);
 void ft_close_stdin_stdout(t_minishell *ms);
 int	ft_process_input_and_execute(t_minishell *ms);
 int	ft_handle_and_tokenize_input(t_minishell *ms);
@@ -149,7 +150,7 @@ t_token	*ft_tokenize_input(char *str, int n_args, int i, int j);
 int		ft_tokenize(char *str, int *i, t_token *tokens, int *j);
 t_type	ft_get_token_type(char *str, t_type prev_type);
 char	*ft_revalue_quoted_value(char *value);
-int		ft_verify_variable_value(char *str);
+int		ft_verify_variable_value(char *str, int i);
 
 /**__PARSING_AST_(Abstract Syntax Tree)__**/
 t_node	*ft_parse_ast(t_token *tokens); // muito grande!

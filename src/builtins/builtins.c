@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/25 16:18:05 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/26 07:23:16 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 	else if (!ft_strcmp(node->token->value, "env"))
 		ft_builtin_env(node->cmd_ready, ms);
 	else if (!ft_strcmp(node->token->value, "pwd"))
-		ft_builtin_pwd(ms);
+		ft_builtin_pwd();
 	else if (!ft_strcmp(node->token->value, "cd"))
 		ft_builtin_cd(node->cmd_ready, ms);
 	else if (!ft_strcmp(node->token->value, "export"))
