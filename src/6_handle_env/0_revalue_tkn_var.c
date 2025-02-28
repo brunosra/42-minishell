@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   0_revalue_tkn_var.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:03:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 17:57:31 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/02/27 21:04:33 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	ft_revalue_tkn_var(t_minishell *ms)
 	i = -1;
 	while (ms->tokens[++i].value)
 	{
-		if (ft_is_expandable_token(ms->tokens[i].type) && i > 0
+		if (ft_is_expandable_token(ms->tokens[i].type) && (i > 0 || ms->tokens[0].type == TKN_CMD)
 			&& ms->tokens[i - 1].type != TKN_HDOC)
 		{
 			ptr = ft_strchr(ms->tokens[i].value, '$');

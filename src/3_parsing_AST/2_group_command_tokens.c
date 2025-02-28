@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 01:47:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 00:44:18 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/28 05:14:05 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,10 @@ static void	ft_handle_individual_token(t_token *tokens, int *index,
 		(*index)++;
 		return ;
 	}
-	if (h->i > h->j)
+	if (h->i > h->j && (ft_cmp_str_str(tokens[*index].value, "'",
+			ft_strlen(tokens[*index].value))
+			|| ft_cmp_str_str(tokens[*index].value,
+			"\"", ft_strlen(tokens[*index].value))))
 		tokens[*index].value = ft_remove_quotes(tokens[*index].value);
 	cmd_node->cmd_ready[h->i] = ft_strdup(tokens[*index].value);
 	h->i++;
