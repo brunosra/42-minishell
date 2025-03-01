@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 12:24:29 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/01 18:56:44 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ int	ft_dup_envp(char **envp, char ***dupenv, int count)
 	int	i;
 
 	i = 0;
+	if (*dupenv)
+		free(*dupenv);
 	*dupenv = malloc((count + 1) * sizeof(char *));
 	if (!(*dupenv))
 		return (-1);
