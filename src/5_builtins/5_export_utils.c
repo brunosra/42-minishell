@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 12:24:29 by bschwell          #+#    #+#             */
-/*   Updated: 2025/03/01 19:05:45 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/01 19:06:45 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,9 +80,9 @@ void	ft_output_export_1_arg(char **arr, int count)
 	}
 	while (++i < count)
 	{
-		// if (ft_strncmp(arr[i], "_=", 2) == 0 ||
-		// 	ft_strcmp(arr[i], "_") == 0)
-		// 	continue ;
+		if (ft_strncmp(arr[i], "_=", 2) == 0 ||
+			ft_strcmp(arr[i], "_") == 0)
+			continue ;
 		printf("declare -x %s\n", arr[i]);
 	}
 }
