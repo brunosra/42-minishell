@@ -49,4 +49,4 @@ fclean: clean
 re: fclean all
 
 # Declarando que não são arquivos reais
-.PHONY: all clean fclean  re test
+.PHONY: all clean fclean  re test valgrind

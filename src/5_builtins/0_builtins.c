@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   0_builtins.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:42:01 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/01 16:31:44 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ int	ft_exec_builtins_check(t_node *node, t_minishell *ms)
 		return (ft_builtin_cd_check(node->cmd_ready, ms));
 	else if (!ft_strcmp(node->token->value, "export"))
 		ft_builtin_export_check(node->cmd_ready);
+	ft_free_ms(ms, true, true);
 	return (EX_OK);
 }
 
@@ -113,5 +114,6 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 		ft_builtin_export(node->cmd_ready, ms);
 	else if (!ft_strcmp(node->token->value, "unset"))
 		ft_builtin_unset(node->cmd_ready, ms);
+	ft_free_ms(ms, true, true);
 	return (ft_exit_code(-1));
 }
