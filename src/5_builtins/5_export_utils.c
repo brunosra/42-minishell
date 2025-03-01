@@ -6,7 +6,7 @@
 /*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 12:24:29 by bschwell          #+#    #+#             */
-/*   Updated: 2025/03/01 18:54:30 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/01 19:05:45 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ int	ft_dup_envp(char **envp, char ***dupenv, int count)
 	int	i;
 
 	i = 0;
+	if (*dupenv)
+		free(*dupenv);
 	*dupenv = malloc((count + 1) * sizeof(char *));
 	if (!(*dupenv))
 		return (-1);
