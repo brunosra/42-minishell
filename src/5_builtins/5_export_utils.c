@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   5_export_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 12:24:29 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/01 18:54:30 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ int	ft_dup_envp(char **envp, char ***dupenv, int count)
  */
 void	ft_output_export_1_arg(char **arr, int count)
 {
-	int	i;
+	int		i;
 
 	i = -1;
 	if (arr == NULL)
@@ -76,8 +76,13 @@ void	ft_output_export_1_arg(char **arr, int count)
 		printf("[print_str_arr]: NULL / Empty array");
 		return ;
 	}
-	while (++i < count - 1)
+	while (++i < count)
+	{
+		// if (ft_strncmp(arr[i], "_=", 2) == 0 ||
+		// 	ft_strcmp(arr[i], "_") == 0)
+		// 	continue ;
 		printf("declare -x %s\n", arr[i]);
+	}
 }
 
 /**
