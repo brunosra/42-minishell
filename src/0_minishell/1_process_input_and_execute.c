@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   1_process_input_and_execute.c                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:04:02 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/28 04:38:05 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/01 20:02:19 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ int	ft_process_input_and_execute(t_minishell *ms)
 	}
 	ms->ast_root = ft_parse_ast(ms->tokens);
 	ft_find_stuck_cats(ms, ms->ast_root);
-	ft_print_ast(ms->ast_root, 0);
+	// ft_print_ast(ms->ast_root, 0);
 	if (ms->ast_root)
 	{
 		ms->status = ft_execute_ast(ms->ast_root, ms);
