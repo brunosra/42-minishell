@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 19:22:52 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/01 16:30:51 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,6 +275,7 @@ int				ft_set_env(const char *key, const char *value, t_minishell *ms);
 void			ft_free_tokens(t_token *tokens);
 void			ft_free_ast(t_node *root);
 void			ft_free_split(char **str);
+void			ft_free_ms(t_minishell *ms, bool free_prompt, bool free_envp);
 
 /* 8_handle_signal */
 /* handle_signal.c */

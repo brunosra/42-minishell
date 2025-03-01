@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 01:59:02 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/26 06:38:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/02/28 05:12:10 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,12 @@ char	*ft_remove_quotes(char *value)
 			sub = ft_extract_quoted(value, &i, value[i]);
 		else
 			sub = ft_extract_unquoted(value, &i);
+		if (!sub)
+		{
+			free(final);
+			free(value);
+			return (NULL);
+		}
 		ft_concat_new_value(&final, sub);
 	}
 	free(value);
@@ -92,13 +98,24 @@ static void	ft_concat_new_value(char **final, char *sub)
 {
 	char	*temp;
 
+	if (!sub)
+		return ;
 	if (!*final)
+	{
 		*final = ft_strdup(sub);
+		if (!*final)
+			free(sub);
+	}
 	else
 	{
-		temp = *final;
-		*final = ft_strjoin(*final, sub);
-		free(temp);
+		temp = ft_strjoin(*final, sub);
+		if (!temp)
+		{
+			free(sub);
+			return ;
+		}
+		free(*final);
+		*final = temp;
 	}
 	free(sub);
 }

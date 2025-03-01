@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 23:48:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 21:07:09 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/01 16:31:47 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,11 +47,8 @@ int	main(int argc, char **argv, char **envp)
 			break ;
 		if (ft_process_input_and_execute(&ms))
 			continue ;
-		ft_free_tokens(ms.tokens);
-		ft_free_ast(ms.ast_root);
-		free(ms.input);
+		ft_free_ms(&ms, false, false);
 	}
-	free(ms.input);
 	ft_free_split(ms.env.envp);
 	return (0);
 }
