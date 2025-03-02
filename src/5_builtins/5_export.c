@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 21:13:47 by bschwell          #+#    #+#             */
-/*   Updated: 2025/03/02 19:14:51 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/02 23:36:28 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,11 @@ static int	ft_replace_existing_var(char **list, char *arg)
 	i = 0;
 	while (list[i])
 	{
-		if (!ft_strncmp(list[i], arg, len) && (list[i][len] == '='
-			|| list[i][len] == '\0'))
+		if (!ft_strncmp(list[i], arg, len)
+			&& (list[i][len] == '=' || list[i][len] == '\0'))
 		{
+			if (!equal_sign && ft_strchr(list[i], '='))
+				return (1);
 			free(list[i]);
 			list[i] = ft_strdup(arg);
 			if (!list[i])
@@ -121,7 +123,6 @@ static int	ft_valid_export_arg(const char *arg)
 
 	if (!arg || !arg[0])
 		return (0);
-	// O primeiro caractere deve ser uma letra ou '_'
 	if (!((arg[0] >= 'A' && arg[0] <= 'Z')
 		|| (arg[0] >= 'a' && arg[0] <= 'z')
 		|| (arg[0] == '_')))
@@ -129,7 +130,6 @@ static int	ft_valid_export_arg(const char *arg)
 	i = 1;
 	while (arg[i] && arg[i] != '=')
 	{
-		// Apenas letras, números e '_' são permitidos antes do '='
 		if (!((arg[i] >= 'A' && arg[i] <= 'Z')
 			|| (arg[i] >= 'a' && arg[i] <= 'z')
 			|| (arg[i] >= '0' && arg[i] <= '9')
@@ -137,9 +137,6 @@ static int	ft_valid_export_arg(const char *arg)
 			return (0);
 		i++;
 	}
-	// // Se há um '=', deve ser após um nome válido (não pode ser o primeiro caractere)
-	// if (arg[i] == '=' && i == 0)
-	//	return (0);
 	return (1);
 }
 
