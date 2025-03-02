@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/01 16:30:51 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/02 15:27:06 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ typedef struct s_env
 	char	*env_paths;
 	char	**paths;
 	char	*full_path;
+	char	**export;
 }	t_env;
 
 typedef struct s_minishell

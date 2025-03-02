@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:41:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 07:00:16 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/02 20:17:14 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,11 +138,20 @@ static void	ft_handle_operator_token(char *str, int *i)
  */
 static void	ft_handle_regular_token(char *str, int *i)
 {
+	char quotes;
+
+	quotes = '\0';
 	while (str[*i] && str[*i] != ' ')
 	{
 		if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<' || str[*i] == ';'
 			|| str[*i] == '&')
 			break ;
+		if (str[*i] == '\'' || str[*i] == '"')
+		{
+			quotes = str[*i];
+			while (str[*i] && str[*i] != quotes)
+				i++;
+		}	
 		*i += 1;
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 23:48:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/01 16:31:47 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/02 15:27:05 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ static void	ft_init_ms(t_minishell *ms)
 	ms->env.env_paths = NULL;
 	ms->env.paths = NULL;
 	ms->env.full_path = NULL;
+	ms->env.export = NULL;
 	ft_init_prompt(ms);
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   5_export.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 21:13:47 by bschwell          #+#    #+#             */
-/*   Updated: 2025/03/01 19:57:16 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/02 19:14:51 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,12 @@
 int			ft_builtin_export_check(char **args/* , t_minishell *ms */);
 void		ft_builtin_export(char **args, t_minishell *ms);
 static int	ft_export_1_arg(t_minishell *ms);
+static int	ft_valid_export_arg(const char *arg);
+static int	ft_process_export(char* str, t_minishell *ms);
+static int	ft_export_add_var(char *arg, t_minishell *ms);
+static char	**ft_expand_list(char **list, char *new_var);
+static int	ft_replace_existing_var(char **list, char *arg);
+
 
 int	ft_builtin_export_check(char **args/* , t_minishell *ms */)
 {
@@ -23,61 +29,99 @@ int	ft_builtin_export_check(char **args/* , t_minishell *ms */)
 	count = 0;
 	while (args[count] != NULL)
 		count++;
-	// printf("export check: %s\n", ms->env.envp[0]);
 	return (0);
 }
 
-int	ft_export_add_var(char *arg, t_minishell *ms)
+// static char	**ft_get_target_list(char *arg, t_minishell *ms)
+// {
+// 	if (ft_strchr(arg, '='))
+// 		return (ms->env.envp);
+// 	return (ms->env.export);
+// }
+
+static int	ft_replace_existing_var(char **list, char *arg)
 {
-	char	**new_env;
-	char	*new_var;
+	int		i;
+	size_t	len;
+	char	*equal_sign;
+
+	equal_sign = ft_strchr(arg, '=');
+	if (equal_sign)
+		len = equal_sign - arg;
+	else
+		len = ft_strlen(arg);
+	i = 0;
+	while (list[i])
+	{
+		if (!ft_strncmp(list[i], arg, len) && (list[i][len] == '='
+			|| list[i][len] == '\0'))
+		{
+			free(list[i]);
+			list[i] = ft_strdup(arg);
+			if (!list[i])
+				return (-1);
+			return (1);
+		}
+		i++;
+	}
+	return (0);
+}
+
+static char	**ft_expand_list(char **list, char *new_var)
+{
+	char	**new_list;
 	int		count;
 	int		i;
 
 	count = 0;
-	while (ms->env.envp[count])
+	while (list[count])
 		count++;
-	if (!ft_strchr(arg, '='))
-	{
-		new_var = malloc(ft_strlen(arg) + 2);
-		if (!new_var)
-			return (-1);
-		ft_strcpy(new_var, arg);
-		ft_strcat(new_var, "=");
-	}
-	else
-	{
-		new_var = ft_strdup(arg);
-		if (!new_var)
-			return (-1);
-	}
-	new_env = malloc((count + 2) * sizeof(char *));
-	if (!new_env)
-	{
-		free(new_var);
-		return (-1);
-	}
+	new_list = malloc((count + 2) * sizeof(char *));
+	if (!new_list)
+		return (NULL);
 	i = 0;
 	while (i < count)
 	{
-		new_env[i] = ms->env.envp[i];
+		new_list[i] = list[i];
 		i++;
 	}
-	new_env[count] = new_var;
-	new_env[count + 1] = NULL;
-	free(ms->env.envp);
-	ms->env.envp = new_env;
+	new_list[count] = ft_strdup(new_var);
+	if (!new_list[count])
+		return (NULL);
+	new_list[count + 1] = NULL;
+	free(list);
+	return (new_list);
+}
+
+static int	ft_export_add_var(char *arg, t_minishell *ms)
+{
+	int		replaced;
+
+	if (ft_strchr(arg, '='))
+	{
+		replaced = ft_replace_existing_var(ms->env.envp, arg);
+		if (replaced == 0)
+			ms->env.envp = ft_expand_list(ms->env.envp, arg);
+		replaced = ft_replace_existing_var(ms->env.export, arg);
+		if (replaced == 0)
+			ms->env.export = ft_expand_list(ms->env.export, arg);
+	}
+	else
+	{
+		replaced = ft_replace_existing_var(ms->env.export, arg);
+		if (replaced == 0)
+			ms->env.export = ft_expand_list(ms->env.export, arg);
+	}
 	return (0);
 }
 
-int	ft_valid_export_arg(const char *arg)
+static int	ft_valid_export_arg(const char *arg)
 {
 	int	i;
 
-	if (!arg)
+	if (!arg || !arg[0])
 		return (0);
-	if (!arg[0])
-		return (0);
+	// O primeiro caractere deve ser uma letra ou '_'
 	if (!((arg[0] >= 'A' && arg[0] <= 'Z')
 		|| (arg[0] >= 'a' && arg[0] <= 'z')
 		|| (arg[0] == '_')))
@@ -85,6 +129,7 @@ int	ft_valid_export_arg(const char *arg)
 	i = 1;
 	while (arg[i] && arg[i] != '=')
 	{
+		// Apenas letras, números e '_' são permitidos antes do '='
 		if (!((arg[i] >= 'A' && arg[i] <= 'Z')
 			|| (arg[i] >= 'a' && arg[i] <= 'z')
 			|| (arg[i] >= '0' && arg[i] <= '9')
@@ -92,37 +137,52 @@ int	ft_valid_export_arg(const char *arg)
 			return (0);
 		i++;
 	}
+	// // Se há um '=', deve ser após um nome válido (não pode ser o primeiro caractere)
+	// if (arg[i] == '=' && i == 0)
+	//	return (0);
 	return (1);
 }
 
-static int	ft_process_export(char* str, t_minishell *ms)
+static int	ft_process_export(char *str, t_minishell *ms)
 {
 	if (!str)
 		return (0);
-	ft_export_add_var(str, ms);
-	return (1);
+	return (ft_export_add_var(str, ms));
 }
 
 void	ft_builtin_export(char **args, t_minishell *ms)
 {
 	int	i;
+	int error;
 
-	i = 0;
-	if (args[1] == NULL)
+	i = 1;
+	error = 0;
+	if (ms->env.export == NULL)
+	{
+		ms->env.export = ft_duplicate_envp(ms->env.envp);
+		if (ms->env.export == NULL)
+			ft_perror("malloc", ft_exit_code(1));
+	}
+	if (args[i] == NULL)
 		ft_export_1_arg(ms);
 	else
 	{
-		while (args[i++])
+		while (args[i])
 		{
 			if (ft_valid_export_arg(args[i]) == 0)
-				ft_exit_code(1);
-			else
 			{
-				ft_process_export(args[i], ms);
+				ft_putstr_fd("minishell: export: `", STDERR_FILENO);
+				ft_putstr_fd(args[i], STDERR_FILENO);
+				ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO);
+				error = 1;
+				ft_exit_code(error);
 			}
+			else
+				ft_process_export(args[i], ms);
+			i++;
 		}
+		ft_exit_code(error);
 	}
-	
 }
 
 /**
@@ -132,21 +192,12 @@ void	ft_builtin_export(char **args, t_minishell *ms)
  */
 static int	ft_export_1_arg(t_minishell *ms)
 {
-	char	**dupenv;
 	int		count;
 
 	count = -1;
 	while (ms->env.envp[++count] != NULL)
 		;
-	dupenv = malloc(sizeof(char *) * count);
-	if (dupenv == NULL)
-	{
-		perror("malloc error");
-		return (ft_exit_code(1));
-	}
-	ft_dup_envp(ms->env.envp, &dupenv, count);
-	ft_sort_envp(dupenv, count);
-	ft_output_export_1_arg(dupenv, count);
-	ft_free_str_arr(dupenv);
+	ft_sort_envp(ms->env.export, count);
+	ft_output_export_1_arg(ms->env.export, count);
 	return (ft_exit_code(0));
 }
