@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/03 05:45:52 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/03 07:01:34 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -271,6 +271,7 @@ char			*ft_get_env_value(const char *str, t_minishell *ms, char **key,
 					bool heredoc);
 char			*ft_get_env(const char *key, t_minishell *ms);
 int				ft_unset_env(const char *key, t_minishell *ms);
+/* 4_handle_env_utils2.c */
 int				ft_set_env(const char *key, const char *value, t_minishell *ms);
 
 /* 7_handle_malloc */
@@ -293,8 +294,6 @@ void			ft_signal_heredoc_handler(int sig);
 /* mini_utils_1.c  */
 int				ft_perror(char *error, int return_value);
 int				ft_putstr_and_return(char *msg, int return_value);
-/* void			ft_set_exit_code(t_minishell *ms, int exit_code);
-int				ft_exit_code(t_minishell *ms); */
 int				ft_exit_code(int newcode);
 
 /* mini_utils_2.c */

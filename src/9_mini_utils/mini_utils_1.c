@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mini_utils_1.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 04:38:05 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 19:21:16 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/03 07:03:21 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 int		ft_perror(char *error, int return_value);
 int		ft_putstr_and_return(char *msg, int return_value);
-/* void	ft_set_exit_code(t_minishell *ms, int exit_code);
-int		ft_exit_code(t_minishell *ms); */
 int		ft_exit_code(int newcode);
 
 /**
@@ -45,27 +43,15 @@ int	ft_putstr_and_return(char *msg, int return_value)
 }
 
 /**
- * @brief  Setter for the exit code in the minishell structure.
+ * @brief  Manages the global exit code of the shell.
  * 
- * @param  ms         Pointer to the minishell structure.
- * @param  exit_code  The exit code to set.
- */
-/* void	ft_set_exit_code(t_minishell *ms, int exit_code)
-{
-	ms->exit_code = exit_code;
-} */
-
-/**
- * @brief  Getter for the exit code in the minishell structure.
+ * This function acts as a getter and setter for the exit code.
+ * If called with -1, it returns the current exit code.
+ * Otherwise, it updates the exit code to the given value.
  * 
- * @param  ms  Pointer to the minishell structure.
- * @return int The current exit code.
+ * @param  newcode  The new exit code to set (-1 to retrieve current value).
+ * @return int      The updated or current exit code.
  */
-/* int	ft_exit_code(t_minishell *ms)
-{
-	return (ms->exit_code);
-} */
-
 int	ft_exit_code(int newcode)
 {
 	static int	code = 0;

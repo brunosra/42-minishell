@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:17:28 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 05:21:54 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/03 06:56:48 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ char	*ft_get_env_value(const char *str, t_minishell *ms, char **key,
 			bool heredoc);
 char	*ft_get_env(const char *key, t_minishell *ms);
 int		ft_unset_env(const char *key, t_minishell *ms);
-int		ft_set_env(const char *key, const char *value, t_minishell *ms);
 
 /**
  * @brief  Duplicates the environment variables array.
@@ -151,41 +150,4 @@ int	ft_unset_env(const char *key, t_minishell *ms)
 		i++;
 	}
 	return (1);
-}
-
-/**
- * @brief  Sets or updates an environment variable in the environment array.
- * 
- * @param  key    Variable name to set or update.
- * @param  value  Value to assign to the variable.
- * @param  ms     Pointer to the minishell structure.
- * @return int    Status of the operation.
- **         0 on success.
- **         1 on error.
- */
-int	ft_set_env(const char *key, const char *value, t_minishell *ms)
-{
-	int		i;
-	size_t	len;
-	char	*new_var;
-
-	i = 0;
-	len = ft_strlen(key);
-	new_var = ft_strjoin(ft_strjoin(key, "="), value);
-	if (!key || !value || !ms || !ms->env.envp || !new_var)
-		return (1);
-	while (ms->env.envp[i])
-	{
-		if (!ft_strncmp(ms->env.envp[i], key, len)
-			&& ms->env.envp[i][len] == '=')
-		{
-			free(ms->env.envp[i]);
-			ms->env.envp[i] = new_var;
-			return (0);
-		}
-		i++;
-	}
-	ms->env.envp[i] = new_var;
-	ms->env.envp[i + 1] = NULL;
-	return (0);
 }
