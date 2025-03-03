@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:03:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 23:03:00 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/03 16:11:17 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,8 @@ static char	*ft_process_token_expansion(t_minishell *ms, t_token *token,
 		return (ft_strchr(ptr, '$'));
 	}
 	free(key);
+	if (*env_value == '\0')
+		free(env_value);
 	return (ft_strchr(token->value, '$'));
 }
 
