@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:03:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/03 17:56:51 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/03 18:07:42 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,7 @@ static void	ft_expand_exit_code(t_token *token, char *ptr)
 	key = ft_strdup("?");
 	exit_code = ft_itoa(ft_exit_code(-1));
 	ft_replace_str(&token->value, key, ptr, exit_code);
+	free(key);
 	free(exit_code);
 }
 
