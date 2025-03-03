@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   2_handle_multiple_heredocs.c                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:21:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:37:18 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/03 05:44:13 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,10 +103,12 @@ static void	ft_cleanup_heredocs(t_minishell *ms, int save_stdout, t_node *node)
 	{
 		temp_node = current;
 		current = current->left;
+		free(temp_node->right);
 		free(temp_node);
 	}
 	node->left = current;
-	node->left->prev = node;
+	if (current)
+		current->prev = node;
 }
 
 /**
