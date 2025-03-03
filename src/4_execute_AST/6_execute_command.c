@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:43:45 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/03 01:19:09 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/03 06:09:42 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ static int	ft_execute_external(t_node *node, t_minishell *ms)
 
 	valid = ft_is_valid_file(node->cmd_ready[0], X_OK);
 	if (valid != 0)
-		exit(valid);
+		exit(ft_free_ms(ms, true, true, valid));
 	execve(node->cmd_ready[0], node->cmd_ready, ms->env.envp);
 	exit(42);
 }
