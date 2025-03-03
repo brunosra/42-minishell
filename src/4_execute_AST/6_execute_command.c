@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:43:45 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/01 16:33:21 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/03 01:19:09 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	if (node->token->type == TKN_BLTIN && !ft_strcmp(node->cmd_ready[0], "exit")
 		&& ft_exit_code(-1) != 1)
 	{
-		ft_free_ms(ms, true, true);
+		ft_free_ms(ms, true, true, -1);
 		exit(ft_exit_code(-1));
 	}
 	return (ft_exit_code(-1));
@@ -91,33 +91,23 @@ static void	ft_handle_cmd_exit_status(t_node *node, t_minishell *ms)
 static void	ft_execute_child_process(t_node *node, t_minishell *ms)
 {
 	if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
-	{
-		ft_free_ms(ms, true, true);
-		exit(0);
-	}
+		exit(ft_free_ms(ms, true, true, 0));
 	if (node->token->type == TKN_BLTIN)
 		ft_execute_builtin(node, ms);
 	if (node->cmd_ready[0][0] == '/' || node->cmd_ready[0][0] == '.' ||
 		!ft_strncmp(node->cmd_ready[0], "../", 3))
 		ft_execute_external(node, ms);
 	if (ft_find_executable(ms, node->cmd_ready[0]) == 127)
-	{
-		ft_free_ms(ms, true, true);
-		exit(42);
-	}
+		exit(ft_free_ms(ms, true, true, 42));
 	if (node->cmd_ready[1] == NULL && !ft_strcmp(node->cmd_ready[0], "cat")
 		&& node->prev && node->prev->token->type == TKN_PIPE
 		&& (node->prev->left == node
 			|| (node->prev->prev && node->prev->prev->token->type == TKN_PIPE
 				&& node->prev->right == node)))
-	{
-		ft_free_ms(ms, true, true);
-		exit(13);
-	}
+		exit(ft_free_ms(ms, true, true, 13));
 	execve(ms->env.full_path, node->cmd_ready, ms->env.envp);
 	perror("execve");
-	ft_free_ms(ms, true, true);
-	exit(127);
+	exit(ft_free_ms(ms, true, true, 127));
 }
 
 /**

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:19:06 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/02 19:48:56 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/03 01:21:41 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,7 @@ static int	ft_skip_and_process(char *str, int i, char quote_type)
  */
 static int	ft_handle_argument(char *str, int i)
 {
-	char quotes;
+	char	quotes;
 
 	quotes = '\0';
 	while (str[i] && str[i] != ' ' && str[i] != '|' && str[i] != '>'
@@ -155,7 +155,7 @@ static int	ft_handle_argument(char *str, int i)
 		if ((str[i] == '\'' || str[i] == '"') && i > 0 && str[i - 1] == '=')
 			quotes = str[i];
 		while (quotes && str[i] != quotes)
-			i++;	
+			i++;
 		i++;
 	}
 	return (i);

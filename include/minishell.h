@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/02 15:27:06 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/03 01:17:13 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,6 +239,8 @@ int				ft_builtin_exit(char **args);
 /* 5_export.c */
 int				ft_builtin_export_check(char **args);
 void			ft_builtin_export(char **args, t_minishell *ms);
+/* 5_export2.c */
+int				ft_process_export(char* str, t_minishell *ms);
 /* 5_export_utils.c  */
 int				ft_dup_envp(char **envp, char ***dupenv, int count);
 void			ft_output_export_1_arg(char **arr, int count);
@@ -276,7 +278,8 @@ int				ft_set_env(const char *key, const char *value, t_minishell *ms);
 void			ft_free_tokens(t_token *tokens);
 void			ft_free_ast(t_node *root);
 void			ft_free_split(char **str);
-void			ft_free_ms(t_minishell *ms, bool free_prompt, bool free_envp);
+int				ft_free_ms(t_minishell *ms, bool free_prompt, bool free_envp,
+					int exit);
 
 /* 8_handle_signal */
 /* handle_signal.c */

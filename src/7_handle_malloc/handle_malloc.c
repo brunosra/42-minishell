@@ -6,13 +6,13 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 22:18:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/01 16:33:44 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/03 01:23:16 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void	ft_free_ms(t_minishell *ms, bool free_prompt, bool free_envp);
+int		ft_free_ms(t_minishell *ms, bool free_prompt, bool free_envp, int exit);
 void	ft_free_tokens(t_token *tokens);
 void	ft_free_ast(t_node *root);
 void	ft_free_split(char **str);
@@ -22,7 +22,7 @@ void	ft_free_split(char **str);
  * 
  * @param  tokens  Pointer to the t_minishell to free.
  */
-void	ft_free_ms(t_minishell *ms, bool free_prompt, bool free_envp)
+int	ft_free_ms(t_minishell *ms, bool free_prompt, bool free_envp, int exit)
 {
 	ft_free_tokens(ms->tokens);
 	ft_free_ast(ms->ast_root);
@@ -30,9 +30,13 @@ void	ft_free_ms(t_minishell *ms, bool free_prompt, bool free_envp)
 	if (free_prompt == true)
 		free(ms->prompt);
 	if (free_envp == true)
+	{
 		ft_free_split(ms->env.envp);
+		if (ms->env.export)
+			free(ms->env.export);
+	}
+	return (exit);
 }
-
 
 /**
  * @brief  Frees the memory allocated for the token array.
