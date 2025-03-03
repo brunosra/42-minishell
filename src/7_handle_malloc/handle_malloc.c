@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 22:18:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/03 01:23:16 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/03 02:54:03 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int	ft_free_ms(t_minishell *ms, bool free_prompt, bool free_envp, int exit)
 	{
 		ft_free_split(ms->env.envp);
 		if (ms->env.export)
-			free(ms->env.export);
+			ft_free_split(ms->env.export);
 	}
 	return (exit);
 }
@@ -47,14 +47,15 @@ void	ft_free_tokens(t_token *tokens)
 {
 	int	i;
 
-	i = -1;
+	i = 0;
 	if (!tokens)
 		return ;
-	while (tokens[++i].value)
+	while (tokens[i].value && tokens[i].type != TKN_NULL)
 	{
 		free(tokens[i].value);
 		if (tokens[i].old_value)
 			free(tokens[i].old_value);
+		i++;
 	}
 	free(tokens);
 	return ;
