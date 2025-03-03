@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   7_unset.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/27 17:59:15 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/03 19:26:37 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,8 @@ static int	ft_check_option(char *arg)
 {
 	if (arg[0] == '-')
 	{
-		printf("unset: options not implemented\n");
+		ft_putstr_fd("minishell: unset: options not implemented\n",
+			STDERR_FILENO);
 		return (1);
 	}
 	return (0);
