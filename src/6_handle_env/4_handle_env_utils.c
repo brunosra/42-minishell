@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:17:28 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/03 06:56:48 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/04 23:32:57 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ char	**ft_duplicate_envp(char **envp);
 char	*ft_get_env_value(const char *str, t_minishell *ms, char **key,
 			bool heredoc);
 char	*ft_get_env(const char *key, t_minishell *ms);
-int		ft_unset_env(const char *key, t_minishell *ms);
+int		ft_unset_env(const char *key, char **list);
 
 /**
  * @brief  Duplicates the environment variables array.
@@ -125,7 +125,7 @@ char	*ft_get_env(const char *key, t_minishell *ms)
  **         0 on success.
  **         1 if the variable does not exist or on error.
  */
-int	ft_unset_env(const char *key, t_minishell *ms)
+int	ft_unset_env(const char *key, char **list)
 {
 	int		i;
 	int		j;
@@ -134,17 +134,17 @@ int	ft_unset_env(const char *key, t_minishell *ms)
 	len = ft_strlen(key);
 	i = 0;
 	j = 0;
-	if (!key || !ms || !ms->env.envp)
+	if (!key || !list)
 		return (1);
-	while (ms->env.envp[i])
+	while (list[i])
 	{
-		if (!ft_strncmp(ms->env.envp[i], key, len)
-			&& ms->env.envp[i][len] == '=')
+		if (!ft_strncmp(list[i], key, len)
+			&& list[i][len] == '=')
 		{
-			free(ms->env.envp[i]);
+			free(list[i]);
 			j = i - 1;
-			while (ms->env.envp[++j])
-				ms->env.envp[j] = ms->env.envp[j + 1];
+			while (list[++j])
+				list[j] = list[j + 1];
 			return (0);
 		}
 		i++;

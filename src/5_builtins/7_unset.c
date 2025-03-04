@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2025/03/03 19:33:23 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/04 23:32:51 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,10 @@ void	ft_builtin_unset(char **args, t_minishell *ms)
 			break ;
 		}
 		if (ft_check_valid_varname(args[i]) == 0)
-			ft_unset_env(args[i], ms);
+		{
+			ft_unset_env(args[i], ms->env.export);
+			ft_unset_env(args[i], ms->env.envp);
+		}
 		i++;
 	}
 	ft_exit_code(err);

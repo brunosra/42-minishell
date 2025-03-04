@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/03 07:01:34 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/04 23:30:45 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -270,7 +270,7 @@ char			**ft_duplicate_envp(char **envp);
 char			*ft_get_env_value(const char *str, t_minishell *ms, char **key,
 					bool heredoc);
 char			*ft_get_env(const char *key, t_minishell *ms);
-int				ft_unset_env(const char *key, t_minishell *ms);
+int				ft_unset_env(const char *key, char **list);
 /* 4_handle_env_utils2.c */
 int				ft_set_env(const char *key, const char *value, t_minishell *ms);
 
