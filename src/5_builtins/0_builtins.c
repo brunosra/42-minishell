@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/03 06:05:15 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/04 19:43:40 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,8 +79,9 @@ char	*ft_strtok(char *str, const char *delim)
  */
 int	ft_exec_builtins_check(t_node *node, t_minishell *ms)
 {
-	if (!ft_strcmp(node->token->value, "exit")
-		|| !ft_strcmp(node->token->value, "pwd")
+	if (!ft_strcmp(node->token->value, "exit"))
+		return (ft_free_ms(ms, true, true, ft_exit_code(-1)));
+	if (!ft_strcmp(node->token->value, "pwd")
 		|| !ft_strcmp(node->token->value, "env"))
 		return (ft_free_ms(ms, true, true, 0));
 	else if (!ft_strcmp(node->token->value, "cd"))

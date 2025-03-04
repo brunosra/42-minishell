@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:43:45 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/04 19:01:01 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/04 19:51:54 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,9 @@ static void	ft_handle_cmd_exit_status(t_node *node, t_minishell *ms)
 			ft_putstr_fd(": command not found\n", STDERR_FILENO);
 			ft_exit_code(127);
 		}
-		else if (ft_exit_code(-1) == 0 && node->token->type == TKN_BLTIN
+		else if ((ft_exit_code(-1) == 0 && node->token->type == TKN_BLTIN
 			&& ft_strcmp(node->token->value, "echo"))
+				|| !ft_strcmp(node->token->value, "exit"))
 			ft_exec_builtins(node, ms);
 	}
 	else if (WIFSIGNALED(ms->status))
