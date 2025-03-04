@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:19:06 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/03 01:21:41 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/04 22:06:22 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ int	ft_handle_quotes(char *str, int i, int *start, int *end)
 		if (str[i] == '\'' || str[i] == '"')
 		{
 			quote_type = str[i++];
-			if (str[i] && str[i] == quote_type && str[i - 2] != '$')
+			if (str[i] && str[i] == quote_type && i >=2 && str[i - 2] != '$')
 				i++;
 			else
 				i = ft_skip_and_process(str, i, quote_type);
