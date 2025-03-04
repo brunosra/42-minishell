@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 21:13:47 by bschwell          #+#    #+#             */
-/*   Updated: 2025/03/03 01:14:10 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/04 17:11:18 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ static int	ft_export_1_arg(t_minishell *ms)
 	int	count;
 
 	count = -1;
-	while (ms->env.envp[++count] != NULL)
+	while (ms->env.export[++count] != NULL)
 		;
 	ft_sort_envp(ms->env.export, count);
 	ft_output_export_1_arg(ms->env.export, count);
