@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/01 18:37:58 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/03 06:05:15 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,12 +82,13 @@ int	ft_exec_builtins_check(t_node *node, t_minishell *ms)
 	if (!ft_strcmp(node->token->value, "exit")
 		|| !ft_strcmp(node->token->value, "pwd")
 		|| !ft_strcmp(node->token->value, "env"))
-		return (0);
+		return (ft_free_ms(ms, true, true, 0));
 	else if (!ft_strcmp(node->token->value, "cd"))
-		return (ft_builtin_cd_check(node->cmd_ready, ms));
+		return (ft_free_ms(ms, true, true,
+				ft_builtin_cd_check(node->cmd_ready, ms)));
 	else if (!ft_strcmp(node->token->value, "export"))
 		ft_builtin_export_check(node->cmd_ready);
-	ft_free_ms(ms, true, true);
+	ft_free_ms(ms, true, true, 0);
 	return (EX_OK);
 }
 
@@ -103,7 +104,7 @@ int	ft_exec_builtins(t_node *node, t_minishell *ms)
 	if (!ft_strcmp(node->token->value, "echo"))
 	{
 		ft_builtin_echo(node->cmd_ready);
-		ft_free_ms(ms, true, true);
+		ft_free_ms(ms, true, true, 0);
 	}
 	else if (!ft_strcmp(node->token->value, "exit"))
 		ft_builtin_exit(node->cmd_ready);

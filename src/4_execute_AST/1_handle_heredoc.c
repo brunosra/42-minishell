@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   1_handle_heredoc.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:08:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:37:18 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/03 02:01:19 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ static void	ft_heredoc_child_process(t_node *node, t_minishell *ms)
 	}
 	ft_write_heredoc(ms, node, temp);
 	close(ms->pipefd[1]);
-	exit(0);
+	exit(ft_free_ms(ms, true, true, 0));
 }
 
 /**

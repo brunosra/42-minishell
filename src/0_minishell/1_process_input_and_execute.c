@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   1_process_input_and_execute.c                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:04:02 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/01 20:02:19 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/03 16:25:26 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ int	ft_process_input_and_execute(t_minishell *ms)
 	}
 	ms->ast_root = ft_parse_ast(ms->tokens);
 	ft_find_stuck_cats(ms, ms->ast_root);
-	// ft_print_ast(ms->ast_root, 0);
 	if (ms->ast_root)
 	{
 		ms->status = ft_execute_ast(ms->ast_root, ms);
@@ -92,7 +91,7 @@ static void	ft_find_stuck_cats(t_minishell *ms, t_node *node)
 	current = node;
 	if (!current)
 		return ;
-	if (current->token->type == TKN_CMD)
+	if (current->token->type == TKN_CMD && current->token->value[0] != '\0')
 	{
 		if (current->cmd_ready[1] == NULL
 			&& (!ft_strcmp(current->cmd_ready[0], "cat")

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/01 16:30:51 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/03 07:01:34 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ typedef struct s_env
 	char	*env_paths;
 	char	**paths;
 	char	*full_path;
+	char	**export;
 }	t_env;
 
 typedef struct s_minishell
@@ -238,6 +239,8 @@ int				ft_builtin_exit(char **args);
 /* 5_export.c */
 int				ft_builtin_export_check(char **args);
 void			ft_builtin_export(char **args, t_minishell *ms);
+/* 5_export2.c */
+int				ft_process_export(char *str, t_minishell *ms);
 /* 5_export_utils.c  */
 int				ft_dup_envp(char **envp, char ***dupenv, int count);
 void			ft_output_export_1_arg(char **arr, int count);
@@ -268,6 +271,7 @@ char			*ft_get_env_value(const char *str, t_minishell *ms, char **key,
 					bool heredoc);
 char			*ft_get_env(const char *key, t_minishell *ms);
 int				ft_unset_env(const char *key, t_minishell *ms);
+/* 4_handle_env_utils2.c */
 int				ft_set_env(const char *key, const char *value, t_minishell *ms);
 
 /* 7_handle_malloc */
@@ -275,7 +279,8 @@ int				ft_set_env(const char *key, const char *value, t_minishell *ms);
 void			ft_free_tokens(t_token *tokens);
 void			ft_free_ast(t_node *root);
 void			ft_free_split(char **str);
-void			ft_free_ms(t_minishell *ms, bool free_prompt, bool free_envp);
+int				ft_free_ms(t_minishell *ms, bool free_prompt, bool free_envp,
+					int exit);
 
 /* 8_handle_signal */
 /* handle_signal.c */
@@ -289,8 +294,6 @@ void			ft_signal_heredoc_handler(int sig);
 /* mini_utils_1.c  */
 int				ft_perror(char *error, int return_value);
 int				ft_putstr_and_return(char *msg, int return_value);
-/* void			ft_set_exit_code(t_minishell *ms, int exit_code);
-int				ft_exit_code(t_minishell *ms); */
 int				ft_exit_code(int newcode);
 
 /* mini_utils_2.c */

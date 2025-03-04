@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 01:47:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/28 05:14:05 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/03 16:48:08 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,9 @@ t_node	*ft_group_command_tokens(t_token *tokens, int *index)
 	if (h.c_except)
 		*index = h.stop;
 	cmd_node->cmd_ready[h.i] = NULL;
-	cmd_node->cmd_ready = ft_remove_null_values(cmd_node->cmd_ready,
-			h.arg_count);
+	if (cmd_node->cmd_ready[0])
+		cmd_node->cmd_ready = ft_remove_null_values(cmd_node->cmd_ready,
+				h.arg_count);
 	return (cmd_node);
 }
 
@@ -114,9 +115,9 @@ static void	ft_handle_individual_token(t_token *tokens, int *index,
 		return ;
 	}
 	if (h->i > h->j && (ft_cmp_str_str(tokens[*index].value, "'",
-			ft_strlen(tokens[*index].value))
+				ft_strlen(tokens[*index].value))
 			|| ft_cmp_str_str(tokens[*index].value,
-			"\"", ft_strlen(tokens[*index].value))))
+				"\"", ft_strlen(tokens[*index].value))))
 		tokens[*index].value = ft_remove_quotes(tokens[*index].value);
 	cmd_node->cmd_ready[h->i] = ft_strdup(tokens[*index].value);
 	h->i++;

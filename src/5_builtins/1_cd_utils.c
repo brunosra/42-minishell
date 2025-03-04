@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/27 02:12:31 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/03 18:33:30 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static int	ft_cd_set_resolved_p_check(char **args, char *curpwd,
 	if (args[1] == NULL)
 	{
 		if (ft_get_env("HOME", ms) == NULL)
-			return (ft_builtin_error("cd: HOME not set", 1));
+			return (ft_builtin_error("minishell: cd: HOME not set", 1));
 		ft_strncpy(res_p, ft_get_env("HOME", ms), PATH_MAX - 1);
 	}
 	else if (args[2] == NULL)
@@ -42,7 +42,7 @@ static int	ft_cd_set_resolved_p_check(char **args, char *curpwd,
 		if (!ft_strcmp(args[1], "-"))
 		{
 			if (ft_get_env("OLDPWD", ms) == NULL)
-				return (ft_builtin_error("cd: OLDPWD not set", 2));
+				return (ft_builtin_error("minishell: cd: OLDPWD not set", 2));
 			ft_strncpy(res_p, ft_get_env("OLDPWD", ms), PATH_MAX - 1);
 		}
 		else
@@ -81,7 +81,7 @@ int	ft_builtin_cd_check(char **args, t_minishell *ms)
 		return (ret);
 	if (chdir(res_p) != 0)
 	{
-		ft_putstr_fd("Minishell: cd: ", STDERR_FILENO);
+		ft_putstr_fd("minishell: cd: ", STDERR_FILENO);
 		ft_putstr_fd(args[1], STDERR_FILENO);
 		ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
 		return (1);

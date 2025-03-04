@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   2_handle_multiple_heredocs_utils.c                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:21:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:35:57 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/03 02:19:02 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,10 @@ void	ft_finalize_heredoc(t_minishell *ms, int *i)
 		ft_putstr_fd(new_temp, ms->pipefd[1]);
 		free(new_temp);
 	}
+	else
+		free(ms->temp);
 	close(ms->pipefd[1]);
-	exit(0);
+	exit(ft_free_ms(ms, true, true, 0));
 }
 
 /**

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   5_handle_pipe.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:35:12 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:34:28 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/03 02:18:42 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,8 @@ static void	ft_execute_pipe_child(t_node *node, t_minishell *ms)
 		exit(1);
 	}
 	close(ms->pipefd[1]);
-	exit(ft_execute_ast(node->left, ms));
+	ft_execute_ast(node->left, ms);
+	exit(ft_free_ms(ms, true, true, 0));
 }
 
 /**
