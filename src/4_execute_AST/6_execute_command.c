@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:43:45 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/03 06:09:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/04 19:01:01 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,6 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	if (ft_exit_code(-1) != 0 && node->prev
 		&& node->prev->token->type == TKN_IN_RD)
 		ft_remove_created_files(node->prev);
-	if (node->token->type == TKN_BLTIN && !ft_strcmp(node->cmd_ready[0], "exit")
-		&& ft_exit_code(-1) != 1)
-	{
-		ft_free_ms(ms, true, true, -1);
-		exit(ft_exit_code(-1));
-	}
 	return (ft_exit_code(-1));
 }
 

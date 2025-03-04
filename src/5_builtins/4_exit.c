@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:47:54 by bschwell          #+#    #+#             */
-/*   Updated: 2025/03/04 18:46:23 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/04 18:55:55 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,8 @@ int	ft_builtin_exit(char **args)
 		ft_exit_code(0);
 	else if (i > 2 && ft_atoll(args[1], 0, 0))
 	{
-		ft_putstr_fd(" too many arguments\n", STDERR_FILENO);
-		ft_exit_code(1);
+		ft_putstr_fd("exit\nminishell: exit: too many arguments\n", STDERR_FILENO);
+		return (ft_exit_code(2));
 	}
 	else if (ft_value_is_numeric(args[1]))
 	{
