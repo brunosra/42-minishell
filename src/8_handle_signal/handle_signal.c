@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_signal.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 19:21:03 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/05 22:47:49 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,8 +90,13 @@ void	ft_signal_heredoc_handler(int sig)
 {
 	if (sig == SIGINT)
 	{
+		t_minishell	*ms;
+
+		ms = ft_ms_struct(NULL, 1);
 		write(STDERR_FILENO, "\n", 1);
-		ft_exit_code(130);
+		ft_exit_code(ft_free_ms(ms, true, true, 130));
+		if(ms->temp)
+			free(ms->temp);
 		exit(130);
 	}
 }
