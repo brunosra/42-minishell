@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:41:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/05 00:04:33 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/05 01:25:49 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,10 @@ static int	ft_handle_quoted_token(char *str, int *i, t_token *tokens, int *j)
 	*i = ft_handle_quotes(str, *i, &start, &end);
 	tokens[*j].value = ft_strndup(str + start, end - start);
 	if ((end - start) == 2)
-		tokens[*j].value = ft_strdup("\0");
+	{
+		free(tokens[*j].value);
+		tokens[*j].value = ft_strdup("");
+	}
 	else
 		tokens[*j].value = ft_revalue_quoted_value(tokens[*j].value);
 	*i += 1;
