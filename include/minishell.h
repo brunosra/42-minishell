@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/04 23:30:45 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/05 05:12:23 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ typedef enum e_token_type
 	TKN_BLTIN,
 	TKN_NULL,
 	TKN_EXCPT,
+	TKN_EPTY,
 }	t_type;
 
 typedef struct s_token

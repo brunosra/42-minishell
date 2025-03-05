@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 01:34:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 00:36:00 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/05 05:50:26 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,18 @@ t_node	*ft_parse_ast(t_token *tokens)
 	current = NULL;
 	while (tokens[i].type != TKN_NULL)
 	{
+		if (tokens[i].type == TKN_EPTY)
+		{
+			if (tokens[i + 1].type != TKN_NULL && tokens[i + 1].type != TKN_EPTY)
+			{
+				if (ft_check_builtins(tokens[i + 1].value))
+					tokens[i + 1].type = TKN_BLTIN;
+				else
+					tokens[i + 1].type = TKN_CMD;
+			}
+			i++;
+			continue ;			
+		}
 		if (!tokens[i].value && tokens[i].type == TKN_CMD)
 			tokens[i].value = ft_strdup("");
 		ft_process_token(tokens, &i, &current, &root);

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:43:45 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/04 19:51:54 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/05 05:55:24 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,15 +55,15 @@ static void	ft_handle_cmd_exit_status(t_node *node, t_minishell *ms)
 	if (WIFEXITED(ms->status))
 	{
 		ft_exit_code(WEXITSTATUS(ms->status));
-		if (ft_exit_code(-1) == 42 && node->cmd_ready[0])
+		if (ft_exit_code(-1) == 42)
 		{
 			ft_putstr_fd(node->cmd_ready[0], STDERR_FILENO);
 			ft_putstr_fd(": command not found\n", STDERR_FILENO);
 			ft_exit_code(127);
 		}
 		else if ((ft_exit_code(-1) == 0 && node->token->type == TKN_BLTIN
-			&& ft_strcmp(node->token->value, "echo"))
-				|| !ft_strcmp(node->token->value, "exit"))
+				&& ft_strcmp(node->token->value, "echo"))
+			|| !ft_strcmp(node->token->value, "exit"))
 			ft_exec_builtins(node, ms);
 	}
 	else if (WIFSIGNALED(ms->status))
@@ -86,7 +86,7 @@ static void	ft_handle_cmd_exit_status(t_node *node, t_minishell *ms)
 static void	ft_execute_child_process(t_node *node, t_minishell *ms)
 {
 	if (!node->cmd_ready[0] || node->cmd_ready[0][0] == '\0')
-		exit(ft_free_ms(ms, true, true, 0));
+		exit(ft_free_ms(ms, true, true, 42));
 	if (node->token->type == TKN_BLTIN)
 		ft_execute_builtin(node, ms);
 	if (node->cmd_ready[0][0] == '/' || node->cmd_ready[0][0] == '.' ||

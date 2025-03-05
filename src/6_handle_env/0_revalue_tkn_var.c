@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:03:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/03 18:07:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/05 05:46:46 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,15 @@ int	ft_revalue_tkn_var(t_minishell *ms)
 	{
 		if (i > 0 && ms->tokens[i - 1].type == TKN_HDOC)
 			return (0);
+		if (!ms->tokens[i].value[0])
+			return (0);
 		if (ft_is_expandable_token(ms->tokens[i].type))
 		{
 			ptr = ft_strchr(ms->tokens[i].value, '$');
 			while (ptr && *ptr)
 				ptr = ft_process_token_expansion(ms, &ms->tokens[i], ptr);
+			if (!ms->tokens[i].value[0])
+				ms->tokens[i].type = TKN_EPTY;
 		}
 	}
 	return (0);
