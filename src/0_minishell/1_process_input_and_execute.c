@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:04:02 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/03 16:25:26 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/05 18:23:19 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ static int	ft_handle_and_tokenize_input(t_minishell *ms)
 	if (ms->tokens == NULL)
 		return (1);
 	ft_revalue_tkn_var(ms);
+	ms->tokens = ft_handle_empty_tokens(ms->tokens);
 	return (0);
 }
 

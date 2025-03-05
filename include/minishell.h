@@ -133,6 +133,8 @@ int				main(int argc, char **argv, char **envp);
 void			ft_create_prompt(t_minishell *ms);
 /* 1_process_input_and_execute.c */
 int				ft_process_input_and_execute(t_minishell *ms);
+/* 2_handle_empty_tokens.c */
+t_token			*ft_handle_empty_tokens(t_token *tokens);
 
 /* 1_handle_input */
 /* handle_input.c */
