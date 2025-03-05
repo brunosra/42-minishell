@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/05 05:12:23 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/05 20:27:40 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -266,15 +266,17 @@ int				ft_replace_str(char **value, char *key, char *ptr,
 					char *env_value);
 int				ft_cleanup(char *to_free1, char *to_free2, int error);
 int				ft_check_balanced_quotes(char *str, int idx);
-/* 3_revalue_heredoc_input.c */
+/* 3_remove_extra_spaces.c */
+int				ft_remove_extra_spaces(char **str);
+/* 4_revalue_heredoc_input.c */
 int				ft_revalue_heredoc_input(char **input, t_minishell *ms);
-/* 4_handle_env_utils.c */
+/* 5_handle_env_utils.c */
 char			**ft_duplicate_envp(char **envp);
 char			*ft_get_env_value(const char *str, t_minishell *ms, char **key,
 					bool heredoc);
 char			*ft_get_env(const char *key, t_minishell *ms);
 int				ft_unset_env(const char *key, char **list);
-/* 4_handle_env_utils2.c */
+/* 5_handle_env_utils2.c */
 int				ft_set_env(const char *key, const char *value, t_minishell *ms);
 
 /* 7_handle_malloc */

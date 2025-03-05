@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:03:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/05 05:46:46 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/05 20:27:32 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,12 +93,15 @@ static void	ft_expand_env_variable(t_minishell *ms, t_token *token,
 				char *ptr, char **key)
 {
 	char	*env_value;
+	int		to_free;
 
+	to_free = 1;
 	env_value = ft_get_env_value(ptr, ms, key, false);
 	if (!env_value)
 		env_value = ft_strdup("");
+	to_free = ft_remove_extra_spaces(&env_value);
 	ft_replace_str(&token->value, *key, ptr, env_value);
-	if (*env_value == '\0')
+	if (*env_value == '\0' || !to_free)
 		free(env_value);
 }
 
