@@ -16,3 +16,9 @@
     ...
     fun:add_history
 }
+{
+   readline_uninit
+   Memcheck:Cond
+   ...
+   fun:readline
+}
