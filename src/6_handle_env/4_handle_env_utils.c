@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:17:28 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/04 23:32:57 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/05 00:22:33 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,8 +138,7 @@ int	ft_unset_env(const char *key, char **list)
 		return (1);
 	while (list[i])
 	{
-		if (!ft_strncmp(list[i], key, len)
-			&& list[i][len] == '=')
+		if (!ft_strncmp(list[i], key, len))
 		{
 			free(list[i]);
 			j = i - 1;
