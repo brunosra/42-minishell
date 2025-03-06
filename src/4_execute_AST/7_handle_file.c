@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:48:45 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 01:03:43 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/06 04:39:40 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,9 +57,7 @@ static int	ft_file_error(char *filepath, char *msg, int code)
 	ft_putstr_fd("minishell: ", STDERR_FILENO);
 	if (filepath)
 		ft_putstr_fd(filepath, STDERR_FILENO);
-	ft_putstr_fd(": ", STDERR_FILENO);
-	ft_putstr_fd(msg, STDERR_FILENO);
-	ft_putstr_fd("\n", STDERR_FILENO);
+	ft_putstr_three_fd(": ", msg, "\n", STDERR_FILENO);
 	return (code);
 }
 

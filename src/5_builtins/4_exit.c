@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:47:54 by bschwell          #+#    #+#             */
-/*   Updated: 2025/03/05 00:08:29 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/06 04:51:53 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,9 +89,8 @@ static int	ft_value_is_numeric(char *str)
  */
 static void	ft_putstr_and_exit(char *str)
 {
-	ft_putstr_fd("exit\nminishell: exit: ", STDERR_FILENO);
-	ft_putstr_fd(str, STDERR_FILENO);
-	ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
+	ft_putstr_three_fd("exit\nminishell: exit: ", str,
+		": numeric argument required\n", STDERR_FILENO);
 	ft_free_ms(ft_ms_struct(NULL, 1), true, true, 0);
 	exit(2);
 }

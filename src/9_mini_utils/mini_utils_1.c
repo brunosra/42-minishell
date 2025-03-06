@@ -6,15 +6,16 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 04:38:05 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/03 07:03:21 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/06 04:48:25 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int		ft_perror(char *error, int return_value);
-int		ft_putstr_and_return(char *msg, int return_value);
-int		ft_exit_code(int newcode);
+int	ft_perror(char *error, int return_value);
+int	ft_putstr_and_return(char *msg, int return_value);
+int	ft_exit_code(int newcode);
+int	ft_putstr_three_fd(const char *s1, const char *s2, const char *s3, int fd);
 
 /**
  * @brief  Print an error message using perror and return a specified value.
@@ -60,4 +61,23 @@ int	ft_exit_code(int newcode)
 		return (code);
 	code = newcode;
 	return (code);
+}
+
+/**
+ * @brief Writes three strings consecutively to the given file descriptor.
+ * 
+ * @param s1  First string.
+ * @param s2  Second string.
+ * @param s3  Third string.
+ * @param fd  File descriptor to write to.
+ */
+int	ft_putstr_three_fd(const char *s1, const char *s2, const char *s3, int fd)
+{
+	if (s1)
+		write(fd, s1, ft_strlen(s1));
+	if (s2)
+		write(fd, s2, ft_strlen(s2));
+	if (s3)
+		write(fd, s3, ft_strlen(s3));
+	return (1);
 }

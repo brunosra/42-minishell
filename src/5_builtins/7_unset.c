@@ -6,14 +6,13 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 09:13:42 by bschwell          #+#    #+#             */
-/*   Updated: 2025/03/04 23:32:51 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/06 05:29:29 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 void		ft_builtin_unset(char **args, t_minishell *ms);
-static int	ft_check_valid_varname(char *arg);
 static int	ft_check_option(char *arg);
 
 /**
@@ -36,32 +35,19 @@ void	ft_builtin_unset(char **args, t_minishell *ms)
 		if (i == 1 && ft_check_option(args[i]) != 0)
 		{
 			err = 1 ;
-			ft_exit_code(err);
 			break ;
 		}
-		if (ft_check_valid_varname(args[i]) == 0)
+		if (ft_valid_export_arg(args[i]))
 		{
 			ft_unset_env(args[i], ms->env.export);
 			ft_unset_env(args[i], ms->env.envp);
 		}
+		else
+			err = ft_putstr_three_fd("minishell: unset: `", args[i],
+					"': not a valid identifier\n", STDERR_FILENO);
 		i++;
 	}
 	ft_exit_code(err);
-}
-
-/**
- * @brief	Check if arguments are valid for unset
- * 
- * @param	arg		string with varname
- * @return	int 
- * *		0: ok
- * *		1: error
- */
-static int	ft_check_valid_varname(char *arg)
-{
-	if (!arg[0] || !ft_isalpha(arg[0]) || arg[0] == '_')
-		return (1);
-	return (0);
 }
 
 /**

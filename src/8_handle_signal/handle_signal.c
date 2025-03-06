@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/05 22:47:49 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/06 04:50:41 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,14 +88,14 @@ void	ft_set_heredoc_signals(void)
  */
 void	ft_signal_heredoc_handler(int sig)
 {
+	t_minishell	*ms;
+
 	if (sig == SIGINT)
 	{
-		t_minishell	*ms;
-
 		ms = ft_ms_struct(NULL, 1);
-		write(STDERR_FILENO, "\n", 1);
+		close(ms->pipefd[1]);
 		ft_exit_code(ft_free_ms(ms, true, true, 130));
-		if(ms->temp)
+		if (ms->temp)
 			free(ms->temp);
 		exit(130);
 	}

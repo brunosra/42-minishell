@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 21:13:47 by bschwell          #+#    #+#             */
-/*   Updated: 2025/03/04 17:11:18 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/06 04:51:38 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int			ft_builtin_export_check(char **args);
 void		ft_builtin_export(char **args, t_minishell *ms);
 static void	ft_validate_and_process_export(char **args, t_minishell *ms);
 static int	ft_export_1_arg(t_minishell *ms);
-static int	ft_valid_export_arg(const char *arg);
+int			ft_valid_export_arg(const char *arg);
 
 /**
  * @brief  Counts the number of arguments passed to the export command.
@@ -60,7 +60,7 @@ void	ft_builtin_export(char **args, t_minishell *ms)
  * @param  args  Array of export arguments.
  * @param  ms    Pointer to the minishell structure.
  */
-static void	ft_validate_and_process_export(char **args, t_minishell *ms)
+void	ft_validate_and_process_export(char **args, t_minishell *ms)
 {
 	int	i;
 	int	error;
@@ -70,12 +70,8 @@ static void	ft_validate_and_process_export(char **args, t_minishell *ms)
 	while (args[i])
 	{
 		if (ft_valid_export_arg(args[i]) == 0)
-		{
-			ft_putstr_fd("minishell: export: `", STDERR_FILENO);
-			ft_putstr_fd(args[i], STDERR_FILENO);
-			ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO);
-			error = 1;
-		}
+			error = ft_putstr_three_fd("minishell: export: `", args[i],
+					"': not a valid identifier\n", STDERR_FILENO);
 		else
 			ft_process_export(args[i], ms);
 		i++;
@@ -89,7 +85,7 @@ static void	ft_validate_and_process_export(char **args, t_minishell *ms)
  * @param  arg  The variable name to validate.
  * @return int  1 if valid, 0 otherwise.
  */
-static int	ft_valid_export_arg(const char *arg)
+int	ft_valid_export_arg(const char *arg)
 {
 	int	i;
 

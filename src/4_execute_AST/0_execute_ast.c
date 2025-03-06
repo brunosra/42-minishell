@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   0_execute_ast.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:05:11 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:36:37 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/06 04:25:52 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,8 @@ int	ft_execute_ast(t_node *node, t_minishell *ms)
  */
 static int	ft_handle_syntax_error(t_node *node)
 {
-	ft_putstr_fd("minishell: syntax error near unexpected token `",
-		STDERR_FILENO);
-	ft_putstr_fd(node->token->value, STDERR_FILENO);
-	ft_putstr_fd("'\n", STDERR_FILENO);
+	ft_putstr_three_fd("minishell: syntax error near unexpected token `",
+		node->token->value, "'\n", STDERR_FILENO);
 	ft_exit_code(2);
 	return (1);
 }

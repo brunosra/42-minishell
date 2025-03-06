@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:35:12 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/03 02:18:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/06 03:41:27 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,13 @@ int	ft_handle_pipe(t_node *node, t_minishell *ms)
 	ms->pid = fork();
 	if (ms->pid == -1)
 		return (ft_handle_fork_error());
+	ft_set_fork_signals();
 	if (ms->pid == 0)
 		ft_execute_pipe_child(node, ms);
 	close(ms->pipefd[1]);
 	if (!ft_has_cat(node))
 		waitpid(ms->pid, &ms->status, 0);
+	ft_set_main_signals();
 	if (ft_redirect_pipe_input(ms))
 		return (1);
 	return (ft_execute_ast(node->right, ms));

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/05 20:27:40 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/06 04:22:14 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -242,6 +242,7 @@ int				ft_builtin_exit(char **args);
 /* 5_export.c */
 int				ft_builtin_export_check(char **args);
 void			ft_builtin_export(char **args, t_minishell *ms);
+int				ft_valid_export_arg(const char *arg);
 /* 5_export2.c */
 int				ft_process_export(char *str, t_minishell *ms);
 /* 5_export_utils.c  */
@@ -300,6 +301,8 @@ void			ft_signal_heredoc_handler(int sig);
 int				ft_perror(char *error, int return_value);
 int				ft_putstr_and_return(char *msg, int return_value);
 int				ft_exit_code(int newcode);
+int				ft_putstr_three_fd(const char *s1, const char *s2,
+					const char *s3, int fd);
 
 /* mini_utils_2.c */
 void			ft_init_prompt(t_minishell *ms);
