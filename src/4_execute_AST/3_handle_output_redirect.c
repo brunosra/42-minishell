@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:29:26 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/07 03:06:18 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/07 03:33:10 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,9 @@ int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 	if (fd == -1)
 	{
 		ft_putstr_three_fd("minishell: ", node->right->token->value,
-				": No such file or directory\n", STDERR_FILENO);
+			": No such file or directory\n", STDERR_FILENO);
 		ft_exit_code(1);
-		return (1);	
+		return (1);
 	}
 	if (dup2(fd, STDOUT_FILENO) == -1)
 		return (ft_handle_dup_error(fd));
