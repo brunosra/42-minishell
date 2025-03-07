@@ -6,31 +6,15 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:54:19 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/04 19:43:40 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/07 03:42:16 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int		ft_builtin_error(char *msg, int err);
 char	*ft_strtok(char *str, const char *delim);
 int		ft_exec_builtins_check(t_node *node, t_minishell *ms);
 int		ft_exec_builtins(t_node *node, t_minishell *ms);
-
-/**
- * @brief  Print an error message using perror and return a specified error code.
- * 
- * @param  msg  The error message to display.
- * @param  err  The error code to return.
- * @return int  The specified error code.
- */
-// TODO: temos mais duas funcoes que fazem o mesmo! UNIFORMIZAR
-int	ft_builtin_error(char *msg, int err)
-{
-	ft_putstr_fd(msg, STDERR_FILENO);
-	printf("\n");
-	return (err);
-}
 
 /**
  * @brief 	Tokenize a string and returns them in order

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/07 02:29:48 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/07 03:42:11 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,7 +227,6 @@ void			ft_create_files(t_node *node);
 
 /* 5_builtins */
 /* builtins.c  */
-int				ft_builtin_error(char *msg, int err);
 char			*ft_strtok(char *str, const char *delim);
 int				ft_exec_builtins_check(t_node *node, t_minishell *ms);
 int				ft_exec_builtins(t_node *node, t_minishell *ms);
