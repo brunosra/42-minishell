@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:43:45 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/07 03:31:12 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/07 19:40:38 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	waitpid(ms->pid, &ms->status, 0);
 	ft_handle_cmd_exit_status(node, ms);
 	ft_set_main_signals();
-	if (ft_exit_code(-1) != 0 && node->prev
+	if (ft_exit_code(-1) != 0 && ft_exit_code(-1) != 1 && node->prev
 		&& node->prev->token->type == TKN_IN_RD)
 		ft_remove_created_files(node->prev);
 	return (ft_exit_code(-1));

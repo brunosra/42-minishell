@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/07 08:15:35 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/07 22:34:17 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -309,6 +309,7 @@ int				ft_putstr_and_return(char *msg, int return_value);
 int				ft_exit_code(int newcode);
 int				ft_putstr_three_fd(const char *s1, const char *s2,
 					const char *s3, int fd);
+int				ft_last_left_is_cmd(t_node *node);
 
 /* mini_utils_2.c */
 void			ft_init_prompt(t_minishell *ms);

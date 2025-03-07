@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 01:34:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/05 18:28:06 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/07 22:35:26 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,14 @@ static t_node	*ft_handle_op_node(t_token *tokens, int *i,
 	ast.op_node->prev = *current;
 	if (!*root)
 		*root = ast.op_node;
+	else if ((*root)->token->type == TKN_PIPE && !(*root)->right
+		&& ft_last_left_is_cmd(*root))
+	{
+		(*root)->right = ast.op_node;
+		*current = (*root)->right;
+		(*i)++;
+		return (ast.op_node);
+	}
 	else
 		(*root)->prev = ast.op_node;
 	ft_adjust_input_redirect(tokens, i, &ast);
