@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/06 04:22:14 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/07 02:29:48 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,6 +135,8 @@ void			ft_create_prompt(t_minishell *ms);
 int				ft_process_input_and_execute(t_minishell *ms);
 /* 2_handle_empty_tokens.c */
 t_token			*ft_handle_empty_tokens(t_token *tokens);
+/* 3_void		finalize_execution.c */
+void			ft_finalize_execution(t_minishell *ms);
 
 /* 1_handle_input */
 /* handle_input.c */
@@ -207,6 +209,8 @@ void			ft_swap_redirects_values(t_node *node, t_type type);
 /* 5_handle_pipe.c */
 int				ft_handle_pipe(t_node *node, t_minishell *ms);
 int				ft_handle_fork_error(void);
+/* 5_handle_pipe2.c */
+int			ft_check_pipe_syntax(t_node *node, t_minishell *ms);
 /* 5_handle_pipe_utils.c  */
 int				ft_create_pipe(t_minishell *ms);
 int				ft_pipe_syntax_error(char *token, int code);
