@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   4_handle_input_redirect.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:32:06 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:39:28 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/07 03:06:25 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,12 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms)
 		return (1);
 	fd = open(node->right->token->value, O_RDONLY);
 	if (fd == -1)
-		return (ft_handle_file_error());
+	{
+		ft_putstr_three_fd("minishell: ", node->right->token->value,
+				": No such file or directory\n", STDERR_FILENO);
+		ft_exit_code(1);
+		return (1);	
+	}
 	if (dup2(fd, STDIN_FILENO) == -1)
 		return (ft_handle_dup_error(fd));
 	close(fd);

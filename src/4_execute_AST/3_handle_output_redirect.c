@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   3_handle_output_redirect.c                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:29:26 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:39:24 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/07 03:06:18 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 int			ft_handle_output_redirect(t_node *node, t_minishell *ms);
 int			ft_check_redirect_syntax(t_node *node);
 static int	ft_open_output_file(t_node *node);
-int			ft_handle_file_error(void);
 int			ft_handle_dup_error(int fd);
 
 /**
@@ -35,7 +34,12 @@ int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 		return (1);
 	fd = ft_open_output_file(node);
 	if (fd == -1)
-		return (ft_handle_file_error());
+	{
+		ft_putstr_three_fd("minishell: ", node->right->token->value,
+				": No such file or directory\n", STDERR_FILENO);
+		ft_exit_code(1);
+		return (1);	
+	}
 	if (dup2(fd, STDOUT_FILENO) == -1)
 		return (ft_handle_dup_error(fd));
 	close(fd);
@@ -95,19 +99,6 @@ static int	ft_open_output_file(t_node *node)
 	if (fd != -1)
 		node->file = true;
 	return (fd);
-}
-
-/**
- * @brief  Handles errors when opening the file.
- * 
- * @param  ms  Pointer to the minishell structure.
- * @return int Always returns 1 to indicate an error.
- */
-int	ft_handle_file_error(void)
-{
-	perror("open");
-	ft_exit_code(1);
-	return (1);
 }
 
 /**
