@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:04:02 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/05 18:23:19 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/07 01:14:24 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,12 +36,13 @@ int	ft_process_input_and_execute(t_minishell *ms)
 			return (ft_putstr_and_return("minishell: unclosed quotes\n", 1));
 	}
 	ms->ast_root = ft_parse_ast(ms->tokens);
-	ft_find_stuck_cats(ms, ms->ast_root);
+	if (ms->in_pipe == false)
+		ft_find_stuck_cats(ms, ms->ast_root);
 	if (ms->ast_root)
 	{
 		ms->status = ft_execute_ast(ms->ast_root, ms);
-		if (dup2(ms->save_stdin, STDIN_FILENO) == -1
-			|| dup2(ms->save_stdout, STDOUT_FILENO) == -1)
+		if ((dup2(ms->save_stdin, STDIN_FILENO) == -1
+			|| dup2(ms->save_stdout, STDOUT_FILENO) == -1) && ms->in_pipe == false)
 		{
 			ft_close_stdin_stdout(ms);
 			return (ft_perror("dup2", 1));
@@ -50,7 +51,8 @@ int	ft_process_input_and_execute(t_minishell *ms)
 			ms->in_pipe = false;
 		else
 			ft_close_stdin_stdout(ms);
-		ft_clean_stuck_cats(ms);
+		if (ms->status != 130)
+			ft_clean_stuck_cats(ms);
 	}
 	return (0);
 }
@@ -130,22 +132,56 @@ static void	ft_close_stdin_stdout(t_minishell *ms)
  * @param  ms  Pointer to the minishell structure.
  * @return void
  */
+// static void	ft_clean_stuck_cats(t_minishell *ms)
+// {
+// 	char	c;
+
+// 	if (!ms->c_stuck_cats)
+// 		return ;
+// 	while (ms->c_stuck_cats)
+// 	{
+// 		while (read(STDIN_FILENO, &c, 1) > 0)
+// 		{
+// 			if (c == '\n')
+// 				ms->c_stuck_cats--;
+// 			if (ms->c_stuck_cats == 0)
+// 				break ;
+// 		}
+// 	}
+// 	ft_exit_code(0);
+// 	return ;
+// }
+
 static void	ft_clean_stuck_cats(t_minishell *ms)
 {
-	char	c;
+	char	*input;
 
+	input = NULL;
 	if (!ms->c_stuck_cats)
 		return ;
-	while (ms->c_stuck_cats)
+	ft_create_pipe(ms);
+	ms->pid = fork();
+	if (ms->pid == -1)
+		return ;
+	ft_set_fork_signals();
+	if (ms->pid == 0)
 	{
-		while (read(STDIN_FILENO, &c, 1) > 0)
+		ft_set_heredoc_signals();
+		close(ms->pipefd[0]);
+		while (ms->c_stuck_cats)
 		{
-			if (c == '\n')
-				ms->c_stuck_cats--;
-			if (ms->c_stuck_cats == 0)
-				break ;
+			input = readline("");
+			if (!input)
+				exit(ft_free_ms(ms, true, true, 0));
+			ms->c_stuck_cats--;
+			free(input);
 		}
+		close(ms->pipefd[1]);
+		exit(ft_free_ms(ms, true, true, 0));
 	}
-	ft_exit_code(0);
-	return ;
+	close(ms->pipefd[1]);
+	waitpid(ms->pid, &ms->status, 0);
+	ft_set_main_signals();
+	close(ms->pipefd[0]);
+	ms->c_stuck_cats = 0;
 }

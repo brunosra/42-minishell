@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:35:12 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/06 03:41:27 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/07 01:12:48 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,15 +113,80 @@ int	ft_handle_fork_error(void)
 static int	ft_check_pipe_syntax(t_node *node, t_minishell *ms)
 {
 	char	*input;
+	// int	save_stdout;
+	int		pipe_status;
 
+	input = NULL;
 	if (!node->left)
 		return (ft_pipe_syntax_error("|", 2));
 	if (node->right)
 		return (0);
-	input = readline("> ");
+	// Criar o pipe
+	pipe_status = ft_create_pipe(ms);
+	if (pipe_status)
+		return (pipe_status);
+	// Criar o processo filho
+	// save_stdout = ft_redirect_stdout(ms);
+	ms->pid = fork();
+	if (ms->pid == -1)
+		return (ft_handle_heredoc_fork_error(ms));
+	
+	ft_set_fork_signals();
+	
+	if (ms->pid == 0) // FILHO
+	{
+		ft_set_heredoc_signals();
+		close(ms->pipefd[0]); // Fechar leitura no filho
+
+		while (1)
+		{
+			// Ler input do usuário
+			input = readline("> ");
+			if (!input)
+				exit(2);
+			if (*input != '\0') // Aceita input válido
+				break;
+			// Redirecionar stdout para o pipe
+		}
+		dup2(ms->pipefd[1], STDOUT_FILENO);
+		
+		// Escrever input no pipe
+		write(ms->pipefd[1], input, ft_strlen(input)); // printf garante newline e flush
+		free(input);
+		close(ms->pipefd[1]); // Fechar o fd original, pois já redirecionamos
+		exit(ft_free_ms(ms, true, true, 0));
+	}
+
+	// PAI
+	close(ms->pipefd[1]); // Fecha escrita no pipe (não será usada no pai)
+	waitpid(ms->pid, &ms->status, 0);
+	if (WIFEXITED(ms->status) && WEXITSTATUS(ms->status) == 130)
+	{
+		ft_exit_code(130);
+		ms->c_stuck_cats = 0;
+		close(ms->pipefd[0]);
+		return (130);
+	}
+	// ft_restore_stdin(ms);
+	// if (save_stdout != -1)
+	// 	ft_restore_stdout(save_stdout);
+
+	if (WIFEXITED(ms->status) && WEXITSTATUS(ms->status) == 2)
+	{
+		ft_putstr_fd("minishell: syntax error: unexpected end of file\nexit\n", STDERR_FILENO);
+		ft_free_ms(ms, true, true, 0);
+		exit(ft_exit_code(-1));
+	}
+	ft_set_main_signals();
+	// Ler do pipe corretamente
+	input = get_next_line(ms->pipefd[0]);
+	close(ms->pipefd[0]); // Fechar leitura do pipe após leitura
 	if (!input)
-		return (ft_pipe_syntax_error("unexpected end of file", 258));
+		return (0);
 	ft_handle_unfinished_pipe(ms, input);
+	free(input);
+	// if (ms->c_stuck_cats)
+	// 	ms->c_stuck_cats -= 1;
 	ft_process_input_and_execute(ms);
 	return (1);
 }

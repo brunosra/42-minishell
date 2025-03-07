@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:35:12 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/06 04:37:53 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/06 18:51:44 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	ft_handle_unfinished_pipe(t_minishell *ms, char *input)
 	temp = ft_strjoin(ms->input, " ");
 	free(ms->input);
 	ms->input = ft_strjoin(temp, input);
-	free(input);
+	// free(input);
 	free(temp);
 	ft_free_tokens(ms->tokens);
 	ft_free_ast(ms->ast_root);

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:43:45 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/06 04:40:41 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/06 23:11:01 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,10 @@ static void	ft_execute_child_process(t_node *node, t_minishell *ms)
 		&& (node->prev->left == node
 			|| (node->prev->prev && node->prev->prev->token->type == TKN_PIPE
 				&& node->prev->right == node)))
-		exit(ft_free_ms(ms, true, true, 13));
+	{
+			free(ms->env.full_path);
+			exit(ft_free_ms(ms, true, true, 13));
+	}		
 	execve(ms->env.full_path, node->cmd_ready, ms->env.envp);
 	perror("execve");
 	exit(ft_free_ms(ms, true, true, 127));
