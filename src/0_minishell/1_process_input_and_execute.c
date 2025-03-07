@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:04:02 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/07 02:28:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/07 08:08:36 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ int	ft_process_input_and_execute(t_minishell *ms)
 		else
 			return (ft_putstr_and_return("minishell: unclosed quotes\n", 1));
 	}
+	if (ft_is_cat_pipeline(ms->tokens))
+		ms->tokens = ft_trim_tokens_before_pipe(ms->tokens, ms);
 	ms->ast_root = ft_parse_ast(ms->tokens);
 	if (ms->in_pipe == false)
 		ft_find_stuck_cats(ms, ms->ast_root);
