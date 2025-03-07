@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   4_handle_env_utils.c                               :+:      :+:    :+:   */
+/*   5_handle_env_utils.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:17:28 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/05 00:22:33 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/07 05:14:46 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,10 @@ char	*ft_get_env(const char *key, t_minishell *ms)
 	while (envp[i])
 	{
 		if (!ft_strncmp(envp[i], key, len) && envp[i][len] == '=')
-			return (&envp[i][len + 1]);
+		{
+			if (envp[i][len + 1])
+				return (&envp[i][len + 1]);
+		}
 		i++;
 	}
 	return (NULL);
