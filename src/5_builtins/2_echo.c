@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   2_echo.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/31 17:18:39 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/27 18:42:02 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/08 07:31:21 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,15 +50,15 @@ static int	ft_check_valid_echo_opt(char *opt)
 void	ft_builtin_echo(char **args)
 {
 	int	i;
-	int	newline;
+	int	new_line;
 
 	i = 1;
-	newline = 1;
+	new_line = 1;
 	while (args[i])
 	{
 		if (ft_check_valid_echo_opt(args[i]) == 0)
 			break ;
-		newline = 0;
+		new_line = 0;
 		i++;
 	}
 	while (args[i])
@@ -68,7 +68,7 @@ void	ft_builtin_echo(char **args)
 			printf(" ");
 		i++;
 	}
-	if (newline)
+	if (new_line)
 		printf("\n");
 	ft_exit_code(EX_OK);
 }
