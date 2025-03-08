@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:48:45 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/06 04:39:40 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/08 04:30:13 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,8 +136,6 @@ void	ft_remove_created_files(t_node *node)
 	{
 		if (unlink(node->right->token->value) == -1)
 			perror("unlink");
-		else
-			node->file = false;
 	}
 	if (node->prev && node->prev->right == node)
 	{

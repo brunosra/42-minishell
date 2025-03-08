@@ -6,16 +6,50 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:32:06 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/07 03:33:16 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/08 04:30:47 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int			ft_handle_input_redirect(t_node *node, t_minishell *ms);
+int			ft_handle_input_redirect(t_node *node, t_minishell *ms, int fd);
 static int	ft_validate_input_file(t_node *node);
 int			ft_invalid_right_token_value(char *value);
+static int	ft_is_input_also_output(t_node *node, t_node *root);
 void		ft_swap_redirects_values(t_node *node, t_type type);
+
+/**
+ * @brief Checks if the given input file is also used as an output file.
+ * 
+ * This function scans the AST to detect cases where a file is both read
+ * from (`<`) and written to (`>` or `>>`), which may cause conflicts.
+ * 
+ * @param node  Pointer to the current input redirection node (`TKN_IN_RD`).
+ * @param root  Pointer to the root of the AST.
+ * @return int  1 if the file is also an output, 0 otherwise.
+ */
+static int	ft_is_input_also_output(t_node *node, t_node *root)
+{
+	t_node	*current;
+	char	*filename;
+
+	if (!node || !root || !node->right || node->token->type != TKN_IN_RD)
+		return (0);
+	filename = node->right->token->value;
+	current = root;
+	while (current)
+	{
+		if (current->token->type == TKN_OUT_RD && current->file == true
+			&& ft_strcmp(current->right->token->value, filename) == 0)
+			return (1);
+		if (ft_is_input_also_output(node, current->right))
+			return (1);
+		if (ft_is_input_also_output(node, current->left))
+			return (1);
+		current = current->right;
+	}
+	return (0);
+}
 
 /**
  * @brief  Handles input redirection from a file.
@@ -26,16 +60,21 @@ void		ft_swap_redirects_values(t_node *node, t_type type);
  *         0 on success.
  *         Non-zero in case of errors or syntax issues.
  */
-int	ft_handle_input_redirect(t_node *node, t_minishell *ms)
+int	ft_handle_input_redirect(t_node *node, t_minishell *ms, int fd)
 {
-	int	fd;
-
 	if (ft_check_redirect_syntax(node))
 		return (1);
 	if (ft_validate_input_file(node))
 		return (1);
+	if (ft_is_input_also_output(node, ms->ast_root))
+	{
+		ft_putstr_three_fd("minishell: ", node->right->token->value,
+			": No such file or directory\n", STDERR_FILENO);
+		ft_exit_code(1);
+		return (1);
+	}
 	fd = open(node->right->token->value, O_RDONLY);
-	if (fd == -1)
+	if (fd == -1 || node->file == true)
 	{
 		ft_putstr_three_fd("minishell: ", node->right->token->value,
 			": No such file or directory\n", STDERR_FILENO);

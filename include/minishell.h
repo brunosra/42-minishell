@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/07 22:34:17 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/08 04:27:29 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,7 +206,7 @@ int				ft_check_redirect_syntax(t_node *node);
 int				ft_handle_file_error(void);
 int				ft_handle_dup_error(int fd);
 /* 4_handle_input_redirect.c  */
-int				ft_handle_input_redirect(t_node *node, t_minishell *ms);
+int				ft_handle_input_redirect(t_node *node, t_minishell *ms, int fd);
 int				ft_invalid_right_token_value(char *value);
 void			ft_swap_redirects_values(t_node *node, t_type type);
 /* 5_handle_pipe.c */

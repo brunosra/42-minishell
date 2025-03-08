@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:05:11 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/06 04:25:52 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/08 04:28:35 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ static int	ft_execute_input_redirect(t_node *node, t_minishell *ms)
 		ft_swap_redirects_values(node, TKN_IN_RD);
 		ms->swap_input_redirects = true;
 	}
-	return (ft_handle_input_redirect(node, ms));
+	return (ft_handle_input_redirect(node, ms, -1));
 }
 
 /**

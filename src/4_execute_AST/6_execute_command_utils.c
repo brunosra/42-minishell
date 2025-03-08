@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 03:00:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 01:00:45 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/08 04:46:47 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,8 @@ int	ft_find_executable(t_minishell *ms, char *cmd)
  */
 static char	**ft_get_path_dirs(t_minishell *ms)
 {
+	if (!ft_get_env("PATH", ms))
+		return (NULL);
 	ms->env.env_paths = getenv("PATH");
 	if (!ms->env.env_paths)
 		return (NULL);
