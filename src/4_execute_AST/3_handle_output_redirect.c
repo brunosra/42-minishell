@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:29:26 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/07 03:33:10 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/08 02:59:50 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,22 +81,27 @@ int	ft_check_redirect_syntax(t_node *node)
 }
 
 /**
- * @brief  Opens the file for output redirection.
+ * @brief Opens an output file for writing or appending.
  * 
- * @param  node  Pointer to the output redirection node.
- * @return int   File descriptor, or -1 on failure.
+ * This function ensures that `node->file` is only set to true 
+ * if the file did not exist before opening.
+ * 
+ * @param node Pointer to the AST node representing the output redirection.
+ * @return int The file descriptor if successful, -1 on failure.
  */
 static int	ft_open_output_file(t_node *node)
 {
 	int	fd;
+	int	existed;
 
+	existed = (access(node->right->token->value, F_OK) == 0);
 	if (ft_strcmp(node->token->value, ">>") == 0)
 		fd = open(node->right->token->value,
 				O_WRONLY | O_CREAT | O_APPEND, 0644);
 	else
 		fd = open(node->right->token->value,
 				O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd != -1)
+	if (fd != -1 && !existed)
 		node->file = true;
 	return (fd);
 }
