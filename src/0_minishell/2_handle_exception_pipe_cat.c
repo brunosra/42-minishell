@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 08:06:42 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/07 08:26:22 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/08 18:26:59 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ int	ft_is_cat_pipeline(t_token *tokens)
 			&& tokens[0].type == TKN_CMD))
 		return (0);
 	i = ft_skip_initial_args(tokens);
-	if (tokens[i].type == TKN_PIPE)
+	if (tokens && tokens[0].type != TKN_NULL && tokens[i].type == TKN_PIPE)
 		return (ft_check_cat_sequence(tokens, i + 1));
 	return (0);
 }
@@ -120,9 +120,13 @@ static int	ft_skip_initial_args(t_token *tokens)
 	int	i;
 
 	i = 1;
-	while (tokens[i].type != TKN_NULL && (tokens[i].type == TKN_ARG
-			|| tokens[i].type == TKN_VAR || tokens[i].type == TKN_FILE
-			|| tokens[i].type == TKN_EPTY))
-		i++;
+	if (tokens[0].type != TKN_NULL)
+	{
+		while (tokens[0].type != TKN_NULL && tokens[i].type != TKN_NULL
+			&& (tokens[i].type == TKN_ARG
+				|| tokens[i].type == TKN_VAR || tokens[i].type == TKN_FILE
+				|| tokens[i].type == TKN_EPTY))
+			i++;
+	}
 	return (i);
 }
