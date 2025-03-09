@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/08 07:52:37 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/09 00:14:20 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -320,7 +320,4 @@ void			ft_init_prompt(t_minishell *ms);
 char			*ft_strjoin_free(char *s1, char *s2, int free_s1, int free_s2);
 t_minishell		*ft_ms_struct(t_minishell *ms, int flag);
 void			ft_print_ast(t_node *node, int depth);
-
-/* mini_utils_3.c */
-void			ft_check_terminal_scroll(void);
 #endif
