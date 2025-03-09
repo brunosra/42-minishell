@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/07 01:41:14 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/09 00:56:13 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,17 @@ void	ft_signal_heredoc_handler(int sig);
  */
 void	ft_signal_handler(int sig)
 {
+	t_minishell	*ms;
+
 	if (sig == SIGINT)
 	{
+		ms = ft_ms_struct(NULL, 1);
 		write(STDERR_FILENO, "\n", 1);
 		ft_exit_code(130);
 		rl_replace_line("", 0);
 		rl_on_new_line();
+		ft_create_prompt(ms);
+		rl_set_prompt(ms->prompt);
 		rl_redisplay();
 	}
 }

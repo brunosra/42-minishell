@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mini_utils_2.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 04:38:05 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:52:30 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/09 00:59:06 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,29 +16,6 @@ char		*ft_strjoin_free(char *s1, char *s2, int free_s1, int free_s2);
 t_minishell	*ft_ms_struct(t_minishell *ms, int flag);
 static char	*ft_free_inputs(char *s1, char *s2, int free_s1, int free_s2);
 void		ft_print_ast(t_node *node, int depth);
-void		ft_init_prompt(t_minishell *ms);
-
-/**
- * @brief  Initializes the minishell prompt with exit code and current directory.
- * 
- * This function creates the prompt string by including the exit code and 
- * the current working directory, formatting them with color codes, and 
- * storing the result in `ms->prompt`.
- * 
- * @param ms Pointer to the `t_minishell` structure containing the state 
- *           of the minishell.
- */
-void	ft_init_prompt(t_minishell *ms)
-{
-	char	*exit_code;
-
-	exit_code = NULL;
-	getcwd(ms->currpath, PATH_MAX);
-	exit_code = ft_itoa(ft_exit_code(-1));
-	ms->prompt = ft_strjoin_all(4, RD"["RST, exit_code,
-			RD"] minishell"RST, "$ ");
-	free(exit_code);
-}
 
 /**
  * @brief  Joins two strings and optionally frees them.
