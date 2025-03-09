@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/09 00:59:22 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/09 04:03:53 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ typedef struct s_ast_node
 	t_node	*right;
 	t_node	*prev;
 	bool	file;
+	bool	file_unlink;
 	char	**heredoc_stops;
 }	t_node;
 

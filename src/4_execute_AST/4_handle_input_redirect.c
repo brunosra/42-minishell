@@ -6,14 +6,14 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:32:06 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/08 04:30:47 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/09 04:09:17 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 int			ft_handle_input_redirect(t_node *node, t_minishell *ms, int fd);
-static int	ft_validate_input_file(t_node *node);
+static int	ft_validate_input_file(t_node *node, t_node *root);
 int			ft_invalid_right_token_value(char *value);
 static int	ft_is_input_also_output(t_node *node, t_node *root);
 void		ft_swap_redirects_values(t_node *node, t_type type);
@@ -64,12 +64,11 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms, int fd)
 {
 	if (ft_check_redirect_syntax(node))
 		return (1);
-	if (ft_validate_input_file(node))
+	if (ft_validate_input_file(node, ms->ast_root))
 		return (1);
 	if (ft_is_input_also_output(node, ms->ast_root))
 	{
-		ft_putstr_three_fd("minishell: ", node->right->token->value,
-			": No such file or directory\n", STDERR_FILENO);
+		ft_remove_created_files(ms->ast_root);
 		ft_exit_code(1);
 		return (1);
 	}
@@ -95,11 +94,11 @@ int	ft_handle_input_redirect(t_node *node, t_minishell *ms, int fd)
  * @param  ms    Pointer to the minishell structure.
  * @return int   1 if the file is invalid, 0 otherwise.
  */
-static int	ft_validate_input_file(t_node *node)
+static int	ft_validate_input_file(t_node *node, t_node *root)
 {
 	if (ft_is_valid_file(node->right->token->value, O_RDONLY))
 	{
-		ft_remove_created_files(node->prev);
+		ft_remove_created_files(root);
 		ft_create_files(node->left);
 		ft_exit_code(1);
 		return (1);

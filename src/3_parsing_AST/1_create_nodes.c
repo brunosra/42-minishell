@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 01:43:53 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 00:37:06 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/09 03:36:41 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ t_node	*ft_create_cmd_node(t_token *token)
 	node->right = NULL;
 	node->prev = NULL;
 	node->file = false;
+	node->file_unlink = false;
 	node->heredoc_stops = NULL;
 	return (node);
 }
@@ -59,6 +60,7 @@ t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right)
 	node->right = right;
 	node->prev = NULL;
 	node->file = false;
+	node->file_unlink = false;
 	node->heredoc_stops = NULL;
 	return (node);
 }

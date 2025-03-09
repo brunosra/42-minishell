@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:48:45 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/08 04:30:13 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/09 03:40:42 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,19 +131,12 @@ void	ft_remove_created_files(t_node *node)
 {
 	if (!node)
 		return ;
-	if (node->token->type == TKN_OUT_RD && node->right
-		&& node->right->token->value && node->file == true)
+	if (node->file == true && node->file_unlink == false)
 	{
 		if (unlink(node->right->token->value) == -1)
 			perror("unlink");
+		node->file_unlink = true;
 	}
-	if (node->prev && node->prev->right == node)
-	{
-		ft_remove_created_files(node->prev);
-		return ;
-	}
-	if (node->prev && node->prev->right)
-		ft_remove_created_files(node->prev->right);
-	if (node->prev)
-		ft_remove_created_files(node->prev);
+	ft_remove_created_files(node->right);
+	ft_remove_created_files(node->left);
 }
