@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/09 04:03:53 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/09 08:27:40 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,14 +216,13 @@ int				ft_invalid_right_token_value(char *value);
 void			ft_swap_redirects_values(t_node *node, t_type type);
 /* 5_handle_pipe.c */
 int				ft_handle_pipe(t_node *node, t_minishell *ms);
-int				ft_handle_fork_error(void);
 /* 5_handle_pipe2.c */
-int			ft_check_pipe_syntax(t_node *node, t_minishell *ms);
+int				ft_check_pipe_syntax(t_node *node, t_minishell *ms);
 /* 5_handle_pipe_utils.c  */
 int				ft_create_pipe(t_minishell *ms);
 int				ft_pipe_syntax_error(char *token, int code);
 void			ft_handle_unfinished_pipe(t_minishell *ms, char *input);
-int				ft_has_cat(t_node *node);
+int				ft_handle_fork_error(void);
 /* 6_execute_command.c */
 int				ft_execute_command(t_node *node, t_minishell *ms);
 /* 6_execute_command_utils.c */
@@ -306,6 +305,9 @@ void			ft_set_main_signals(void);
 void			ft_set_fork_signals(void);
 void			ft_set_heredoc_signals(void);
 void			ft_signal_heredoc_handler(int sig);
+/* handle_signal2.c */
+void			ft_set_pipe_signals(void);
+void			ft_signal_pipe_handler(int sig);
 
 /* 9_mini_utils */
 /* mini_utils_1.c  */
