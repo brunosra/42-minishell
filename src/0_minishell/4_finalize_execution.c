@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   3_finalize_execution.c                             :+:      :+:    :+:   */
+/*   4_finalize_execution.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 02:22:33 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/07 08:03:13 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/10 08:53:04 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ void		ft_finalize_execution(t_minishell *ms);
 static void	ft_close_stdin_stdout(t_minishell *ms);
 static void	ft_clean_stuck_cats(t_minishell *ms);
 static void	ft_clean_stuck_cats_child(t_minishell *ms);
-void		ft_find_stuck_cats(t_minishell *ms, t_node *node);
 
 /**
  * @brief  Finalizes the execution process.
@@ -97,51 +96,24 @@ void	ft_clean_stuck_cats(t_minishell *ms)
 static void	ft_clean_stuck_cats_child(t_minishell *ms)
 {
 	char	*input;
+	int		no_stop;
 
+	no_stop = 0;
 	ft_set_heredoc_signals();
 	close(ms->pipefd[0]);
-	while (ms->c_stuck_cats)
+	if (!ft_strcmp(ms->input, "cat | cat"))
+		no_stop = 1;
+	while (ms->c_stuck_cats || no_stop == 1)
 	{
+		rl_on_new_line();
 		input = readline("");
 		if (!input)
 			exit(ft_free_ms(ms, true, true, 0));
+		printf("%s", input);
+		printf("\n");
 		ms->c_stuck_cats--;
 		free(input);
 	}
 	close(ms->pipefd[1]);
 	exit(ft_free_ms(ms, true, true, 0));
-}
-
-/**
- * @brief  Find and count stuck "cat" commands in the AST.
- * 
- * @param  ms    Pointer to the minishell structure.
- * @param  node  Current node in the AST.
- * @return void
- */
-void	ft_find_stuck_cats(t_minishell *ms, t_node *node)
-{
-	t_node	*current;
-
-	current = node;
-	if (!current)
-		return ;
-	if (current->token->type == TKN_CMD && current->token->value[0] != '\0')
-	{
-		if (current->cmd_ready[1] == NULL
-			&& (!ft_strcmp(current->cmd_ready[0], "cat")
-				|| !ft_strcmp(current->cmd_ready[0], "/bin/cat"))
-			&& current->prev && current->prev->token->type == TKN_PIPE
-			&& (current->prev->left == current
-				|| (current->prev->prev
-					&& current->prev->prev->token->type == TKN_PIPE
-					&& current->prev->right == current)))
-			ms->c_stuck_cats++;
-	}
-	if (!current->left && !current->right)
-		return ;
-	ft_find_stuck_cats(ms, current->left);
-	if (!ms->c_stuck_cats)
-		return ;
-	ft_find_stuck_cats(ms, current->right);
 }

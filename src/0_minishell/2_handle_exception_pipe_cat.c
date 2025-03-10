@@ -5,128 +5,151 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/07 08:06:42 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/08 18:26:59 by tcosta-f         ###   ########.fr       */
+/*   Created: 2025/03/10 05:21:58 by tcosta-f          #+#    #+#             */
+/*   Updated: 2025/03/10 08:55:25 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int			ft_is_cat_pipeline(t_token *tokens);
-t_token		*ft_trim_tokens_before_pipe(t_token *tokens, t_minishell *ms);
-static int	ft_check_cat_sequence(t_token *tokens, int i);
-static int	ft_skip_initial_args(t_token *tokens);
+void			ft_trim_last_cat_sequence(t_minishell *ms);
+static int		ft_find_last_cat(t_token *tokens);
+static int		ft_find_first_cat_sequence(t_token *tokens, int last_cat,
+					int *seq_count);
+static t_token	*ft_copy_tokens_excluding_range(t_minishell *ms,
+					t_token *tokens, int start, int end);
 
 /**
- * @brief Determines if the command sequence is a "cat pipeline".
+ * @brief  Finds the last occurrence of "cat" in the token list.
  * 
- * A valid "cat pipeline" starts with any command, followed by a pipe (`|`),
- * and then only `cat` commands separated by pipes.
+ * Iterates over the token list and returns the index of the last "cat"
+ * command found.
  * 
- * @param tokens The array of tokens.
- * @return 1 if it is a valid "cat pipeline", 0 otherwise.
+ * @param  tokens  Pointer to the array of tokens.
+ * @return int     The index of the last "cat" found, or -1 if none exists.
  */
-int	ft_is_cat_pipeline(t_token *tokens)
+static int	ft_find_last_cat(t_token *tokens)
 {
 	int	i;
-
-	if (!tokens || (!ft_strcmp(tokens[0].value, "cat")
-			&& tokens[0].type == TKN_CMD))
-		return (0);
-	i = ft_skip_initial_args(tokens);
-	if (tokens && tokens[0].type != TKN_NULL && tokens[i].type == TKN_PIPE)
-		return (ft_check_cat_sequence(tokens, i + 1));
-	return (0);
-}
-
-/**
- * @brief  Creates a new token array up to the first `|` and updates ms->n_args.
- *
- * @param  tokens  Pointer to the array of tokens.
- * @param  ms      Pointer to the minishell structure.
- * @return t_token* New token array containing only the first segment.
- */
-t_token	*ft_trim_tokens_before_pipe(t_token *tokens, t_minishell *ms)
-{
-	t_token	*new_tokens;
-	int		count;
-	int		i;
+	int	last_cat;
 
 	i = 0;
-	count = 0;
-	while (tokens[count].type != TKN_PIPE && tokens[count].type != TKN_NULL)
-		count++;
-	new_tokens = ft_calloc(sizeof(t_token), (count + 1));
-	if (!new_tokens)
-		return (NULL);
-	while (i < count)
-	{
-		new_tokens[i].value = ft_strdup(tokens[i].value);
-		new_tokens[i].type = tokens[i].type;
-		if (tokens[i].old_value)
-			new_tokens[i].old_value = ft_strdup(tokens[i].old_value);
-		i++;
-	}
-	new_tokens[count].type = TKN_NULL;
-	new_tokens[count].value = NULL;
-	ft_free_tokens(tokens);
-	ms->n_args = count;
-	return (new_tokens);
-}
-
-/**
- * @brief Checks if a valid "cat pipeline" sequence exists.
- * 
- * This function verifies that after an initial command, the sequence follows
- * the pattern `cat | cat | cat ...` until the end.
- * 
- * @param tokens The array of tokens.
- * @param i The index where the sequence should start.
- * @return 1 if the sequence is valid, 0 otherwise.
- */
-static int	ft_check_cat_sequence(t_token *tokens, int i)
-{
-	int	count;
-
-	count = 0;
+	last_cat = -1;
 	while (tokens[i].type != TKN_NULL)
 	{
 		if (tokens[i].type == TKN_CMD && !ft_strcmp(tokens[i].value, "cat"))
-		{
-			i++;
-			count++;
-		}
-		if (tokens[i].type != TKN_PIPE || tokens[i].type == TKN_NULL)
-			break ;
+			last_cat = i;
 		i++;
 	}
-	if (tokens[i].type == TKN_NULL && !ft_strcmp(tokens[i - 1].value, "cat")
-		&& count > 1)
-		return (1);
-	return (0);
+	return (last_cat);
 }
 
 /**
- * @brief Skips initial arguments before checking pipeline validity.
+ * @brief  Finds the first occurrence of a "cat | cat | ..." sequence.
  * 
- * This function skips over tokens that are arguments, variables, files,
- * or empty values before reaching the first command.
+ * Traverses the tokens backward from the last "cat", counting how many
+ * "cat |" sequences exist in a row.
  * 
- * @param tokens The array of tokens to analyze.
- * @return Index of the first non-argument token.
+ * @param  tokens     Pointer to the array of tokens.
+ * @param  last_cat   The index of the last "cat" found.
+ * @param  seq_count  Pointer to store the count of "cat |" sequences.
+ * @return int        The index of the first "cat" in the sequence, or -1.
  */
-static int	ft_skip_initial_args(t_token *tokens)
+static int	ft_find_first_cat_sequence(t_token *tokens, int last_cat,
+				int *seq_count)
 {
 	int	i;
+	int	first_cat;
 
-	i = 1;
-	if (tokens[0].type != TKN_NULL)
+	i = last_cat;
+	first_cat = -1;
+	*seq_count = 0;
+	while (i >= 0)
 	{
-		while (tokens[0].type != TKN_NULL && tokens[i].type != TKN_NULL
-			&& (tokens[i].type == TKN_ARG
-				|| tokens[i].type == TKN_VAR || tokens[i].type == TKN_FILE
-				|| tokens[i].type == TKN_EPTY))
-			i++;
+		if (tokens[i].type == TKN_CMD && !ft_strcmp(tokens[i].value, "cat"))
+			i--;
+		if (i < 0)
+			break ;
+		if (tokens[i].type == TKN_PIPE)
+		{
+			(*seq_count)++;
+			i--;
+		}
+		if (tokens[i].type != TKN_PIPE && (tokens[i].type != TKN_CMD
+				|| ft_strcmp(tokens[i].value, "cat")))
+			break ;
 	}
-	return (i);
+	first_cat = i + 2;
+	return (first_cat);
+}
+
+/**
+ * @brief  Removes redundant trailing "cat | cat | cat" sequences.
+ * 
+ * Ensures that if multiple consecutive "cat" commands exist, only one 
+ * remains at the end of the pipeline.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return void
+ */
+void	ft_trim_last_cat_sequence(t_minishell *ms)
+{
+	int	last_cat;
+	int	first_cat;
+	int	seq_count;
+
+	last_cat = ft_find_last_cat(ms->tokens);
+	if (last_cat == -1)
+		return ;
+	first_cat = ft_find_first_cat_sequence(ms->tokens, last_cat, &seq_count);
+	if (last_cat - first_cat >= 1)
+	{
+		if (ms->in_pipe == false)
+			ms->c_stuck_cats = 2;
+	}
+	if (seq_count > 1 && first_cat > 1)
+		ms->tokens = ft_copy_tokens_excluding_range(ms, ms->tokens,
+				first_cat, last_cat);
+}
+
+/**
+ * @brief  Creates a new token array excluding a specified range of tokens.
+ * 
+ * Allocates a new token list, copying all tokens except those between
+ * the given `start` and `end` indices.
+ * 
+ * @param  ms      Pointer to the minishell structure.
+ * @param  tokens  The original array of tokens.
+ * @param  start   The index of the first token to exclude.
+ * @param  end     The index of the last token to exclude.
+ * @return t_token* New token array without the excluded range.
+ */
+static t_token	*ft_copy_tokens_excluding_range(t_minishell *ms,
+					t_token *tokens, int start, int end)
+{
+	int		i;
+	int		j;
+	t_token	*new_tokens;
+
+	new_tokens = ft_calloc(sizeof(t_token), ms->n_args - (end - start) + 1);
+	if (!new_tokens)
+		return (NULL);
+	i = -1;
+	j = 0;
+	while (tokens[++i].type != TKN_NULL)
+	{
+		if (i <= start || i > end)
+		{
+			new_tokens[j].value = ft_strdup(tokens[i].value);
+			new_tokens[j].type = tokens[i].type;
+			if (tokens[i].old_value)
+				new_tokens[j].old_value = ft_strdup(tokens[i].old_value);
+			j++;
+		}
+	}
+	new_tokens[j].type = TKN_NULL;
+	new_tokens[j].value = NULL;
+	ms->n_args = j;
+	ft_free_tokens(tokens);
+	return (new_tokens);
 }

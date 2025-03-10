@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 23:48:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/10 02:42:53 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/10 07:54:03 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,7 @@ static int	ft_readline(t_minishell *ms)
 {
 	ms->swap_output_redirects = false;
 	ms->swap_input_redirects = false;
+	ms->c_stuck_cats = 0;
 	rl_on_new_line();
 	ft_create_prompt(ms);
 	ms->input = readline(ms->prompt);

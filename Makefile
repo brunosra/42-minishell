@@ -1,7 +1,3 @@
-# COLORS
-RED    = $(shell printf "\33[31m")
-RESET  = $(shell printf "\33[0m")
-
 # Nome do executável
 NAME = minishell
 

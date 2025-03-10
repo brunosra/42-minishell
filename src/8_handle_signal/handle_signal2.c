@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 08:24:42 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/10 01:54:29 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/10 07:10:02 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ void	ft_set_fork_signals(void)
 {
 	signal(SIGINT, ft_sigint_fork_handler);
 	signal(SIGQUIT, SIG_IGN);
+	signal(SIGTERM, ft_sigterm_pipe_handler);
 }
 
 /**
