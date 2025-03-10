@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 02:22:33 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/10 08:53:04 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/10 09:17:43 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ static void	ft_clean_stuck_cats_child(t_minishell *ms)
 	no_stop = 0;
 	ft_set_heredoc_signals();
 	close(ms->pipefd[0]);
-	if (!ft_strcmp(ms->input, "cat | cat"))
+	if (ms->c_stuck_cats == -1)
 		no_stop = 1;
 	while (ms->c_stuck_cats || no_stop == 1)
 	{

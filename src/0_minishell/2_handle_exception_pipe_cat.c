@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 05:21:58 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/10 09:40:23 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/10 22:23:01 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ static int		ft_find_first_cat_sequence(t_token *tokens, int last_cat,
 					int *seq_count);
 static t_token	*ft_copy_tokens_excluding_range(t_minishell *ms,
 					t_token *tokens, int start, int end);
+static int		ft_count_initial_cat_sequence(t_token *tokens);
 
 /**
  * @brief  Finds the last occurrence of "cat" in the token list.
@@ -84,10 +85,10 @@ static int	ft_find_first_cat_sequence(t_token *tokens, int last_cat,
 }
 
 /**
- * @brief  Removes redundant trailing "cat | cat | cat" sequences.
+ * @brief  Trims redundant trailing "cat | cat | ..." sequences.
  * 
- * Ensures that if multiple consecutive "cat" commands exist, only one 
- * remains at the end of the pipeline.
+ * This function identifies and removes extra trailing "cat |" sequences
+ * while ensuring that an initial "cat |" sequence is correctly handled.
  * 
  * @param  ms  Pointer to the minishell structure.
  * @return void
@@ -97,26 +98,19 @@ void	ft_trim_last_cat_sequence(t_minishell *ms)
 	int	last_cat;
 	int	first_cat;
 	int	seq_count;
+	int	init_cat_seq;
 
 	last_cat = ft_find_last_cat(ms->tokens);
 	if (last_cat == -1)
 		return ;
 	first_cat = ft_find_first_cat_sequence(ms->tokens, last_cat, &seq_count);
-	if (ms->tokens[last_cat + 1].type != TKN_NULL && first_cat == 1) 
-	{
-		if (ms->in_pipe == false)
-			ms->c_stuck_cats = last_cat - first_cat - 2;
-	}
-	else if (first_cat == 1 && seq_count > 1 && ms->tokens[last_cat + 1].type == TKN_NULL)
-	{
-		if (ms->in_pipe == false)
-			ms->c_stuck_cats = -1;
-	}
-	else if (last_cat - first_cat >= 1)
-	{
-		if (ms->in_pipe == false)
-			ms->c_stuck_cats = 2;
-	}
+	init_cat_seq = ft_count_initial_cat_sequence(ms->tokens);
+	if (init_cat_seq > 0 && ms->in_pipe == false)
+		ms->c_stuck_cats = init_cat_seq;
+	else if (init_cat_seq == -1 && ms->in_pipe == false)
+		ms->c_stuck_cats = -1;
+	else if (last_cat - first_cat >= 1 && ms->in_pipe == false)
+		ms->c_stuck_cats = 0;
 	if (seq_count > 1 && first_cat > 1)
 		ms->tokens = ft_copy_tokens_excluding_range(ms, ms->tokens,
 				first_cat, last_cat);
@@ -162,4 +156,44 @@ static t_token	*ft_copy_tokens_excluding_range(t_minishell *ms,
 	ms->n_args = j;
 	ft_free_tokens(tokens);
 	return (new_tokens);
+}
+
+/**
+ * @brief  Counts the initial "cat | cat | ... cat" sequence.
+ * 
+ * This function ensures that the token array starts with "cat | cat | ..." 
+ * and determines whether it ends in another command or remains a 
+ * "cat-only pipeline".
+ * 
+ * @param  tokens  Pointer to the array of tokens.
+ * @return int     
+ *         - `-1` if the sequence consists only of "cat | cat | ... cat".
+ *         - `count` if it ends in another command.
+ *         - `0` if the sequence does not start with "cat |".
+ */
+static int	ft_count_initial_cat_sequence(t_token *tokens)
+{
+	int	i;
+	int	count;
+
+	i = 1;
+	if (!tokens || tokens[0].type == TKN_NULL
+		|| !(tokens[0].type == TKN_CMD && !ft_strcmp(tokens[0].value, "cat")))
+		return (0);
+	count = 1;
+	while (tokens[i].type != TKN_NULL)
+	{
+		if (tokens[i].type == TKN_PIPE)
+		{
+			i++;
+			if (tokens[i].type == TKN_CMD && !ft_strcmp(tokens[i].value, "cat"))
+				count++;
+			else
+				return (count);
+		}
+		else
+			return (0);
+		i++;
+	}
+	return (-1);
 }
