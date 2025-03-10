@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 23:48:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/10 02:28:02 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/10 02:42:53 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,8 +156,8 @@ void	ft_create_prompt(t_minishell *ms)
 	e = ft_itoa(ft_exit_code(-1));
 	getcwd(p, PATH_MAX);
 	old_prompt = ms->prompt;
-	new_prompt = ft_strjoin_all(7, "\001\e[32m\002[", e, "\001\e[32m\002] ",
-			"\001\e[33m\002[", p, "\001\e[33m\002] \001\e[31m\002minishell",
+	new_prompt = ft_strjoin_all(7, "\001\e[32m\002[", e, "\001\e[32m\002]",
+			"\001\e[33m\002[", p, "\001\e[33m\002]\001\e[31m\002minishell",
 			"\001\e[37m\002$ ");
 	free(old_prompt);
 	free(e);
