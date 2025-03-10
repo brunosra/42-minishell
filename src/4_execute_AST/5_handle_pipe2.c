@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 02:05:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/07 02:32:22 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/09 23:20:42 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 int			ft_check_pipe_syntax(t_node *node, t_minishell *ms);
 static void	ft_fork_pipe_process(t_minishell *ms);
 static void	ft_handle_pipe_exit_status(t_minishell *ms);
+int			ft_redirect_pipe_input(t_minishell *ms);
 
 /**
  * @brief  Checks for syntax errors in pipe usage and handles unfinished pipes.
@@ -106,4 +107,24 @@ static void	ft_handle_pipe_exit_status(t_minishell *ms)
 		exit(ft_exit_code(-1));
 	}
 	ft_set_main_signals();
+}
+
+/**
+ * @brief  Redirects pipe output to stdin for the next command.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return int 1 if an error occurred, 0 otherwise.
+ */
+int	ft_redirect_pipe_input(t_minishell *ms)
+{
+	if (dup2(ms->pipefd[0], STDIN_FILENO) == -1)
+	{
+		perror("dup2");
+		ft_exit_code(1);
+		close(ms->pipefd[0]);
+		return (1);
+	}
+	close(ms->pipefd[0]);
+	ft_exit_code(0);
+	return (0);
 }

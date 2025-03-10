@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/09 00:56:13 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/10 00:44:07 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 void	ft_signal_handler(int sig);
 void	ft_set_main_signals(void);
-void	ft_set_fork_signals(void);
 void	ft_set_heredoc_signals(void);
 void	ft_signal_heredoc_handler(int sig);
 
@@ -57,18 +56,6 @@ void	ft_set_main_signals(void)
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_RESTART;
 	sigaction(SIGINT, &sa, NULL);
-	signal(SIGQUIT, SIG_IGN);
-}
-
-/**
- * @brief Configures signal handling for child processes.
- * 
- * In a forked process, SIGINT and SIGQUIT are ignored to prevent interruption
- * unless explicitly handled in execution.
- */
-void	ft_set_fork_signals(void)
-{
-	signal(SIGINT, SIG_IGN);
 	signal(SIGQUIT, SIG_IGN);
 }
 

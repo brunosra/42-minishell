@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:48:45 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/09 03:40:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/10 02:28:23 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,20 +122,28 @@ void	ft_create_files(t_node *node)
 }
 
 /**
- * @brief  Removes files created during the execution of output redirection
- * nodes.
+ * @brief  Removes created files if they are empty.
  * 
- * @param  node  Pointer to the node in the AST containing the out redirection.
+ * This function traverses the AST and deletes files that were created
+ * during execution, ensuring that only empty files are removed.
+ * 
+ * @param  node  Pointer to the AST node.
  */
 void	ft_remove_created_files(t_node *node)
 {
+	struct stat	file_stat;
+
 	if (!node)
 		return ;
 	if (node->file == true && node->file_unlink == false)
 	{
-		if (unlink(node->right->token->value) == -1)
-			perror("unlink");
-		node->file_unlink = true;
+		if (stat(node->right->token->value, &file_stat) == 0
+			&& file_stat.st_size == 0)
+		{
+			if (unlink(node->right->token->value) == -1)
+				perror("unlink");
+			node->file_unlink = true;
+		}
 	}
 	ft_remove_created_files(node->right);
 	ft_remove_created_files(node->left);

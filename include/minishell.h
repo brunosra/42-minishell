@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/09 08:43:09 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/10 00:42:34 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,6 +218,7 @@ void			ft_swap_redirects_values(t_node *node, t_type type);
 int				ft_handle_pipe(t_node *node, t_minishell *ms);
 /* 5_handle_pipe2.c */
 int				ft_check_pipe_syntax(t_node *node, t_minishell *ms);
+int				ft_redirect_pipe_input(t_minishell *ms);
 /* 5_handle_pipe_utils.c  */
 int				ft_create_pipe(t_minishell *ms);
 int				ft_pipe_syntax_error(char *token, int code);
@@ -302,12 +303,15 @@ int				ft_free_ms(t_minishell *ms, bool free_prompt, bool free_envp,
 /* handle_signal.c */
 void			ft_signal_handler(int sig);
 void			ft_set_main_signals(void);
-void			ft_set_fork_signals(void);
 void			ft_set_heredoc_signals(void);
 void			ft_signal_heredoc_handler(int sig);
+
 /* handle_signal2.c */
+void			ft_set_fork_signals(void);
+void			ft_sigint_fork_handler(int sig);
 void			ft_set_pipe_signals(void);
-void			ft_signal_pipe_handler(int sig);
+void			ft_sigterm_pipe_handler(int sig);
+void			ft_sigint_pipe_handler(int sig);
 
 /* 9_mini_utils */
 /* mini_utils_1.c  */
