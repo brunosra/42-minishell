@@ -14,5 +14,17 @@
     leak rl_parse_and_bind
     Memcheck:Leak
     ...
-    fun:add_history
+	fun:add_history
+}
+{
+	readline_uninit
+	Memcheck:Cond
+	...
+	fun:readline
+}
+{
+	leak readline
+	Memcheck:Leak
+	...
+	fun:rl_set_prompt
 }

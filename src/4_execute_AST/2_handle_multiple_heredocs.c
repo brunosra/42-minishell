@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   2_handle_multiple_heredocs.c                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:21:48 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:37:18 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/06 04:40:58 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,10 +103,12 @@ static void	ft_cleanup_heredocs(t_minishell *ms, int save_stdout, t_node *node)
 	{
 		temp_node = current;
 		current = current->left;
+		free(temp_node->right);
 		free(temp_node);
 	}
 	node->left = current;
-	node->left->prev = node;
+	if (current)
+		current->prev = node;
 }
 
 /**
@@ -128,10 +130,9 @@ static void	ft_multiple_heredoc_child(t_node *node, t_minishell *ms, int *i)
 		input = readline("> ");
 		if (!input)
 		{
-			ft_putstr_fd("minishell: warning: here-document delimited by EOF"
-				" (wanted `", STDERR_FILENO);
-			ft_putstr_fd(node->heredoc_stops[*i], STDERR_FILENO);
-			write(STDERR_FILENO, "')\n", 3);
+			ft_putstr_three_fd("minishell: warning: here-document delimited by"
+				" EOF (wanted `", node->heredoc_stops[*i], "')\n",
+				STDERR_FILENO);
 			break ;
 		}
 		if (ft_process_heredoc_input(node, ms, input, i))

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   5_handle_pipe_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:35:12 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:34:29 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/09 08:24:10 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int		ft_create_pipe(t_minishell *ms);
 int		ft_pipe_syntax_error(char *token, int code);
 void	ft_handle_unfinished_pipe(t_minishell *ms, char *input);
-int		ft_has_cat(t_node *node);
+int		ft_handle_fork_error(void);
 
 /**
  * @brief  Creates a pipe for heredoc input.
@@ -44,10 +44,8 @@ int	ft_create_pipe(t_minishell *ms)
  */
 int	ft_pipe_syntax_error(char *token, int code)
 {
-	ft_putstr_fd("minishell: syntax error near unexpected token `",
-		STDERR_FILENO);
-	ft_putstr_fd(token, STDERR_FILENO);
-	ft_putstr_fd("'\n", STDERR_FILENO);
+	ft_putstr_three_fd("minishell: syntax error near unexpected token `", token,
+		"'\n", STDERR_FILENO);
 	ft_exit_code(code);
 	return (1);
 }
@@ -73,27 +71,14 @@ void	ft_handle_unfinished_pipe(t_minishell *ms, char *input)
 }
 
 /**
- * @brief  Checks if the command node contains the "cat" command.
+ * @brief  Handles fork errors.
  * 
- * @param  node  Pointer to the command node in the AST.
- * @return int   Boolean value indicating presence of "cat".
- **         1 if "cat" is found.
- **         0 otherwise.
+ * @param  ms  Pointer to the minishell structure.
+ * @return int Always returns 1.
  */
-int	ft_has_cat(t_node *node)
+int	ft_handle_fork_error(void)
 {
-	t_node	*current;
-
-	current = node;
-	if (!current)
-		return (0);
-	if (current->token->type == TKN_CMD)
-	{
-		if (!ft_strcmp(current->cmd_ready[0], "cat")
-			|| !ft_strcmp(current->cmd_ready[0], "/bin/cat"))
-			return (1);
-	}
-	if (!current->left && !current->right)
-		return (0);
-	return (ft_has_cat(current->left));
+	perror("fork");
+	ft_exit_code(1);
+	return (1);
 }

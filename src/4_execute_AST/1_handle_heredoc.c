@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   1_handle_heredoc.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:08:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:37:18 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/06 04:29:30 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,31 +93,29 @@ int	ft_handle_heredoc_fork_error(t_minishell *ms)
  */
 static void	ft_heredoc_child_process(t_node *node, t_minishell *ms)
 {
-	char	*temp;
 	char	*input;
 
 	ft_set_heredoc_signals();
 	close(ms->pipefd[0]);
-	temp = NULL;
+	ms->temp = NULL;
 	while (1)
 	{
 		input = readline("> ");
 		if (!input)
 		{
-			ft_putstr_fd("minishell: warning: here-document delimited by EOF"
-				" (wanted `", STDERR_FILENO);
-			ft_putstr_fd(node->right->token->value, STDERR_FILENO);
-			write(STDERR_FILENO, "')\n", 3);
+			ft_putstr_three_fd("minishell: warning: here-document delimited by"
+				" EOF (wanted `", node->right->token->value, "')\n",
+				STDERR_FILENO);
 			break ;
 		}
 		if (!ft_strcmp(input, node->right->token->value))
 			break ;
-		temp = ft_update_heredoc_buffer(temp, input);
+		ms->temp = ft_update_heredoc_buffer(ms->temp, input);
 		free(input);
 	}
-	ft_write_heredoc(ms, node, temp);
+	ft_write_heredoc(ms, node, ms->temp);
 	close(ms->pipefd[1]);
-	exit(0);
+	exit(ft_free_ms(ms, true, true, 0));
 }
 
 /**

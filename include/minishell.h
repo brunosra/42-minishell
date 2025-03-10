@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/01 16:30:51 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/10 03:21:54 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ typedef enum e_token_type
 	TKN_BLTIN,
 	TKN_NULL,
 	TKN_EXCPT,
+	TKN_EPTY,
 }	t_type;
 
 typedef struct s_token
@@ -65,6 +66,7 @@ typedef struct s_ast_node
 	t_node	*right;
 	t_node	*prev;
 	bool	file;
+	bool	file_unlink;
 	char	**heredoc_stops;
 }	t_node;
 
@@ -75,6 +77,7 @@ typedef struct s_env
 	char	*env_paths;
 	char	**paths;
 	char	*full_path;
+	char	**export;
 }	t_env;
 
 typedef struct s_minishell
@@ -131,6 +134,13 @@ int				main(int argc, char **argv, char **envp);
 void			ft_create_prompt(t_minishell *ms);
 /* 1_process_input_and_execute.c */
 int				ft_process_input_and_execute(t_minishell *ms);
+/* 2_handle_exception_pipe_cat */
+int				ft_is_cat_pipeline(t_token *tokens);
+t_token			*ft_trim_tokens_before_pipe(t_token *tokens, t_minishell *ms);
+/* 3_handle_empty_tokens.c */
+t_token			*ft_handle_empty_tokens(t_token *tokens);
+/* 4_void		finalize_execution.c */
+void			ft_finalize_execution(t_minishell *ms);
 
 /* 1_handle_input */
 /* handle_input.c */
@@ -197,17 +207,19 @@ int				ft_check_redirect_syntax(t_node *node);
 int				ft_handle_file_error(void);
 int				ft_handle_dup_error(int fd);
 /* 4_handle_input_redirect.c  */
-int				ft_handle_input_redirect(t_node *node, t_minishell *ms);
+int				ft_handle_input_redirect(t_node *node, t_minishell *ms, int fd);
 int				ft_invalid_right_token_value(char *value);
 void			ft_swap_redirects_values(t_node *node, t_type type);
 /* 5_handle_pipe.c */
 int				ft_handle_pipe(t_node *node, t_minishell *ms);
-int				ft_handle_fork_error(void);
+/* 5_handle_pipe2.c */
+int				ft_check_pipe_syntax(t_node *node, t_minishell *ms);
+int				ft_redirect_pipe_input(t_minishell *ms);
 /* 5_handle_pipe_utils.c  */
 int				ft_create_pipe(t_minishell *ms);
 int				ft_pipe_syntax_error(char *token, int code);
 void			ft_handle_unfinished_pipe(t_minishell *ms, char *input);
-int				ft_has_cat(t_node *node);
+int				ft_handle_fork_error(void);
 /* 6_execute_command.c */
 int				ft_execute_command(t_node *node, t_minishell *ms);
 /* 6_execute_command_utils.c */
@@ -219,7 +231,6 @@ void			ft_create_files(t_node *node);
 
 /* 5_builtins */
 /* builtins.c  */
-int				ft_builtin_error(char *msg, int err);
 char			*ft_strtok(char *str, const char *delim);
 int				ft_exec_builtins_check(t_node *node, t_minishell *ms);
 int				ft_exec_builtins(t_node *node, t_minishell *ms);
@@ -238,6 +249,9 @@ int				ft_builtin_exit(char **args);
 /* 5_export.c */
 int				ft_builtin_export_check(char **args);
 void			ft_builtin_export(char **args, t_minishell *ms);
+int				ft_valid_export_arg(const char *arg);
+/* 5_export2.c */
+int				ft_process_export(char *str, t_minishell *ms);
 /* 5_export_utils.c  */
 int				ft_dup_envp(char **envp, char ***dupenv, int count);
 void			ft_output_export_1_arg(char **arr, int count);
@@ -260,14 +274,17 @@ int				ft_replace_str(char **value, char *key, char *ptr,
 					char *env_value);
 int				ft_cleanup(char *to_free1, char *to_free2, int error);
 int				ft_check_balanced_quotes(char *str, int idx);
-/* 3_revalue_heredoc_input.c */
+/* 3_remove_extra_spaces.c */
+int				ft_remove_extra_spaces(char **str);
+/* 4_revalue_heredoc_input.c */
 int				ft_revalue_heredoc_input(char **input, t_minishell *ms);
-/* 4_handle_env_utils.c */
+/* 5_handle_env_utils.c */
 char			**ft_duplicate_envp(char **envp);
 char			*ft_get_env_value(const char *str, t_minishell *ms, char **key,
 					bool heredoc);
 char			*ft_get_env(const char *key, t_minishell *ms);
-int				ft_unset_env(const char *key, t_minishell *ms);
+int				ft_unset_env(const char *key, char **list);
+/* 5_handle_env_utils2.c */
 int				ft_set_env(const char *key, const char *value, t_minishell *ms);
 
 /* 7_handle_malloc */
@@ -275,26 +292,33 @@ int				ft_set_env(const char *key, const char *value, t_minishell *ms);
 void			ft_free_tokens(t_token *tokens);
 void			ft_free_ast(t_node *root);
 void			ft_free_split(char **str);
-void			ft_free_ms(t_minishell *ms, bool free_prompt, bool free_envp);
+int				ft_free_ms(t_minishell *ms, bool free_prompt, bool free_envp,
+					int exit);
 
 /* 8_handle_signal */
 /* handle_signal.c */
 void			ft_signal_handler(int sig);
 void			ft_set_main_signals(void);
-void			ft_set_fork_signals(void);
 void			ft_set_heredoc_signals(void);
 void			ft_signal_heredoc_handler(int sig);
+
+/* handle_signal2.c */
+void			ft_set_fork_signals(void);
+void			ft_sigint_fork_handler(int sig);
+void			ft_set_pipe_signals(void);
+void			ft_sigterm_pipe_handler(int sig);
+void			ft_sigint_pipe_handler(int sig);
 
 /* 9_mini_utils */
 /* mini_utils_1.c  */
 int				ft_perror(char *error, int return_value);
 int				ft_putstr_and_return(char *msg, int return_value);
-/* void			ft_set_exit_code(t_minishell *ms, int exit_code);
-int				ft_exit_code(t_minishell *ms); */
 int				ft_exit_code(int newcode);
+int				ft_putstr_three_fd(const char *s1, const char *s2,
+					const char *s3, int fd);
+int				ft_last_left_is_cmd(t_node *node);
 
 /* mini_utils_2.c */
-void			ft_init_prompt(t_minishell *ms);
 char			*ft_strjoin_free(char *s1, char *s2, int free_s1, int free_s2);
 t_minishell		*ft_ms_struct(t_minishell *ms, int flag);
 void			ft_print_ast(t_node *node, int depth);

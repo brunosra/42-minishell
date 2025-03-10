@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:09:47 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 02:39:34 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/05 00:08:36 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,11 @@ int	ft_replace_str(char **value, char *key, char *ptr, char *env_value)
 	if (ft_strlen(*value) == ft_strlen(key) + 1)
 		return (ft_replace_entire_str(value, env_value));
 	start = ft_substr(*value, 0, ptr - *value);
-	end = ft_strdup(ptr + ft_strlen(key) + 1);
+	if (*env_value != '\0' || (*env_value == '\0'
+			&& ptr[ft_strlen(key) + 1] != ' '))
+		end = ft_strdup(ptr + ft_strlen(key) + 1);
+	else
+		end = ft_strdup(ptr + ft_strlen(key) + 2);
 	if (!start || !end)
 		return (ft_cleanup(start, end, 1));
 	new_value = ft_create_replaced_str(start, env_value, end);

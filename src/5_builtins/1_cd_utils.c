@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/27 02:12:31 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/07 03:44:37 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static int	ft_cd_set_resolved_p_check(char **args, char *curpwd,
 	if (args[1] == NULL)
 	{
 		if (ft_get_env("HOME", ms) == NULL)
-			return (ft_builtin_error("cd: HOME not set", 1));
+			return (ft_putstr_and_return("minishell: cd: HOME not set\n", 1));
 		ft_strncpy(res_p, ft_get_env("HOME", ms), PATH_MAX - 1);
 	}
 	else if (args[2] == NULL)
@@ -42,14 +42,15 @@ static int	ft_cd_set_resolved_p_check(char **args, char *curpwd,
 		if (!ft_strcmp(args[1], "-"))
 		{
 			if (ft_get_env("OLDPWD", ms) == NULL)
-				return (ft_builtin_error("cd: OLDPWD not set", 2));
+				return (ft_putstr_and_return("minishell: cd: OLDPWD not set\n",
+						2));
 			ft_strncpy(res_p, ft_get_env("OLDPWD", ms), PATH_MAX - 1);
 		}
 		else
 			ft_rsolve_rel_p(curpwd, args[1], res_p);
 	}
 	else
-		return (ft_builtin_error("minishell: cd: too many arguments", 1));
+		return (ft_putstr_and_return("minishell: cd: too many arguments\n", 1));
 	return (0);
 }
 
@@ -74,17 +75,13 @@ int	ft_builtin_cd_check(char **args, t_minishell *ms)
 	if (curpwd == NULL)
 	{
 		printf("getcwd error\n");
-		return (ft_builtin_error("getcwd:", errno));
+		return (ft_putstr_and_return("getcwd:\n", errno));
 	}
 	ret = ft_cd_set_resolved_p_check(args, curpwd, res_p, ms);
 	if (ret != 0)
 		return (ret);
 	if (chdir(res_p) != 0)
-	{
-		ft_putstr_fd("Minishell: cd: ", STDERR_FILENO);
-		ft_putstr_fd(args[1], STDERR_FILENO);
-		ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
-		return (1);
-	}
+		return (ft_putstr_three_fd("minishell: cd: ", args[1],
+				": No such file or directory\n", STDERR_FILENO));
 	return (0);
 }

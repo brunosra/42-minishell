@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 23:48:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/01 16:31:47 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/10 02:42:53 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,10 +47,11 @@ int	main(int argc, char **argv, char **envp)
 			break ;
 		if (ft_process_input_and_execute(&ms))
 			continue ;
-		ft_free_ms(&ms, false, false);
+		ft_free_ms(&ms, false, false, 0);
 	}
 	ft_free_split(ms.env.envp);
-	return (0);
+	ft_free_split(ms.env.export);
+	return (ft_exit_code(-1));
 }
 
 /**
@@ -80,7 +81,8 @@ static void	ft_init_ms(t_minishell *ms)
 	ms->env.env_paths = NULL;
 	ms->env.paths = NULL;
 	ms->env.full_path = NULL;
-	ft_init_prompt(ms);
+	ms->env.export = NULL;
+	ms->prompt = NULL;
 }
 
 /**
@@ -110,25 +112,38 @@ static int	ft_save_stdin_stdout(t_minishell *ms)
  */
 static int	ft_readline(t_minishell *ms)
 {
-//	ft_create_prompt(ms);
 	ms->swap_output_redirects = false;
 	ms->swap_input_redirects = false;
+	rl_on_new_line();
+	ft_create_prompt(ms);
 	ms->input = readline(ms->prompt);
 	if (ms->input == NULL)
 	{
-//		write(STDOUT_FILENO, "exit\n", 5);
+		write(STDOUT_FILENO, "exit\n", 5);
 		free(ms->prompt);
 		return (1);
 	}
-	if (ms->input)
+	if (ms->input && ms->input[0] != '\0')
 		add_history(ms->input);
 	return (0);
 }
 
 /**
- * @brief  Create a new prompt string based on the current path and exit code.
+ * @brief  Constructs a new prompt string for the minishell.
  * 
- * @param  ms  Pointer to the minishell structure.
+ * This function dynamically creates a new prompt string for the minishell by 
+ * combining the current exit code, the current working directory, and a fixed 
+ * prompt format. The exit code is displayed within square brackets, followed by 
+ * the current directory, and a fixed "minishell" label, with each component in 
+ * specific colors. The prompt is then updated within the minishell structure.
+ * 
+ * The colors used are:
+ * - Exit code: Green
+ * - Current directory: Yellow
+ * - The label "minishell": Red
+ * - Prompt symbol "$": White
+ * 
+ * @param  ms  Pointer to the ms structure which contains the current prompt.
  * @return void
  */
 void	ft_create_prompt(t_minishell *ms)
@@ -141,8 +156,9 @@ void	ft_create_prompt(t_minishell *ms)
 	e = ft_itoa(ft_exit_code(-1));
 	getcwd(p, PATH_MAX);
 	old_prompt = ms->prompt;
-	new_prompt = ft_strjoin_all(6,
-			CY"["RST, e, CY"] ["RST, p, CY"] minishell"RST, "$ ");
+	new_prompt = ft_strjoin_all(7, "\001\e[32m\002[", e, "\001\e[32m\002]",
+			"\001\e[33m\002[", p, "\001\e[33m\002]\001\e[31m\002minishell",
+			"\001\e[37m\002$ ");
 	free(old_prompt);
 	free(e);
 	ms->prompt = new_prompt;

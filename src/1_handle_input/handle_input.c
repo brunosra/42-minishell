@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:19:06 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 00:07:40 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/07 03:18:27 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ int	ft_count_args(char *str, int i)
 		{
 			i++;
 			if (str[i] && str[i + 1] && (str[i] == '<' || str[i] == '>'
-					|| str[i] == '&'))
+					|| str[i] == '&' || str[i] == '|'))
 				i++;
 		}
 		else if (str[i] == '"' || str[i] == '\'')
@@ -101,7 +101,7 @@ int	ft_handle_quotes(char *str, int i, int *start, int *end)
 		if (str[i] == '\'' || str[i] == '"')
 		{
 			quote_type = str[i++];
-			if (str[i] && str[i] == quote_type && str[i - 2] != '$')
+			if (str[i] && str[i] == quote_type && i >= 2 && str[i - 2] != '$')
 				i++;
 			else
 				i = ft_skip_and_process(str, i, quote_type);
@@ -146,8 +146,18 @@ static int	ft_skip_and_process(char *str, int i, char quote_type)
  */
 static int	ft_handle_argument(char *str, int i)
 {
+	char	quotes;
+
+	quotes = '\0';
 	while (str[i] && str[i] != ' ' && str[i] != '|' && str[i] != '>'
 		&& str[i] != '<' && str[i] != ';' && str[i] != '&')
+	{
+		if ((str[i] == '\'' || str[i] == '"') && i > 0 && str[i - 1] == '=')
+			quotes = str[i];
 		i++;
+		while (quotes && str[i] && str[i] != quotes)
+			i++;
+		quotes = '\0';
+	}
 	return (i);
 }

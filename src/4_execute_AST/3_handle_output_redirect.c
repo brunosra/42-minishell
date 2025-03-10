@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   3_handle_output_redirect.c                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:29:26 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:39:24 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/09 06:16:28 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 int			ft_handle_output_redirect(t_node *node, t_minishell *ms);
 int			ft_check_redirect_syntax(t_node *node);
 static int	ft_open_output_file(t_node *node);
-int			ft_handle_file_error(void);
 int			ft_handle_dup_error(int fd);
 
 /**
@@ -34,8 +33,14 @@ int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 	if (ft_check_redirect_syntax(node))
 		return (1);
 	fd = ft_open_output_file(node);
-	if (fd == -1)
-		return (ft_handle_file_error());
+	if (fd == -1 || node->file == true)
+	{
+		ft_putstr_three_fd("minishell: ", node->right->token->value,
+			": No such file or directory\n", STDERR_FILENO);
+		ft_exit_code(1);
+		if (fd == -1)
+			return (1);
+	}
 	if (dup2(fd, STDOUT_FILENO) == -1)
 		return (ft_handle_dup_error(fd));
 	close(fd);
@@ -77,37 +82,29 @@ int	ft_check_redirect_syntax(t_node *node)
 }
 
 /**
- * @brief  Opens the file for output redirection.
+ * @brief Opens an output file for writing or appending.
  * 
- * @param  node  Pointer to the output redirection node.
- * @return int   File descriptor, or -1 on failure.
+ * This function ensures that `node->file` is only set to true 
+ * if the file did not exist before opening.
+ * 
+ * @param node Pointer to the AST node representing the output redirection.
+ * @return int The file descriptor if successful, -1 on failure.
  */
 static int	ft_open_output_file(t_node *node)
 {
 	int	fd;
+	int	existed;
 
+	existed = (access(node->right->token->value, F_OK) == 0);
 	if (ft_strcmp(node->token->value, ">>") == 0)
 		fd = open(node->right->token->value,
 				O_WRONLY | O_CREAT | O_APPEND, 0644);
 	else
 		fd = open(node->right->token->value,
 				O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd != -1)
+	if (fd != -1 && !existed)
 		node->file = true;
 	return (fd);
-}
-
-/**
- * @brief  Handles errors when opening the file.
- * 
- * @param  ms  Pointer to the minishell structure.
- * @return int Always returns 1 to indicate an error.
- */
-int	ft_handle_file_error(void)
-{
-	perror("open");
-	ft_exit_code(1);
-	return (1);
 }
 
 /**

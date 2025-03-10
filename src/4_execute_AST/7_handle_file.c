@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:48:45 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 01:03:43 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/10 02:28:23 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,9 +57,7 @@ static int	ft_file_error(char *filepath, char *msg, int code)
 	ft_putstr_fd("minishell: ", STDERR_FILENO);
 	if (filepath)
 		ft_putstr_fd(filepath, STDERR_FILENO);
-	ft_putstr_fd(": ", STDERR_FILENO);
-	ft_putstr_fd(msg, STDERR_FILENO);
-	ft_putstr_fd("\n", STDERR_FILENO);
+	ft_putstr_three_fd(": ", msg, "\n", STDERR_FILENO);
 	return (code);
 }
 
@@ -124,30 +122,29 @@ void	ft_create_files(t_node *node)
 }
 
 /**
- * @brief  Removes files created during the execution of output redirection
- * nodes.
+ * @brief  Removes created files if they are empty.
  * 
- * @param  node  Pointer to the node in the AST containing the out redirection.
+ * This function traverses the AST and deletes files that were created
+ * during execution, ensuring that only empty files are removed.
+ * 
+ * @param  node  Pointer to the AST node.
  */
 void	ft_remove_created_files(t_node *node)
 {
+	struct stat	file_stat;
+
 	if (!node)
 		return ;
-	if (node->token->type == TKN_OUT_RD && node->right
-		&& node->right->token->value && node->file == true)
+	if (node->file == true && node->file_unlink == false)
 	{
-		if (unlink(node->right->token->value) == -1)
-			perror("unlink");
-		else
-			node->file = false;
+		if (stat(node->right->token->value, &file_stat) == 0
+			&& file_stat.st_size == 0)
+		{
+			if (unlink(node->right->token->value) == -1)
+				perror("unlink");
+			node->file_unlink = true;
+		}
 	}
-	if (node->prev && node->prev->right == node)
-	{
-		ft_remove_created_files(node->prev);
-		return ;
-	}
-	if (node->prev && node->prev->right)
-		ft_remove_created_files(node->prev->right);
-	if (node->prev)
-		ft_remove_created_files(node->prev);
+	ft_remove_created_files(node->right);
+	ft_remove_created_files(node->left);
 }

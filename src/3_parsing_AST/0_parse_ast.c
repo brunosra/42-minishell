@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 01:34:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 00:36:00 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/07 22:35:26 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,11 @@ t_node	*ft_parse_ast(t_token *tokens)
 	{
 		if (!tokens[i].value && tokens[i].type == TKN_CMD)
 			tokens[i].value = ft_strdup("");
+		if (tokens[i].type == TKN_ARG)
+		{
+			i++;
+			continue ;
+		}
 		ft_process_token(tokens, &i, &current, &root);
 	}
 	if (root)
@@ -100,6 +105,14 @@ static t_node	*ft_handle_op_node(t_token *tokens, int *i,
 	ast.op_node->prev = *current;
 	if (!*root)
 		*root = ast.op_node;
+	else if ((*root)->token->type == TKN_PIPE && !(*root)->right
+		&& ft_last_left_is_cmd(*root))
+	{
+		(*root)->right = ast.op_node;
+		*current = (*root)->right;
+		(*i)++;
+		return (ast.op_node);
+	}
 	else
 		(*root)->prev = ast.op_node;
 	ft_adjust_input_redirect(tokens, i, &ast);

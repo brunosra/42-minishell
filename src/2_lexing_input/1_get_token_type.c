@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:48:34 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 00:30:58 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/07 18:12:47 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ static t_type	ft_check_redirection_and_operator(char *str, t_type prev_type,
 	t_type	type;
 
 	type = ft_check_redirection(str);
-	if ((type == TKN_OUT_RD || type == TKN_HDOC)
+	if ((type == TKN_OUT_RD || type == TKN_HDOC || type == TKN_IN_RD)
 		&& (prev_type == TKN_PIPE || prev_type == TKN_NULL))
 		*inverted = true;
 	if (type != TKN_CMD)

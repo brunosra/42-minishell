@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   3_revalue_heredoc_input.c                          :+:      :+:    :+:   */
+/*   4_revalue_heredoc_input.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 05:13:41 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 18:39:56 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/06 04:51:03 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,10 @@ static int	ft_expand_env_var(char **input, t_minishell *ms, char **ptr)
 
 	env_value = ft_get_env_value(*ptr, ms, &key, true);
 	if (!env_value)
-		env_value = ft_strdup("");
+	{
+		free(key);
+		return (1);
+	}
 	if (key != env_value)
 	{
 		ft_replace_str(input, key, *ptr, env_value);
@@ -88,7 +91,10 @@ static int	ft_expand_env_var(char **input, t_minishell *ms, char **ptr)
 		return (0);
 	}
 	if (!*input)
+	{
+		free(key);
 		return (1);
+	}
 	free(key);
 	return (1);
 }

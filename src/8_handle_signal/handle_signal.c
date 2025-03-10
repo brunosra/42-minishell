@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_signal.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bschwell <student@42.fr>                   +#+  +:+       +#+        */
+/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/02/27 19:21:03 by bschwell         ###   ########.fr       */
+/*   Updated: 2025/03/10 00:44:07 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 void	ft_signal_handler(int sig);
 void	ft_set_main_signals(void);
-void	ft_set_fork_signals(void);
 void	ft_set_heredoc_signals(void);
 void	ft_signal_heredoc_handler(int sig);
 
@@ -28,12 +27,17 @@ void	ft_signal_heredoc_handler(int sig);
  */
 void	ft_signal_handler(int sig)
 {
+	t_minishell	*ms;
+
 	if (sig == SIGINT)
 	{
+		ms = ft_ms_struct(NULL, 1);
 		write(STDERR_FILENO, "\n", 1);
 		ft_exit_code(130);
 		rl_replace_line("", 0);
 		rl_on_new_line();
+		ft_create_prompt(ms);
+		rl_set_prompt(ms->prompt);
 		rl_redisplay();
 	}
 }
@@ -52,18 +56,6 @@ void	ft_set_main_signals(void)
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_RESTART;
 	sigaction(SIGINT, &sa, NULL);
-	signal(SIGQUIT, SIG_IGN);
-}
-
-/**
- * @brief Configures signal handling for child processes.
- * 
- * In a forked process, SIGINT and SIGQUIT are ignored to prevent interruption
- * unless explicitly handled in execution.
- */
-void	ft_set_fork_signals(void)
-{
-	signal(SIGINT, SIG_IGN);
 	signal(SIGQUIT, SIG_IGN);
 }
 
@@ -88,10 +80,15 @@ void	ft_set_heredoc_signals(void)
  */
 void	ft_signal_heredoc_handler(int sig)
 {
+	t_minishell	*ms;
+
 	if (sig == SIGINT)
 	{
-		write(STDERR_FILENO, "\n", 1);
-		ft_exit_code(130);
+		ms = ft_ms_struct(NULL, 1);
+		write(STDIN_FILENO, "\n", 1);
+		ft_exit_code(ft_free_ms(ms, true, true, 130));
+		if (ms->temp)
+			free(ms->temp);
 		exit(130);
 	}
 }

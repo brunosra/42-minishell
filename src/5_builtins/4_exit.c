@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:47:54 by bschwell          #+#    #+#             */
-/*   Updated: 2025/02/27 02:00:22 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/06 04:51:53 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,19 +41,22 @@ int	ft_builtin_exit(char **args)
 	while (args[i])
 		i++;
 	if (i == 1)
-		return (0);
+		(ft_exit_code(-1));
 	else if (i > 2 && ft_atoll(args[1], 0, 0))
 	{
-		ft_putstr_fd(" too many arguments\n", STDERR_FILENO);
-		exit (1);
+		ft_putstr_fd("exit\nminishell: exit: too many arguments\n",
+			STDERR_FILENO);
+		return (ft_exit_code(1));
 	}
 	else if (ft_value_is_numeric(args[1]))
 	{
 		mod = ft_atoll(args[1], 0, 0) % 256;
-		exit(mod);
+		ft_exit_code(mod);
 	}
 	else if (!ft_value_is_numeric(args[1]))
 		ft_putstr_and_exit(args[1]);
+	ft_free_ms(ft_ms_struct(NULL, 1), true, true, 0);
+	exit(ft_exit_code(-1));
 	return (0);
 }
 
@@ -86,9 +89,9 @@ static int	ft_value_is_numeric(char *str)
  */
 static void	ft_putstr_and_exit(char *str)
 {
-	ft_putstr_fd("exit\nminishell: exit: ", STDERR_FILENO);
-	ft_putstr_fd(str, STDERR_FILENO);
-	ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
+	ft_putstr_three_fd("exit\nminishell: exit: ", str,
+		": numeric argument required\n", STDERR_FILENO);
+	ft_free_ms(ft_ms_struct(NULL, 1), true, true, 0);
 	exit(2);
 }
 
