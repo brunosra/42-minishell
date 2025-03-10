@@ -1,3 +1,7 @@
+# COLORS
+RED    = $(shell printf "\33[31m")
+RESET  = $(shell printf "\33[0m")
+
 # Nome do executável
 NAME = minishell
 
@@ -13,8 +17,8 @@ LIBFT = $(LIBFT_DIR)/libft.a
 # Compilador e flags
 CC = gcc
 CFLAGS = -g -Wall -Wextra -Werror -I $(INC_DIR)
-LDFLAGS = -L$(LIBFT_DIR) -lft -L. -lreadline -lncurses -ltinfo
-VALGRIND = valgrind --leak-check=full --show-leak-kinds=all --suppressions=readline.supp
+LDFLAGS = -L$(LIBFT_DIR) -lft -L. -lreadline
+VALGRIND = valgrind --quiet --leak-check=full --show-leak-kinds=all --suppressions=readline.supp
 # Buscar todos os arquivos .c dentro de src e seus subdiretórios
 SRCS = $(shell find $(SRC_DIR) -type f -name "*.c")
 

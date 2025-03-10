@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/10 00:42:34 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/10 03:21:54 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,6 @@
 # include <errno.h>
 # include <limits.h>
 # include <stdbool.h>
-# include <termcap.h>
-# include <termios.h>
-# include <curses.h>
-# include <term.h>
 
 typedef struct s_ast_node	t_node;
 
