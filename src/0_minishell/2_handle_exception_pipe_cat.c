@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 05:21:58 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/10 08:55:25 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/10 09:40:23 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,17 @@ void	ft_trim_last_cat_sequence(t_minishell *ms)
 	if (last_cat == -1)
 		return ;
 	first_cat = ft_find_first_cat_sequence(ms->tokens, last_cat, &seq_count);
-	if (last_cat - first_cat >= 1)
+	if (ms->tokens[last_cat + 1].type != TKN_NULL && first_cat == 1) 
+	{
+		if (ms->in_pipe == false)
+			ms->c_stuck_cats = last_cat - first_cat - 2;
+	}
+	else if (first_cat == 1 && seq_count > 1 && ms->tokens[last_cat + 1].type == TKN_NULL)
+	{
+		if (ms->in_pipe == false)
+			ms->c_stuck_cats = -1;
+	}
+	else if (last_cat - first_cat >= 1)
 	{
 		if (ms->in_pipe == false)
 			ms->c_stuck_cats = 2;
