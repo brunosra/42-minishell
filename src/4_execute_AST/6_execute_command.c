@@ -6,14 +6,14 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:43:45 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/09 08:15:56 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/11 06:09:31 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 int			ft_execute_command(t_node *node, t_minishell *ms);
-static void	ft_handle_cmd_exit_status(t_node *node, t_minishell *ms);
+static void	ft_handle_cmd_exit_status(t_node *node, t_minishell *ms, int sig);
 static void	ft_execute_child_process(t_node *node, t_minishell *ms);
 static int	ft_execute_external(t_node *node, t_minishell *ms);
 static void	ft_execute_builtin(t_node *node, t_minishell *ms);
@@ -34,7 +34,7 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
 	if (ms->pid == 0)
 		ft_execute_child_process(node, ms);
 	waitpid(ms->pid, &ms->status, 0);
-	ft_handle_cmd_exit_status(node, ms);
+	ft_handle_cmd_exit_status(node, ms, -1);
 	ft_set_main_signals();
 	if (ft_exit_code(-1) != 0 && node->prev
 		&& node->prev->token->type == TKN_IN_RD)
@@ -48,15 +48,14 @@ int	ft_execute_command(t_node *node, t_minishell *ms)
  * @param  node  Pointer to the AST node.
  * @param  ms    Pointer to the minishell structure.
  */
-static void	ft_handle_cmd_exit_status(t_node *node, t_minishell *ms)
+static void	ft_handle_cmd_exit_status(t_node *node, t_minishell *ms, int sig)
 {
-	int	sig;
-
 	if (WIFEXITED(ms->status))
 	{
 		ft_exit_code(WEXITSTATUS(ms->status));
 		if (ft_exit_code(-1) == 42)
 		{
+			ft_sleep();
 			ft_putstr_three_fd("minishell: ", node->cmd_ready[0],
 				": command not found\n", STDERR_FILENO);
 			ft_exit_code(127);

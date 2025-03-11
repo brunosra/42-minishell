@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/31 17:18:39 by bschwell          #+#    #+#             */
-/*   Updated: 2025/03/08 07:31:21 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/11 06:31:10 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ void	ft_builtin_echo(char **args)
 		new_line = 0;
 		i++;
 	}
+	ft_sleep();
 	while (args[i])
 	{
 		printf("%s", args[i]);

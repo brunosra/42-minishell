@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/11 02:08:41 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/11 05:55:59 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -326,4 +326,5 @@ void			ft_print_ast(t_node *node, int depth);
 /* mini_utils_3.c */
 int				ft_has_error_file(t_minishell *ms, char *file);
 void			ft_add_error_file(t_minishell *ms, char *file);
+void			ft_sleep(void);
 #endif
