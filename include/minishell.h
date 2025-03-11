@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/10 08:21:50 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/11 02:08:41 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,7 @@ typedef struct s_minishell
 	int		c_stuck_cats;
 	char	*prompt;
 	char	currpath[PATH_MAX];
+	char	**error_files;
 }				t_minishell;
 
 /**
@@ -321,4 +322,8 @@ int				ft_last_left_is_cmd(t_node *node);
 char			*ft_strjoin_free(char *s1, char *s2, int free_s1, int free_s2);
 t_minishell		*ft_ms_struct(t_minishell *ms, int flag);
 void			ft_print_ast(t_node *node, int depth);
+
+/* mini_utils_3.c */
+int				ft_has_error_file(t_minishell *ms, char *file);
+void			ft_add_error_file(t_minishell *ms, char *file);
 #endif

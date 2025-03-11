@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 22:18:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/03 18:01:47 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/11 02:05:49 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ int	ft_free_ms(t_minishell *ms, bool free_prompt, bool free_envp, int exit)
 {
 	ft_free_tokens(ms->tokens);
 	ft_free_ast(ms->ast_root);
+	if (ms->error_files)
+		ft_free_split(ms->error_files);
 	free(ms->input);
 	if (free_prompt == true)
 		free(ms->prompt);

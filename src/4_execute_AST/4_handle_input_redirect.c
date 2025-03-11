@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:32:06 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/09 04:09:17 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/11 02:00:14 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,33 +52,34 @@ static int	ft_is_input_also_output(t_node *node, t_node *root)
 }
 
 /**
- * @brief  Handles input redirection from a file.
+ * @brief  Handles input redirection (`<`).
  * 
- * @param  node  Pointer to the input redirection node in the AST.
- * @param  ms    Pointer to the minishell structure.
- * @return int   Execution status.
- *         0 on success.
- *         Non-zero in case of errors or syntax issues.
+ * @param  node  Pointer to the input redirection node.
+ * @param  ms  Pointer to the minishell structure.
+ * @param  fd  File descriptor for input redirection.
+ * @return int  1 on failure, 0 on success.
  */
 int	ft_handle_input_redirect(t_node *node, t_minishell *ms, int fd)
 {
 	if (ft_check_redirect_syntax(node))
-		return (1);
+		return (ft_exit_code(1));
 	if (ft_validate_input_file(node, ms->ast_root))
-		return (1);
+		return (ft_exit_code(1));
 	if (ft_is_input_also_output(node, ms->ast_root))
 	{
 		ft_remove_created_files(ms->ast_root);
-		ft_exit_code(1);
-		return (1);
+		return (ft_exit_code(1));
 	}
 	fd = open(node->right->token->value, O_RDONLY);
 	if (fd == -1 || node->file == true)
 	{
-		ft_putstr_three_fd("minishell: ", node->right->token->value,
-			": No such file or directory\n", STDERR_FILENO);
-		ft_exit_code(1);
-		return (1);
+		if (!ft_has_error_file(ms, node->right->token->value))
+		{
+			ft_putstr_three_fd("minishell: ", node->right->token->value,
+				": No such file or directory\n", STDERR_FILENO);
+			ft_add_error_file(ms, node->right->token->value);
+		}
+		return (ft_exit_code(1));
 	}
 	if (dup2(fd, STDIN_FILENO) == -1)
 		return (ft_handle_dup_error(fd));
