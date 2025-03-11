@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:32:06 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/11 02:00:14 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/11 02:39:26 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,12 +52,13 @@ static int	ft_is_input_also_output(t_node *node, t_node *root)
 }
 
 /**
- * @brief  Handles input redirection (`<`).
+ * @brief  Handles input redirection from a file.
  * 
- * @param  node  Pointer to the input redirection node.
- * @param  ms  Pointer to the minishell structure.
- * @param  fd  File descriptor for input redirection.
- * @return int  1 on failure, 0 on success.
+ * @param  node  Pointer to the input redirection node in the AST.
+ * @param  ms    Pointer to the minishell structure.
+ * @return int   Execution status.
+ *         0 on success.
+ *         Non-zero in case of errors or syntax issues.
  */
 int	ft_handle_input_redirect(t_node *node, t_minishell *ms, int fd)
 {
