@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:35:12 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/11 04:31:31 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/11 04:34:12 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ static void	ft_handle_pipe_exit(pid_t pid1, pid_t pid2, int pid_terminated,
 	int	wait;
 
 	status2 = -1;
-	i = 0;
+	wait = 0;
 	if (pid_terminated == pid2)
 	{
 		status2 = WEXITSTATUS(status1);
