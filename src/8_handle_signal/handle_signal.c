@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 02:57:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/10 00:44:07 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/12 18:43:11 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,20 +24,21 @@ void	ft_signal_heredoc_handler(int sig);
  * clears the input line, and redisplays the prompt.
  * 
  * @param sig  The received signal (expected SIGINT).
+ * 
+ * @note fir exit_code in propmt @include / @replace:
+ *	t_minishell	*ms;
+ *	ms = ft_ms_struct(NULL, 1);
+ *	ft_create_prompt(ms);
+ *	rl_set_prompt(ms->prompt);
  */
 void	ft_signal_handler(int sig)
 {
-	t_minishell	*ms;
-
 	if (sig == SIGINT)
 	{
-		ms = ft_ms_struct(NULL, 1);
 		write(STDERR_FILENO, "\n", 1);
 		ft_exit_code(130);
 		rl_replace_line("", 0);
 		rl_on_new_line();
-		ft_create_prompt(ms);
-		rl_set_prompt(ms->prompt);
 		rl_redisplay();
 	}
 }
