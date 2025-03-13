@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 02:05:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/09 23:20:42 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/13 01:11:56 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,6 @@ static void	ft_handle_pipe_exit_status(t_minishell *ms)
 		ft_exit_code(ft_free_ms(ms, true, true, 2));
 		exit(ft_exit_code(-1));
 	}
-	ft_set_main_signals();
 }
 
 /**

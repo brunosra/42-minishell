@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 02:22:33 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/10 09:17:43 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/13 01:10:20 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,6 @@ void	ft_clean_stuck_cats(t_minishell *ms)
 		ft_clean_stuck_cats_child(ms);
 	close(ms->pipefd[1]);
 	waitpid(ms->pid, &ms->status, 0);
-	ft_set_main_signals();
 	close(ms->pipefd[0]);
 	ms->c_stuck_cats = 0;
 }
