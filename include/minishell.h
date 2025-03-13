@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/11 05:55:59 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/13 18:55:32 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,8 +135,10 @@ int				main(int argc, char **argv, char **envp);
 void			ft_create_prompt(t_minishell *ms);
 /* 1_process_input_and_execute.c */
 int				ft_process_input_and_execute(t_minishell *ms);
-/* 2_handle_exception_pipe_cat */
+/* 2_handle_exception_pipe_cat.c */
 void			ft_trim_last_cat_sequence(t_minishell *ms);
+/* 2_handle_exception_pipe_cat2.c */
+t_token			*ft_simplify_cat_pipes(t_minishell *ms, t_token *tokens);
 /* 3_handle_empty_tokens.c */
 t_token			*ft_handle_empty_tokens(t_token *tokens);
 /* 4_void		finalize_execution.c */

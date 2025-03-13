@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 05:21:58 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/10 22:23:01 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/13 19:01:16 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,41 @@
 
 void			ft_trim_last_cat_sequence(t_minishell *ms);
 static int		ft_find_last_cat(t_token *tokens);
-static int		ft_find_first_cat_sequence(t_token *tokens, int last_cat,
-					int *seq_count);
-static t_token	*ft_copy_tokens_excluding_range(t_minishell *ms,
-					t_token *tokens, int start, int end);
+static int		ft_find_first_cat_sequence(t_token *tokens,
+					int last_cat, int *seq_count);
 static int		ft_count_initial_cat_sequence(t_token *tokens);
+
+/**
+ * @brief  Trims redundant trailing "cat | cat | ..." sequences.
+ * 
+ * This function identifies and removes extra trailing "cat |" sequences
+ * while ensuring that an initial "cat |" sequence is correctly handled.
+ * 
+ * @param  ms  Pointer to the minishell structure.
+ * @return void
+ */
+void	ft_trim_last_cat_sequence(t_minishell *ms)
+{
+	int	last_cat;
+	int	first_cat;
+	int	seq_count;
+	int	init_cat_seq;
+
+	last_cat = ft_find_last_cat(ms->tokens);
+	if (last_cat == -1)
+		return ;
+	first_cat = ft_find_first_cat_sequence(ms->tokens, last_cat, &seq_count);
+	init_cat_seq = ft_count_initial_cat_sequence(ms->tokens);
+	if (init_cat_seq > 1 && ms->in_pipe == false)
+		ms->c_stuck_cats = init_cat_seq;
+	else if (init_cat_seq == -1 && ms->in_pipe == false)
+		ms->c_stuck_cats = -1;
+	else if (last_cat - first_cat >= 1 && ms->in_pipe == false)
+		ms->c_stuck_cats = 0;
+	if (seq_count >= 1 && first_cat > 1)
+		ms->tokens = ft_simplify_cat_pipes(ms, ms->tokens);
+	return ;
+}
 
 /**
  * @brief  Finds the last occurrence of "cat" in the token list.
@@ -82,80 +112,6 @@ static int	ft_find_first_cat_sequence(t_token *tokens, int last_cat,
 	}
 	first_cat = i + 2;
 	return (first_cat);
-}
-
-/**
- * @brief  Trims redundant trailing "cat | cat | ..." sequences.
- * 
- * This function identifies and removes extra trailing "cat |" sequences
- * while ensuring that an initial "cat |" sequence is correctly handled.
- * 
- * @param  ms  Pointer to the minishell structure.
- * @return void
- */
-void	ft_trim_last_cat_sequence(t_minishell *ms)
-{
-	int	last_cat;
-	int	first_cat;
-	int	seq_count;
-	int	init_cat_seq;
-
-	last_cat = ft_find_last_cat(ms->tokens);
-	if (last_cat == -1)
-		return ;
-	first_cat = ft_find_first_cat_sequence(ms->tokens, last_cat, &seq_count);
-	init_cat_seq = ft_count_initial_cat_sequence(ms->tokens);
-	if (init_cat_seq > 0 && ms->in_pipe == false)
-		ms->c_stuck_cats = init_cat_seq;
-	else if (init_cat_seq == -1 && ms->in_pipe == false)
-		ms->c_stuck_cats = -1;
-	else if (last_cat - first_cat >= 1 && ms->in_pipe == false)
-		ms->c_stuck_cats = 0;
-	if (seq_count > 1 && first_cat > 1)
-		ms->tokens = ft_copy_tokens_excluding_range(ms, ms->tokens,
-				first_cat, last_cat);
-}
-
-/**
- * @brief  Creates a new token array excluding a specified range of tokens.
- * 
- * Allocates a new token list, copying all tokens except those between
- * the given `start` and `end` indices.
- * 
- * @param  ms      Pointer to the minishell structure.
- * @param  tokens  The original array of tokens.
- * @param  start   The index of the first token to exclude.
- * @param  end     The index of the last token to exclude.
- * @return t_token* New token array without the excluded range.
- */
-static t_token	*ft_copy_tokens_excluding_range(t_minishell *ms,
-					t_token *tokens, int start, int end)
-{
-	int		i;
-	int		j;
-	t_token	*new_tokens;
-
-	new_tokens = ft_calloc(sizeof(t_token), ms->n_args - (end - start) + 1);
-	if (!new_tokens)
-		return (NULL);
-	i = -1;
-	j = 0;
-	while (tokens[++i].type != TKN_NULL)
-	{
-		if (i <= start || i > end)
-		{
-			new_tokens[j].value = ft_strdup(tokens[i].value);
-			new_tokens[j].type = tokens[i].type;
-			if (tokens[i].old_value)
-				new_tokens[j].old_value = ft_strdup(tokens[i].old_value);
-			j++;
-		}
-	}
-	new_tokens[j].type = TKN_NULL;
-	new_tokens[j].value = NULL;
-	ms->n_args = j;
-	ft_free_tokens(tokens);
-	return (new_tokens);
 }
 
 /**
