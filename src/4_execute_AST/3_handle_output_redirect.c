@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:29:26 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/11 02:33:52 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/14 17:47:35 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,13 @@ int	ft_check_redirect_syntax(t_node *node)
 {
 	if (!node->right)
 	{
-		ft_putstr_fd("minishell: syntax error near unexpected token"
-			"`newline'\n", STDERR_FILENO);
+		ft_putstr_fd("minishell: syntax error near unexpected token `",
+			STDERR_FILENO);
+		if (node->prev->token->value)
+			ft_putstr_fd(node->prev->token->value, STDERR_FILENO);
+		else
+			ft_putstr_fd("newline", STDERR_FILENO);
+		ft_putstr_fd("'\n", STDERR_FILENO);
 		ft_exit_code(2);
 		return (1);
 	}
