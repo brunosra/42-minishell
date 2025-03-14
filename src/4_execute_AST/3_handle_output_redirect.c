@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 02:29:26 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/11 02:33:52 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/14 18:11:55 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 int			ft_handle_output_redirect(t_node *node, t_minishell *ms);
 int			ft_check_redirect_syntax(t_node *node);
+static void	ft_print_syntax_error(char *token_value);
 static int	ft_open_output_file(t_node *node);
 int			ft_handle_dup_error(int fd);
 
@@ -55,34 +56,51 @@ int	ft_handle_output_redirect(t_node *node, t_minishell *ms)
 }
 
 /**
- * @brief  Checks for syntax errors in output redirection.
+ * @brief  Checks for syntax errors in redirections.
  * 
- * @param  node  Pointer to the output redirection node.
- * @param  ms    Pointer to the minishell structure.
- * @return int   1 if there is a syntax error, 0 otherwise.
+ * Ensures redirections have valid syntax, preventing issues such as:
+ * - Missing right-hand operand (`>`, `<`, `>>`, `<<` with no file).
+ * - Invalid tokens as the right-hand operand.
+ * 
+ * @param  node  The current AST node representing a redirection.
+ * @return int   1 if a syntax error is found, 0 otherwise.
  */
 int	ft_check_redirect_syntax(t_node *node)
 {
 	if (!node->right)
 	{
-		ft_putstr_fd("minishell: syntax error near unexpected token"
-			"`newline'\n", STDERR_FILENO);
-		ft_exit_code(2);
+		if (node->prev)
+			ft_print_syntax_error(node->prev->token->value);
+		else if (!node->left)
+			ft_print_syntax_error("newline");
+		else
+			ft_print_syntax_error(node->token->value);
 		return (1);
 	}
 	if (ft_invalid_right_token_value(node->right->token->value))
 	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `",
-			STDERR_FILENO);
-		if (node->right->token->value)
-			ft_putstr_fd(node->right->token->value, STDERR_FILENO);
-		else
-			ft_putstr_fd("newline", STDERR_FILENO);
-		ft_putstr_fd("'\n", STDERR_FILENO);
-		ft_exit_code(2);
+		ft_print_syntax_error(node->right->token->value);
 		return (1);
 	}
 	return (0);
+}
+
+/**
+ * @brief  Prints a syntax error message for unexpected tokens.
+ * 
+ * @param  token_value  The value of the token causing the error.
+ * @return void
+ */
+static void	ft_print_syntax_error(char *token_value)
+{
+	ft_putstr_fd("minishell: syntax error near unexpected token '",
+		STDERR_FILENO);
+	if (token_value)
+		ft_putstr_fd(token_value, STDERR_FILENO);
+	else
+		ft_putstr_fd("newline", STDERR_FILENO);
+	ft_putstr_fd("'\n", STDERR_FILENO);
+	ft_exit_code(2);
 }
 
 /**
