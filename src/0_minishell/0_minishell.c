@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 23:48:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/10 02:42:53 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/14 04:15:17 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ static void	ft_init_ms(t_minishell *ms)
 	ms->env.full_path = NULL;
 	ms->env.export = NULL;
 	ms->prompt = NULL;
+	ms->error_files = NULL;
 }
 
 /**
@@ -114,6 +115,8 @@ static int	ft_readline(t_minishell *ms)
 {
 	ms->swap_output_redirects = false;
 	ms->swap_input_redirects = false;
+	ms->c_stuck_cats = 0;
+	ms->error_files = NULL;
 	rl_on_new_line();
 	ft_create_prompt(ms);
 	ms->input = readline(ms->prompt);
@@ -145,21 +148,26 @@ static int	ft_readline(t_minishell *ms)
  * 
  * @param  ms  Pointer to the ms structure which contains the current prompt.
  * @return void
+ * 
+ * @note for exit_code in propmt @include / @replace:
+ * 	char	*e;
+ * 	e = ft_itoa(ft_exit_code(-1));
+ * 	new_prompt = ft_strjoin_all(7, "\001\e[32m\002[", e, "\001\e[32m\002]",
+			"\001\e[33m\002[", p, "\001\e[33m\002]\001\e[31m\002minishell",
+			"\001\e[37m\002$ "); 
+ *  fee(e);
+ *	@see also handel_sihnal.c >> void	ft_signal_handler(int sig)
  */
 void	ft_create_prompt(t_minishell *ms)
 {
 	char	*old_prompt;
 	char	*new_prompt;
-	char	*e;
 	char	p[PATH_MAX];
 
-	e = ft_itoa(ft_exit_code(-1));
 	getcwd(p, PATH_MAX);
 	old_prompt = ms->prompt;
-	new_prompt = ft_strjoin_all(7, "\001\e[32m\002[", e, "\001\e[32m\002]",
-			"\001\e[33m\002[", p, "\001\e[33m\002]\001\e[31m\002minishell",
-			"\001\e[37m\002$ ");
+	new_prompt = ft_strjoin_all(4, "\001\e[36m\002minishell:", "\001\e[33m\002",
+			p, "\001\e[37m\002$ ");
 	free(old_prompt);
-	free(e);
 	ms->prompt = new_prompt;
 }

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:41:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/05 01:25:49 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/11 01:37:19 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,8 @@ static int	ft_handle_quoted_token(char *str, int *i, t_token *tokens, int *j)
 	}
 	else
 		tokens[*j].value = ft_revalue_quoted_value(tokens[*j].value);
-	*i += 1;
+	if (str[*i] != '|' && str[*i] != '<' && str[*i] != '>')
+		*i += 1;
 	return (*i);
 }
 

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 00:04:02 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/07 08:08:36 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/10 08:05:20 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 int			ft_process_input_and_execute(t_minishell *ms);
 static int	ft_handle_and_tokenize_input(t_minishell *ms);
-static void	ft_find_stuck_cats(t_minishell *ms, t_node *node);
 
 /**
  * @brief  Process the user input and execute commands.
@@ -33,11 +32,8 @@ int	ft_process_input_and_execute(t_minishell *ms)
 		else
 			return (ft_putstr_and_return("minishell: unclosed quotes\n", 1));
 	}
-	if (ft_is_cat_pipeline(ms->tokens))
-		ms->tokens = ft_trim_tokens_before_pipe(ms->tokens, ms);
+	ft_trim_last_cat_sequence(ms);
 	ms->ast_root = ft_parse_ast(ms->tokens);
-	if (ms->in_pipe == false)
-		ft_find_stuck_cats(ms, ms->ast_root);
 	if (ms->ast_root)
 		ft_finalize_execution(ms);
 	return (0);
@@ -64,38 +60,4 @@ static int	ft_handle_and_tokenize_input(t_minishell *ms)
 	ft_revalue_tkn_var(ms);
 	ms->tokens = ft_handle_empty_tokens(ms->tokens);
 	return (0);
-}
-
-/**
- * @brief  Find and count stuck "cat" commands in the AST.
- * 
- * @param  ms    Pointer to the minishell structure.
- * @param  node  Current node in the AST.
- * @return void
- */
-static void	ft_find_stuck_cats(t_minishell *ms, t_node *node)
-{
-	t_node	*current;
-
-	current = node;
-	if (!current)
-		return ;
-	if (current->token->type == TKN_CMD && current->token->value[0] != '\0')
-	{
-		if (current->cmd_ready[1] == NULL
-			&& (!ft_strcmp(current->cmd_ready[0], "cat")
-				|| !ft_strcmp(current->cmd_ready[0], "/bin/cat"))
-			&& current->prev && current->prev->token->type == TKN_PIPE
-			&& (current->prev->left == current
-				|| (current->prev->prev
-					&& current->prev->prev->token->type == TKN_PIPE
-					&& current->prev->right == current)))
-			ms->c_stuck_cats++;
-	}
-	if (!current->left && !current->right)
-		return ;
-	ft_find_stuck_cats(ms, current->left);
-	if (!ms->c_stuck_cats)
-		return ;
-	ft_find_stuck_cats(ms, current->right);
 }
