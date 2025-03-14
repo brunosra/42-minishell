@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:27:32 by bschwell          #+#    #+#             */
-/*   Updated: 2025/03/14 02:43:52 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/14 03:43:56 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,11 +110,9 @@ void	ft_rsolve_rel_p(const char *base_p, const char *rel_p, char *res_p)
 static void	ft_cd_set_resolved_p(char **args, char *curpwd, char *res_p,
 				t_minishell *ms)
 {
-	if (args[1] == NULL && ms->n_args == 1)
+	if (args[1] == NULL)
 		ft_strncpy(res_p, ft_get_env("HOME", ms), PATH_MAX - 1);
-	else if (args[1] == NULL && ms->n_args == 2)
-		return ; // com probelmas, quando faz return aqui o PWD fica sem valor e o cd nao funciona masi, por exemplo (cd $SEMVALOR)
-	else if (args[2] == NULL && ms->n_args >= 2)
+	else if (args[2] == NULL)
 	{
 		if (!ft_strcmp(args[1], "-"))
 		{
@@ -124,6 +122,7 @@ static void	ft_cd_set_resolved_p(char **args, char *curpwd, char *res_p,
 				return ;
 			}
 			ft_strncpy(res_p, ft_get_env("OLDPWD", ms), PATH_MAX - 1);
+			printf("%s\n", res_p);
 		}
 		else if (!ft_strcmp(args[1], "~"))
 			ft_strncpy(res_p, ft_get_env("HOME", ms), PATH_MAX - 1);
