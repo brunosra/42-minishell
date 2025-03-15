@@ -11,7 +11,7 @@ LIBFT_DIR = libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
 # Compilador e flags
-CC = gcc
+CC = cc
 CFLAGS = -g -Wall -Wextra -Werror -I $(INC_DIR)
 LDFLAGS = -L$(LIBFT_DIR) -lft -L. -lreadline
 VALGRIND = valgrind --quiet --leak-check=full --show-leak-kinds=all --suppressions=readline.supp

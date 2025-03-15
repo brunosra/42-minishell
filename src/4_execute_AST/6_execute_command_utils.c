@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   6_execute_command_utils.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 03:00:36 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/08 04:46:47 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/15 15:07:16 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ static char	**ft_get_path_dirs(t_minishell *ms)
 {
 	if (!ft_get_env("PATH", ms))
 		return (NULL);
-	ms->env.env_paths = getenv("PATH");
+	ms->env.env_paths = ft_get_env("PATH", ms);
 	if (!ms->env.env_paths)
 		return (NULL);
 	return (ft_split(ms->env.env_paths, ':'));
