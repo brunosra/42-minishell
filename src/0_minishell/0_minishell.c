@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 23:48:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/14 04:15:17 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/17 19:15:51 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,34 +140,25 @@ static int	ft_readline(t_minishell *ms)
  * the current directory, and a fixed "minishell" label, with each component in 
  * specific colors. The prompt is then updated within the minishell structure.
  * 
- * The colors used are:
- * - Exit code: Green
- * - Current directory: Yellow
- * - The label "minishell": Red
- * - Prompt symbol "$": White
- * 
  * @param  ms  Pointer to the ms structure which contains the current prompt.
  * @return void
  * 
  * @note for exit_code in propmt @include / @replace:
- * 	char	*e;
- * 	e = ft_itoa(ft_exit_code(-1));
- * 	new_prompt = ft_strjoin_all(7, "\001\e[32m\002[", e, "\001\e[32m\002]",
-			"\001\e[33m\002[", p, "\001\e[33m\002]\001\e[31m\002minishell",
-			"\001\e[37m\002$ "); 
- *  fee(e);
- *	@see also handel_sihnal.c >> void	ft_signal_handler(int sig)
  */
 void	ft_create_prompt(t_minishell *ms)
 {
 	char	*old_prompt;
 	char	*new_prompt;
 	char	p[PATH_MAX];
+	char	*e;
 
+	e = ft_itoa(ft_exit_code(-1));
 	getcwd(p, PATH_MAX);
 	old_prompt = ms->prompt;
-	new_prompt = ft_strjoin_all(4, "\001\e[36m\002minishell:", "\001\e[33m\002",
+	new_prompt = ft_strjoin_all(8, "\001\e[31m\002[", "\001\e[37m\002", e,
+			"\001\e[31m\002]", "\001\e[36m\002minishell:", "\001\e[33m\002",
 			p, "\001\e[37m\002$ ");
 	free(old_prompt);
+	free(e);
 	ms->prompt = new_prompt;
 }

@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 23:12:04 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/13 18:55:32 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/17 19:17:14 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 # include "../libft/libft.h"
 # include "errors.h"
-# include "colors.h"
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <sys/wait.h>
@@ -168,6 +167,7 @@ t_node			*ft_parse_ast(t_token *tokens);
 t_node			*ft_create_cmd_node(t_token *token);
 t_node			*ft_create_operator_node(t_token *token, t_node *left,
 					t_node *right);
+t_node			*ft_create_cmd(t_token *tokens, int *i);
 /* 2_group_command_tokens.c */
 t_node			*ft_group_command_tokens(t_token *tokens, int *index);
 /* 3_group_command_tokens_utils.c */

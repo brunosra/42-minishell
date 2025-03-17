@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 01:43:53 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/09 03:36:41 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/17 18:56:52 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 t_node	*ft_create_cmd_node(t_token *token);
 t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right);
+t_node	*ft_create_cmd(t_token *tokens, int *i);
 
 /**
  * @brief  Creates a new command node in the AST.
@@ -63,4 +64,25 @@ t_node	*ft_create_operator_node(t_token *token, t_node *left, t_node *right)
 	node->file_unlink = false;
 	node->heredoc_stops = NULL;
 	return (node);
+}
+
+/**
+ * @brief Creates a command node from the tokens array.
+ * 
+ * @param tokens      Array of tokens to parse.
+ * @param i           Pointer to the current index in tokens.
+ * @return t_node*    Created command node.
+ */
+t_node	*ft_create_cmd(t_token *tokens, int *i)
+{
+	t_node	*cmd_node;
+
+	if (tokens[*i].type == TKN_BLTIN || tokens[*i].type == TKN_CMD)
+		cmd_node = ft_group_command_tokens(tokens, i);
+	else
+	{
+		cmd_node = ft_create_cmd_node(&tokens[*i]);
+		(*i)++;
+	}
+	return (cmd_node);
 }
