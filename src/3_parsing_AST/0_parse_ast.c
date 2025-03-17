@@ -6,7 +6,7 @@
 /*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 01:34:24 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/07 22:35:26 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/17 18:55:55 by tcosta-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,13 +164,7 @@ static t_node	*ft_handle_cmd_node(t_token *tokens, int *i, t_node **current,
 {
 	t_node	*cmd_node;
 
-	if (tokens[*i].type == TKN_BLTIN || tokens[*i].type == TKN_CMD)
-		cmd_node = ft_group_command_tokens(tokens, i);
-	else
-	{
-		cmd_node = ft_create_cmd_node(&tokens[*i]);
-		(*i)++;
-	}
+	cmd_node = ft_create_cmd(tokens, i);
 	if (!*root)
 		*root = cmd_node;
 	else if (*current && ((*current)->token->type == TKN_PIPE
@@ -179,9 +173,16 @@ static t_node	*ft_handle_cmd_node(t_token *tokens, int *i, t_node **current,
 			|| (*current)->token->type == TKN_HDOC
 			|| (*current)->token->type == TKN_EXCPT))
 		(*current)->right = cmd_node;
-	else if (tokens[*i].type != TKN_ARG
-		&& cmd_node->token->type != TKN_ARG)
-		(*current)->prev->left = cmd_node;
+	else if (tokens[*i].type != TKN_ARG && cmd_node->token->type != TKN_ARG)
+	{
+		if ((*current)->prev->left && (*current)->prev == *root)
+		{
+			ft_free_ast((*root)->left);
+			(*root)->left = cmd_node;
+		}
+		else
+			(*current)->prev->left = cmd_node;
+	}
 	cmd_node->prev = *current;
 	*current = cmd_node;
 	return (cmd_node);
