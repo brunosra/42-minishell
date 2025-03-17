@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_malloc.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcosta-f <tcosta-f@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: bschwell <bschwell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 22:18:13 by tcosta-f          #+#    #+#             */
-/*   Updated: 2025/03/11 06:26:08 by tcosta-f         ###   ########.fr       */
+/*   Updated: 2025/03/15 15:06:35 by bschwell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ void	ft_free_split(char **str)
 {
 	int	i;
 
-	if (!str || !*str)
+	if (!str)
 		return ;
 	i = 0;
 	while (str[i])
